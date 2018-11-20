@@ -1,13 +1,28 @@
 {
-    "authors": [
-        "Eyas Sharaiha"
-    ],
-    "devDependencies": {},
-    "dependencies": {
-        "@types/node": "^10.12.9",
-        "gulp": "^4.0.0",
-        "gulp-typescript": "^5.0.0-alpha.3",
-        "rxjs": "^6.3.3",
-        "typescript": "^3.1.6"
-    }
+  "name": "generate-schema-dts",
+  "displayName": "schema-dts Generator",
+  "authors": [
+    "Eyas Sharaiha"
+  ],
+  "devDependencies": {
+    "@types/node": "^10.12.9",
+    "gulp": "^4.0.0",
+    "gulp-typescript": "^5.0.0-alpha.3",
+    "clang-format": "^1.2.4",
+    "typescript": "^3.1.6",
+    "tslint": "^5.11.0"
+  },
+  "dependencies": {
+    "rxjs": "^6.3.3"
+  },
+  "peerDependencies": {
+    "typescript": "^3.1.6",
+    "tslint": "^5.11.0"
+  },
+  "keywords": [
+    "typescript",
+    "tsd",
+    "schema.org"
+  ],
+  "license": "Apache-2.0"
 }
