@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "strict": true,
-    "outDir": "../built/site/",
+    "outDir": "../built/",
     "target": "es2015",
     "module": "commonjs",
     "esModuleInterop": true,

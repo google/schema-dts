@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-const gulp = require("gulp");
-const tsc = require("gulp-typescript");
+const gulp = require('gulp');
+const tsc = require('gulp-typescript');
 
-const nodeProject = tsc.createProject("parser/tsconfig.json");
-gulp.task("build-parser", () => {
-  return nodeProject
-    .src()
-    .pipe(nodeProject())
-    .js.pipe(gulp.dest("built/parser"));
+const nodeProject = tsc.createProject('src/tsconfig.json');
+gulp.task('build-generator', () => {
+  return nodeProject.src().pipe(nodeProject()).js.pipe(gulp.dest('built'));
 });
