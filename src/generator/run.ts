@@ -15,7 +15,7 @@
  */
 import {closeSync, openSync, writeSync} from 'fs';
 import {groupBy, map, mergeMap, toArray} from 'rxjs/operators';
-import {createPrinter, createSourceFile, EmitHint, getCommentRange, getLeadingCommentRanges, getSyntheticLeadingComments, NewLineKind, ScriptKind, ScriptTarget, setSyntheticLeadingComments, transform, visitNode, visitNodes} from 'typescript';
+import {createPrinter, createSourceFile, EmitHint, NewLineKind, ScriptKind, ScriptTarget} from 'typescript';
 
 import {toScopedName} from './names';
 import {load} from './reader';

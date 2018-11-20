@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Node, setSyntheticLeadingComments, SyntaxKind, SynthesizedComment} from 'typescript';
+import {Node, setSyntheticLeadingComments, SyntaxKind} from 'typescript';
 
 export function withComments<T extends Node>(
     comment: string|undefined, node: T): T {
