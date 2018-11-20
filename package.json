@@ -1,0 +1,13 @@
+{
+    "authors": [
+        "Eyas Sharaiha"
+    ],
+    "devDependencies": {},
+    "dependencies": {
+        "@types/node": "^10.12.9",
+        "gulp": "^4.0.0",
+        "gulp-typescript": "^5.0.0-alpha.3",
+        "rxjs": "^6.3.3",
+        "typescript": "^3.1.6"
+    }
+}
