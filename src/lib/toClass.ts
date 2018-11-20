@@ -24,9 +24,13 @@ import {GetComment, GetSubClassOf, GetType, IsClass, IsProperty, TTypeName} from
 
 export type ClassMap = Map<string, Class>;
 
-export interface Grouped {
+export interface BySubject {
   Subject: TSubject;
   values: ObjectPredicate[];
+}
+export interface ByType {
+  type: TTypeName;
+  decls: BySubject[];
 }
 
 export class Class {
@@ -202,7 +206,7 @@ export class EnumValue {
   }
 }
 
-export function toClass(cls: Class, group: Grouped, map: ClassMap): Class {
+export function toClass(cls: Class, group: BySubject, map: ClassMap): Class {
   const rest: ObjectPredicate[] = [];
   for (const value of group.values) {
     const added = cls.add(value, map);
@@ -219,8 +223,7 @@ const wellKnownTypes = [
   new Builtin('Boolean', 'boolean')
 ];
 
-export function ProcessIfClass(input: {type: TTypeName; decls: Grouped[];}):
-    ClassMap|null {
+export function ProcessIfClass(input: ByType): ClassMap|null {
   if (IsClass(input.type)) {
     const ret = new Map<string, Class>();
     for (const wk of wellKnownTypes) {
@@ -245,8 +248,7 @@ export function ProcessIfClass(input: {type: TTypeName; decls: Grouped[];}):
   }
   return null;
 }
-export function ProcessClasses(
-    input: Array<{type: TTypeName; decls: Grouped[]}>): ClassMap {
+export function ProcessClasses(input: ByType[]): ClassMap {
   for (const elem of input) {
     const result = ProcessIfClass(elem);
     if (result) {
@@ -256,8 +258,7 @@ export function ProcessClasses(
   throw new Error('Unexpected: Expected a class');
 }
 
-export function FindProperties(
-    input: Array<{type: TTypeName; decls: Grouped[]}>): Grouped[] {
+export function FindProperties(input: ByType[]): BySubject[] {
   for (const elem of input) {
     if (IsProperty(elem.type)) return elem.decls;
   }

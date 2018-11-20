@@ -13,6 +13,8 @@
     "tslint": "^5.11.0"
   },
   "dependencies": {
+    "@types/argparse": "^1.0.35",
+    "argparse": "^1.0.10",
     "rxjs": "^6.3.3"
   },
   "peerDependencies": {

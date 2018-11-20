@@ -13,52 +13,77 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import {ArgumentParser} from 'argparse';
 import {closeSync, openSync, writeSync} from 'fs';
+import {OperatorFunction} from 'rxjs';
 import {groupBy, map, mergeMap, toArray} from 'rxjs/operators';
 import {createPrinter, createSourceFile, EmitHint, NewLineKind, ScriptKind, ScriptTarget} from 'typescript';
 
 import {toScopedName} from '../lib/names';
-import {EnumValue, FindProperties, Grouped, ProcessClasses} from '../lib/toClass';
+import {BySubject, ByType, EnumValue, FindProperties, ProcessClasses} from '../lib/toClass';
 import {Property, PropertyType} from '../lib/toProperty';
-import {ObjectPredicate} from '../lib/triple';
-import {FindType, IsClass, IsDataType, IsDomainIncludes, IsProperty, TTypeName} from '../lib/wellKnown';
+import {ObjectPredicate, toString, Triple} from '../lib/triple';
+import {FindType, IsClass, IsDataType, IsDomainIncludes, IsProperty} from '../lib/wellKnown';
 
 import {load} from './reader';
 
-async function main() {
-  const result = load();
-  const bySubject =
-      await result
-          .pipe(
-              groupBy(value => value.Subject.toString()),
-              mergeMap(
-                  group => group.pipe(
-                      toArray(),
-                      map(array => ({
-                            Subject: array[0].Subject,
-                            values: array.map(item => ({
-                                                Object: item.Object,
-                                                Predicate: item.Predicate
-                                              }))
-                          })))),
-              toArray())
-          .toPromise();
+interface Options {
+  verbose: boolean;
+  output: string;
+}
+function ParseFlags(): Options|undefined {
+  const parser = new ArgumentParser(
+      {version: '0.0.1', addHelp: true, description: 'schema-dts generator'});
+  parser.addArgument('--verbose', {defaultValue: false});
+  parser.addArgument('output', {
+    help: 'Path of file to be written with TypeScript ' +
+        'content. File will be overwritten if already found.'
+  });
+  return parser.parseArgs();
+}
 
-  const byType = new Map < string, {
-    type: TTypeName;
-    decls: Grouped[]
-  }
-  > ();
-  for (const value of bySubject) {
-    const type = FindType(value.Subject, value.values);
-    let mine = byType.get(type.toString());
-    if (!mine) {
-      mine = {type, decls: []};
-      byType.set(type.toString(), mine);
-    }
-    mine.decls.push(value);
-  }
-  const groups = Array.from(byType.values());
+function groupBySubject(): OperatorFunction<Triple, BySubject> {
+  return (observable) => observable.pipe(
+             groupBy(triple => triple.Subject.toString()),
+             mergeMap(
+                 group => group.pipe(
+                     toArray(),
+                     map(array => ({
+                           Subject: array[0].Subject,  // All are the same
+                           values: array.map(
+                               ({Object, Predicate}) => ({Predicate, Object}))
+                         })),
+
+                     )),
+         );
+}
+
+function groupByType(): OperatorFunction<BySubject, ByType> {
+  return (observable) => observable.pipe(
+             groupBy(
+                 bySubject =>
+                     FindType(bySubject.Subject, bySubject.values).toString()),
+             mergeMap(
+                 group => group.pipe(
+                     toArray(),
+                     map(array => ({
+                           type: FindType(array[0].Subject, array[0].values),
+                           decls: array
+                         })))));
+}
+
+async function main() {
+  const options = ParseFlags();
+  if (!options) return;
+
+  const result = load();
+  const groups = await result
+                     .pipe(
+                         groupBySubject(),
+                         groupByType(),
+                         toArray(),
+                         )
+                     .toPromise();
 
   const classes = ProcessClasses(groups);
   const props = FindProperties(groups);
@@ -71,9 +96,8 @@ async function main() {
       if (IsDomainIncludes(value.Predicate)) {
         const cls = classes.get(value.Object.toString());
         if (!cls) {
-          console.error(
-              'Could not find class for ' + prop.Subject.toString(), value);
-          continue;
+          throw new Error(`Could not find class for ${
+              prop.Subject.toString()}, ${toString(value)}.`);
         }
         cls.addProp(new Property(toScopedName(prop.Subject), property));
       } else if (!added) {
@@ -81,8 +105,11 @@ async function main() {
       }
     }
     // Go over RangeIncludes or DomainIncludes:
-    if (rest.length > 0) {
-      // console.log("Still unadded: ", prop.Subject, rest);
+    if (rest.length > 0 && options.verbose) {
+      console.log(`Still unadded: ${prop.Subject.toString()}:`);
+      for (const unadded of rest) {
+        console.log(`  ${toString(unadded)}`);
+      }
     }
   }
 
@@ -101,17 +128,17 @@ async function main() {
         if (!enumValue.add(v, classes)) skipped.push(v);
       }
 
-      if (skipped.length > 0) {
-        console.error(`Did not process: `, skipped);
+      if (skipped.length > 0 && options.verbose) {
+        console.error(`Did not process: `, skipped.map(toString));
       }
     }
   }
 
 
-  const t = openSync('./out.ts', 'w');
+  const t = openSync(options.output, 'w');
   writeSync(t, '// tslint:disable\n\n');
   const source = createSourceFile(
-      'out.ts', '', ScriptTarget.ES2015, /*setParentNodes=*/false,
+      options.output, '', ScriptTarget.ES2015, /*setParentNodes=*/false,
       ScriptKind.TS);
   const printer = createPrinter({newLine: NewLineKind.LineFeed});
 
@@ -128,10 +155,9 @@ async function main() {
 
 main()
     .then(() => {
-      console.log('Done');
       process.exit();
     })
     .catch(e => {
-      console.log(e);
+      console.error(e);
       process.abort();
     });

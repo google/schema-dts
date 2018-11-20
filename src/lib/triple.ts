@@ -29,3 +29,10 @@ export interface ObjectPredicate {
   Object: TObject;
   Predicate: TPredicate;
 }
+
+export function toString(o: Triple|ObjectPredicate): string {
+  return ((o as Triple).Subject) ?
+      `{ ${(o as Triple).Subject.toString()} ${o.Predicate.toString()} ${
+          o.Object.toString()} }` :
+      `{ Predicate: ${o.Predicate.toString()} Object: ${o.Object.toString()}}`;
+}
