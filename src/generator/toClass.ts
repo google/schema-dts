@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import {createEnumDeclaration, createEnumMember, createIntersectionTypeNode, createKeywordTypeNode, createModifiersFromModifierFlags, createParenthesizedType, createStringLiteral, createTypeAliasDeclaration, createTypeLiteralNode, createTypeReferenceNode, createUnionTypeNode, EnumDeclaration, ModifierFlags, SyntaxKind, TypeNode} from 'typescript';
+
+import {withComments} from './comments';
 import {toClassName, toEnumName, toScopedName} from './names';
 import {Property, PropertyType} from './toProperty';
 import {ObjectPredicate, TObject, TPredicate, TSubject} from './triple';
@@ -27,7 +30,7 @@ export interface Grouped {
 }
 
 export class Class {
-  private readonly comments: string[] = [];
+  private comment?: string;
   private readonly parents: string[] = [];
   private readonly _props: Property[] = [];
   private readonly _enums: EnumValue[] = [];
@@ -50,7 +53,11 @@ export class Class {
       classMap: ClassMap): boolean {
     const c = GetComment(value);
     if (c) {
-      this.comments.push(c.comment);
+      if (this.comment) {
+        throw new Error(`Trying to add comment on class ${
+            this.subject.toString()} but one already exists.`);
+      }
+      this.comment = c.comment;
       return true;
     }
     const s = GetSubClassOf(value);
@@ -77,42 +84,66 @@ export class Class {
     this._enums.push(e);
   }
 
-  toString(): string {
-    const sb = new StringBuilder();
+  private nonEnumType(): TypeNode {
+    // Parent Part.
+    const parentTypes =
+        this.parents.map(parent => createTypeReferenceNode(parent, []));
+    const parentNode = parentTypes.length === 0 ?
+        null :
+        parentTypes.length === 1 ? parentTypes[0] :
+                                   createUnionTypeNode(parentTypes);
 
-    this.enumPart(sb);
-    buildCommentString(sb, this.comments);
-    this.classPart(sb);
-    sb.push('\n\n');
-    return sb.join('');
-  }
+    // Properties part.
+    const propLiteral =
+        createTypeLiteralNode(this.properties().map(prop => prop.toNode()));
 
-  private joinParen(arr: string[], joiner: string): string {
-    if (arr.length === 0) return '';
-    if (arr.length === 1) return arr[0];
-    return `(${arr.join(joiner)})`;
-  }
-
-  private classPart(sb: StringBuilder): void {
-    const props = this.properties();
-    const isEnum = this._enums.length > 0;
-    sb.push(
-        'export type ', toClassName(this.subject), ' = ',
-        isEnum ? `${toClassName(this.subject)}Enum | (` : '',
-        this.joinParen(this.parents, '|'));
-    if (props.length > 0) {
-      sb.push(' & {\n', ...props.map(p => p.toString()), '}');
+    if (parentNode && propLiteral.members.length > 0) {
+      return createIntersectionTypeNode([parentNode, propLiteral]);
+    } else if (parentNode) {
+      return parentNode;
+    } else if (propLiteral.members.length > 0) {
+      return propLiteral;
+    } else {
+      return createKeywordTypeNode(SyntaxKind.NeverKeyword);
     }
-    if (isEnum) sb.push(')');
-    sb.push(';\n');
   }
 
-  private enumPart(sb: StringBuilder): void {
-    if (this._enums.length === 0) return;
-    const className = toClassName(this.subject);
-    sb.push(
-        `export enum ${className}Enum {\n`,
-        this._enums.map(e => e.toString()).join(',\n'), '\n}\n');
+  private totalType(): TypeNode {
+    const isEnum = this._enums.length > 0;
+
+    if (isEnum) {
+      return createUnionTypeNode([
+        createTypeReferenceNode(toClassName(this.subject) + 'Enum', []),
+        createParenthesizedType(this.nonEnumType()),
+      ]);
+    } else {
+      return this.nonEnumType();
+    }
+  }
+
+  private enumType(): EnumDeclaration|undefined {
+    if (this._enums.length === 0) return undefined;
+
+    return createEnumDeclaration(
+        /* decorators= */[],
+        createModifiersFromModifierFlags(ModifierFlags.Export),
+        toClassName(this.subject) + 'Enum', this._enums.map(e => e.toNode()));
+  }
+
+  toNode() {
+    const typeValue: TypeNode = this.totalType();
+    const enumType = this.enumType();
+    const declaration = withComments(
+        this.comment,
+        createTypeAliasDeclaration(
+            /* decorators = */[],
+            createModifiersFromModifierFlags(ModifierFlags.Export),
+            toClassName(this.subject),
+            [],
+            typeValue,
+            ));
+
+    return enumType ? [enumType, declaration] : [declaration];
   }
 }
 
@@ -122,19 +153,18 @@ export class Builtin extends Class {
       private readonly doc?: string) {
     super(new SchemaObject(name));
   }
-  toString() {
-    return `${this.doc ? `/** ${this.doc} */` : ''}
-export type ${this.name} = ${this.equivTo};
-`;
-  }
 
-  validateType() {}
+  toNode() {
+    return [createTypeAliasDeclaration(
+        [], createModifiersFromModifierFlags(ModifierFlags.Export), this.name,
+        [], createTypeReferenceNode(this.equivTo, []))];
+  }
 }
 
 export class EnumValue {
   readonly INSTANCE = 'EnumValue';
 
-  private readonly comments: string[] = [];
+  private comment?: string;
   constructor(private readonly value: TSubject) {}
 
   add(value: ObjectPredicate, map: ClassMap) {
@@ -152,26 +182,23 @@ export class EnumValue {
     // Comment.
     const comment = GetComment(value);
     if (comment) {
-      this.comments.push(comment.comment);
+      if (this.comment) {
+        throw new Error(`Attempt to add comment on ${
+            this.value.toString()} enum but one already exists.`);
+      }
+      this.comment = comment.comment;
       return true;
     }
 
     return false;
   }
 
-  toString() {
-    const sb = new StringBuilder();
-    buildCommentString(sb, this.comments);
-    sb.push(`${toEnumName(this.value)} = "${this.value.toString()}"`);
-    return sb.join('');
-  }
-}
-
-class StringBuilder extends Array<string> {}
-
-function buildCommentString(sb: StringBuilder, comments: string[]) {
-  if (comments) {
-    sb.push('/**\n', ...comments.map(comment => ` * ${comment}\n`), '*/\n');
+  toNode() {
+    return withComments(
+        this.comment,
+        createEnumMember(
+            toEnumName(this.value),
+            createStringLiteral(this.value.toString())));
   }
 }
 

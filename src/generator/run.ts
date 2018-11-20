@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 import {closeSync, openSync, writeSync} from 'fs';
-import {groupBy, map, mergeMap, skip, toArray} from 'rxjs/operators';
+import {groupBy, map, mergeMap, toArray} from 'rxjs/operators';
+import {createPrinter, createSourceFile, EmitHint, getCommentRange, getLeadingCommentRanges, getSyntheticLeadingComments, NewLineKind, ScriptKind, ScriptTarget, setSyntheticLeadingComments, transform, visitNode, visitNodes} from 'typescript';
 
-import {toClassName, toScopedName} from './names';
+import {toScopedName} from './names';
 import {load} from './reader';
 import {EnumValue, FindProperties, Grouped, ProcessClasses} from './toClass';
 import {Property, PropertyType} from './toProperty';
 import {ObjectPredicate} from './triple';
-import {SchemaObject, SchemaSource} from './types';
-import {EnsureSubject, FindType, IsClass, IsDataType, IsDomainIncludes, IsProperty, TTypeName} from './wellKnown';
+import {FindType, IsClass, IsDataType, IsDomainIncludes, IsProperty, TTypeName} from './wellKnown';
 
 async function main() {
   const result = load();
@@ -106,9 +106,21 @@ async function main() {
     }
   }
 
+
   const t = openSync('./out.ts', 'w');
+  writeSync(t, '// tslint:disable\n\n');
+  const source = createSourceFile(
+      'out.ts', '', ScriptTarget.ES2015, /*setParentNodes=*/false,
+      ScriptKind.TS);
+  const printer = createPrinter({newLine: NewLineKind.LineFeed});
+
   for (const cls of classes.entries()) {
-    writeSync(t, cls[1].toString());
+    for (const node of cls[1].toNode()) {
+      const result = printer.printNode(EmitHint.Unspecified, node, source);
+      writeSync(t, result);
+      writeSync(t, '\n');
+    }
+    writeSync(t, '\n');
   }
   closeSync(t);
 }
