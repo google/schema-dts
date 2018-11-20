@@ -16,8 +16,8 @@
 import https from 'https';
 import {Observable} from 'rxjs';
 
-import {TObject, TPredicate, Triple, TSubject} from './triple';
-import {Rdfs, RdfSchema, RdfSyntax, SchemaObject, SchemaSource, SchemaString, W3CNameSpaced, W3cSkos, WikidataConst} from './types';
+import {TObject, TPredicate, Triple, TSubject} from '../lib/triple';
+import {Rdfs, RdfSchema, RdfSyntax, SchemaObject, SchemaSource, SchemaString, W3CNameSpaced, W3cSkos, WikidataConst} from '../lib/types';
 
 function verify<T>(
     content: string, ...rest: Array<(content: string) => T | null>): T {

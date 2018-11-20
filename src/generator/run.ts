@@ -17,12 +17,13 @@ import {closeSync, openSync, writeSync} from 'fs';
 import {groupBy, map, mergeMap, toArray} from 'rxjs/operators';
 import {createPrinter, createSourceFile, EmitHint, NewLineKind, ScriptKind, ScriptTarget} from 'typescript';
 
-import {toScopedName} from './names';
+import {toScopedName} from '../lib/names';
+import {EnumValue, FindProperties, Grouped, ProcessClasses} from '../lib/toClass';
+import {Property, PropertyType} from '../lib/toProperty';
+import {ObjectPredicate} from '../lib/triple';
+import {FindType, IsClass, IsDataType, IsDomainIncludes, IsProperty, TTypeName} from '../lib/wellKnown';
+
 import {load} from './reader';
-import {EnumValue, FindProperties, Grouped, ProcessClasses} from './toClass';
-import {Property, PropertyType} from './toProperty';
-import {ObjectPredicate} from './triple';
-import {FindType, IsClass, IsDataType, IsDomainIncludes, IsProperty, TTypeName} from './wellKnown';
 
 async function main() {
   const result = load();
