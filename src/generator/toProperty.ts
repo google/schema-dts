@@ -18,9 +18,9 @@ import {TObject, TPredicate, TSubject} from './triple';
 import {GetComment, GetType, IsRangeIncludes} from './wellKnown';
 
 export class PropertyType {
-  public readonly comments: string[] = [];
-  public readonly types: TObject[] = [];
-  constructor(public readonly subect: TSubject, object?: TObject) {
+  readonly comments: string[] = [];
+  readonly types: TObject[] = [];
+  constructor(readonly subect: TSubject, object?: TObject) {
     if (object) this.types.push(object);
   }
 

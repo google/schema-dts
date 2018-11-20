@@ -97,8 +97,9 @@ export function FindType(key: TSubject, values: ObjectPredicate[]): TTypeName {
 }
 
 export function EnsureSubject(type: TTypeName): TSubject {
-  if (type.type === 'RdfSntax' || type.type === 'RdfSchema')
+  if (type.type === 'RdfSntax' || type.type === 'RdfSchema') {
     throw new Error(`Expected ${type.toString()} to be a Subject.`);
+  }
   return type;
 }
 
