@@ -13,24 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { toClassName, toScopedName, toEnumName } from "./names";
-import { Property, PropertyType } from "./toProperty";
-import { ObjectPredicate, TObject, TPredicate, TSubject } from "./triple";
-import { SchemaObject, SchemaString } from "./types";
-import {
-  GetComment,
-  GetSubClassOf,
-  GetType,
-  IsClass,
-  IsProperty,
-  TTypeName
-} from "./wellKnown";
+import {toClassName, toEnumName, toScopedName} from './names';
+import {Property, PropertyType} from './toProperty';
+import {ObjectPredicate, TObject, TPredicate, TSubject} from './triple';
+import {SchemaObject, SchemaString} from './types';
+import {GetComment, GetSubClassOf, GetType, IsClass, IsProperty, TTypeName} from './wellKnown';
 
 export type ClassMap = Map<string, Class>;
 
 export interface Grouped {
   Subject: TSubject;
-  values: Array<ObjectPredicate>;
+  values: ObjectPredicate[];
 }
 
 export class Class {
@@ -41,25 +34,20 @@ export class Class {
   private isLeaf = true;
 
   properties() {
-    return this.isLeaf
-      ? [
+    return this.isLeaf ?
+        [
           new Property(
-            "@type",
-            new PropertyType(
-              this.subject,
-              new SchemaString(toScopedName(this.subject))
-            )
-          ),
+              '@type',
+              new PropertyType(
+                  this.subject, new SchemaString(toScopedName(this.subject)))),
           ...this._props
-        ]
-      : this._props;
+        ] :
+        this._props;
   }
 
-  constructor(public readonly subject: TSubject) {}
-  add(
-    value: { Predicate: TPredicate; Object: TObject },
-    classMap: ClassMap
-  ): boolean {
+  constructor(readonly subject: TSubject) {}
+  add(value: {Predicate: TPredicate; Object: TObject},
+      classMap: ClassMap): boolean {
     const c = GetComment(value);
     if (c) {
       this.comments.push(c.comment);
@@ -72,14 +60,13 @@ export class Class {
       if (parentClass) {
         parentClass.isLeaf = false;
       } else {
-        throw new Error(
-          `Couldn't find parent of ${this.subject.toString()}, ${s.subClassOf.toString()}`
-        );
+        throw new Error(`Couldn't find parent of ${this.subject.toString()}, ${
+            s.subClassOf.toString()}`);
       }
       return true;
     }
 
-    if (GetType(value)) return true; // We used types already.
+    if (GetType(value)) return true;  // We used types already.
 
     return false;
   }
@@ -96,12 +83,12 @@ export class Class {
     this.enumPart(sb);
     buildCommentString(sb, this.comments);
     this.classPart(sb);
-    sb.push("\n\n");
-    return sb.join("");
+    sb.push('\n\n');
+    return sb.join('');
   }
 
   private joinParen(arr: string[], joiner: string): string {
-    if (arr.length === 0) return "";
+    if (arr.length === 0) return '';
     if (arr.length === 1) return arr[0];
     return `(${arr.join(joiner)})`;
   }
@@ -110,40 +97,33 @@ export class Class {
     const props = this.properties();
     const isEnum = this._enums.length > 0;
     sb.push(
-      "export type ",
-      toClassName(this.subject),
-      " = ",
-      isEnum ? `${toClassName(this.subject)}Enum | (` : "",
-      this.joinParen(this.parents, "|")
-    );
+        'export type ', toClassName(this.subject), ' = ',
+        isEnum ? `${toClassName(this.subject)}Enum | (` : '',
+        this.joinParen(this.parents, '|'));
     if (props.length > 0) {
-      sb.push(" & {\n", ...props.map(p => p.toString()), "}");
+      sb.push(' & {\n', ...props.map(p => p.toString()), '}');
     }
-    if (isEnum) sb.push(")");
-    sb.push(";\n");
+    if (isEnum) sb.push(')');
+    sb.push(';\n');
   }
 
   private enumPart(sb: StringBuilder): void {
     if (this._enums.length === 0) return;
     const className = toClassName(this.subject);
     sb.push(
-      `export enum ${className}Enum {\n`,
-      this._enums.map(e => e.toString()).join(",\n"),
-      "\n}\n"
-    );
+        `export enum ${className}Enum {\n`,
+        this._enums.map(e => e.toString()).join(',\n'), '\n}\n');
   }
 }
 
 export class Builtin extends Class {
   constructor(
-    private readonly name: string,
-    private readonly equivTo: string,
-    private readonly doc?: string
-  ) {
+      private readonly name: string, private readonly equivTo: string,
+      private readonly doc?: string) {
     super(new SchemaObject(name));
   }
   toString() {
-    return `${this.doc ? `/** ${this.doc} */` : ""}
+    return `${this.doc ? `/** ${this.doc} */` : ''}
 export type ${this.name} = ${this.equivTo};
 `;
   }
@@ -152,7 +132,7 @@ export type ${this.name} = ${this.equivTo};
 }
 
 export class EnumValue {
-  readonly Instance = "EnumValue";
+  readonly INSTANCE = 'EnumValue';
 
   private readonly comments: string[] = [];
   constructor(private readonly value: TSubject) {}
@@ -162,8 +142,9 @@ export class EnumValue {
     const type = GetType(value);
     if (type) {
       const enumObject = map.get(type.toString());
-      if (!enumObject)
+      if (!enumObject) {
         throw new Error(`Couldn't find ${type.toString()} in classes.`);
+      }
       enumObject.addEnum(this);
       return true;
     }
@@ -182,7 +163,7 @@ export class EnumValue {
     const sb = new StringBuilder();
     buildCommentString(sb, this.comments);
     sb.push(`${toEnumName(this.value)} = "${this.value.toString()}"`);
-    return sb.join("");
+    return sb.join('');
   }
 }
 
@@ -190,12 +171,12 @@ class StringBuilder extends Array<string> {}
 
 function buildCommentString(sb: StringBuilder, comments: string[]) {
   if (comments) {
-    sb.push("/**\n", ...comments.map(comment => ` * ${comment}\n`), "*/\n");
+    sb.push('/**\n', ...comments.map(comment => ` * ${comment}\n`), '*/\n');
   }
 }
 
 export function toClass(cls: Class, group: Grouped, map: ClassMap): Class {
-  const rest: Array<ObjectPredicate> = [];
+  const rest: ObjectPredicate[] = [];
   for (const value of group.values) {
     const added = cls.add(value, map);
     if (!added) rest.push(value);
@@ -204,20 +185,15 @@ export function toClass(cls: Class, group: Grouped, map: ClassMap): Class {
 }
 
 const wellKnownTypes = [
-  new Builtin("Text", "string"),
-  new Builtin("Number", "number"),
+  new Builtin('Text', 'string'), new Builtin('Number', 'number'),
   new Builtin(
-    "Time",
-    "string",
-    "DateTime represented in string, e.g. 2017-01-04T17:10:00-05:00."
-  ),
-  new Builtin("Boolean", "boolean")
+      'Time', 'string',
+      'DateTime represented in string, e.g. 2017-01-04T17:10:00-05:00.'),
+  new Builtin('Boolean', 'boolean')
 ];
 
-export function ProcessIfClass(input: {
-  type: TTypeName;
-  decls: Grouped[];
-}): ClassMap | null {
+export function ProcessIfClass(input: {type: TTypeName; decls: Grouped[];}):
+    ClassMap|null {
   if (IsClass(input.type)) {
     const ret = new Map<string, Class>();
     for (const wk of wellKnownTypes) {
@@ -243,22 +219,20 @@ export function ProcessIfClass(input: {
   return null;
 }
 export function ProcessClasses(
-  input: Array<{ type: TTypeName; decls: Grouped[] }>
-): ClassMap {
+    input: Array<{type: TTypeName; decls: Grouped[]}>): ClassMap {
   for (const elem of input) {
     const result = ProcessIfClass(elem);
     if (result) {
       return result;
     }
   }
-  throw new Error("Unexpected: Expected a class");
+  throw new Error('Unexpected: Expected a class');
 }
 
 export function FindProperties(
-  input: Array<{ type: TTypeName; decls: Grouped[] }>
-): Grouped[] {
+    input: Array<{type: TTypeName; decls: Grouped[]}>): Grouped[] {
   for (const elem of input) {
     if (IsProperty(elem.type)) return elem.decls;
   }
-  throw new Error("Unexpected: Expected a property");
+  throw new Error('Unexpected: Expected a property');
 }

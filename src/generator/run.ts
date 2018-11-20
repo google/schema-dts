@@ -13,51 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { closeSync, openSync, writeSync } from "fs";
-import { groupBy, map, mergeMap, toArray, skip } from "rxjs/operators";
-import { toScopedName, toClassName } from "./names";
-import { load } from "./reader";
-import { FindProperties, Grouped, ProcessClasses, EnumValue } from "./toClass";
-import { Property, PropertyType } from "./toProperty";
-import { ObjectPredicate } from "./triple";
-import {
-  FindType,
-  IsDomainIncludes,
-  TTypeName,
-  IsClass,
-  IsProperty,
-  IsDataType,
-  EnsureSubject
-} from "./wellKnown";
-import { SchemaObject, SchemaSource } from "./types";
+import {closeSync, openSync, writeSync} from 'fs';
+import {groupBy, map, mergeMap, skip, toArray} from 'rxjs/operators';
+
+import {toClassName, toScopedName} from './names';
+import {load} from './reader';
+import {EnumValue, FindProperties, Grouped, ProcessClasses} from './toClass';
+import {Property, PropertyType} from './toProperty';
+import {ObjectPredicate} from './triple';
+import {SchemaObject, SchemaSource} from './types';
+import {EnsureSubject, FindType, IsClass, IsDataType, IsDomainIncludes, IsProperty, TTypeName} from './wellKnown';
 
 async function main() {
   const result = load();
-  const bySubject = await result
-    .pipe(
-      groupBy(value => value.Subject.toString()),
-      mergeMap(group =>
-        group.pipe(
-          toArray(),
-          map(array => ({
-            Subject: array[0].Subject,
-            values: array.map(item => ({
-              Object: item.Object,
-              Predicate: item.Predicate
-            }))
-          }))
-        )
-      ),
-      toArray()
-    )
-    .toPromise();
+  const bySubject =
+      await result
+          .pipe(
+              groupBy(value => value.Subject.toString()),
+              mergeMap(
+                  group => group.pipe(
+                      toArray(),
+                      map(array => ({
+                            Subject: array[0].Subject,
+                            values: array.map(item => ({
+                                                Object: item.Object,
+                                                Predicate: item.Predicate
+                                              }))
+                          })))),
+              toArray())
+          .toPromise();
 
-  const byType = new Map<string, { type: TTypeName; decls: Grouped[] }>();
+  const byType = new Map < string, {
+    type: TTypeName;
+    decls: Grouped[]
+  }
+  > ();
   for (const value of bySubject) {
     const type = FindType(value.Subject, value.values);
     let mine = byType.get(type.toString());
     if (!mine) {
-      mine = { type, decls: [] };
+      mine = {type, decls: []};
       byType.set(type.toString(), mine);
     }
     mine.decls.push(value);
@@ -76,9 +71,7 @@ async function main() {
         const cls = classes.get(value.Object.toString());
         if (!cls) {
           console.error(
-            "Could not find class for " + prop.Subject.toString(),
-            value
-          );
+              'Could not find class for ' + prop.Subject.toString(), value);
           continue;
         }
         cls.addProp(new Property(toScopedName(prop.Subject), property));
@@ -88,7 +81,7 @@ async function main() {
     }
     // Go over RangeIncludes or DomainIncludes:
     if (rest.length > 0) {
-      //console.log("Still unadded: ", prop.Subject, rest);
+      // console.log("Still unadded: ", prop.Subject, rest);
     }
   }
 
@@ -113,7 +106,7 @@ async function main() {
     }
   }
 
-  const t = openSync("./out.ts", "w");
+  const t = openSync('./out.ts', 'w');
   for (const cls of classes.entries()) {
     writeSync(t, cls[1].toString());
   }
@@ -121,11 +114,11 @@ async function main() {
 }
 
 main()
-  .then(() => {
-    console.log("Done");
-    process.exit();
-  })
-  .catch(e => {
-    console.log(e);
-    process.abort();
-  });
+    .then(() => {
+      console.log('Done');
+      process.exit();
+    })
+    .catch(e => {
+      console.log(e);
+      process.abort();
+    });

@@ -13,33 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {
-  SchemaObject,
-  SchemaSource,
-  W3CNameSpaced,
-  RdfSchema,
-  RdfSyntax,
-  W3cSkos,
-  SchemaString,
-  Rdfs,
-  WikidataConst
-} from "./types";
+import {Rdfs, RdfSchema, RdfSyntax, SchemaObject, SchemaSource, SchemaString, W3CNameSpaced, W3cSkos, WikidataConst} from './types';
 
 export interface Triple {
-  readonly Subject: SchemaObject | SchemaSource | W3CNameSpaced;
-  readonly Predicate: RdfSchema | RdfSyntax | SchemaObject | W3cSkos;
-  readonly Object:
-    | SchemaObject
-    | SchemaSource
-    | SchemaString
-    | RdfSchema
-    | RdfSyntax
-    | Rdfs
-    | WikidataConst
-    | W3CNameSpaced;
+  readonly Subject: SchemaObject|SchemaSource|W3CNameSpaced;
+  readonly Predicate: RdfSchema|RdfSyntax|SchemaObject|W3cSkos;
+  readonly Object:|SchemaObject|SchemaSource|SchemaString|RdfSchema|RdfSyntax|
+      Rdfs|WikidataConst|W3CNameSpaced;
 }
-export type TSubject = Triple["Subject"];
-export type TPredicate = Triple["Predicate"];
-export type TObject = Triple["Object"];
+export type TSubject = Triple['Subject'];
+export type TPredicate = Triple['Predicate'];
+export type TObject = Triple['Object'];
 
-export type ObjectPredicate = { Object: TObject; Predicate: TPredicate };
+export interface ObjectPredicate {
+  Object: TObject;
+  Predicate: TPredicate;
+}
