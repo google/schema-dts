@@ -75,7 +75,7 @@ export class Property {
         createPropertySignature(
             /* modifiers= */[],
             createStringLiteral(this.key),
-            this.required() ? createToken(SyntaxKind.QuestionToken) : undefined,
+            this.required() ? undefined : createToken(SyntaxKind.QuestionToken),
             /*typeNode=*/this.typeNode(),
             /*initializer=*/undefined,
             ));
