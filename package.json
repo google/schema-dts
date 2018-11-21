@@ -15,7 +15,9 @@
   "dependencies": {
     "@types/argparse": "^1.0.35",
     "argparse": "^1.0.10",
-    "rxjs": "^6.3.3"
+    "child_process": "^1.0.2",
+    "rxjs": "^6.3.3",
+    "through2": "^3.0.0"
   },
   "peerDependencies": {
     "typescript": "^3.1.6",

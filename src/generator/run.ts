@@ -29,16 +29,11 @@ import {load} from './reader';
 
 interface Options {
   verbose: boolean;
-  output: string;
 }
 function ParseFlags(): Options|undefined {
   const parser = new ArgumentParser(
       {version: '0.0.1', addHelp: true, description: 'schema-dts generator'});
   parser.addArgument('--verbose', {defaultValue: false});
-  parser.addArgument('output', {
-    help: 'Path of file to be written with TypeScript ' +
-        'content. File will be overwritten if already found.'
-  });
   return parser.parseArgs();
 }
 
@@ -106,9 +101,9 @@ async function main() {
     }
     // Go over RangeIncludes or DomainIncludes:
     if (rest.length > 0 && options.verbose) {
-      console.log(`Still unadded: ${prop.Subject.toString()}:`);
+      console.error(`Still unadded: ${prop.Subject.toString()}:`);
       for (const unadded of rest) {
-        console.log(`  ${toString(unadded)}`);
+        console.error(`  ${toString(unadded)}`);
       }
     }
   }
@@ -134,23 +129,24 @@ async function main() {
     }
   }
 
-
-  const t = openSync(options.output, 'w');
-  writeSync(t, '// tslint:disable\n\n');
+  write('// tslint:disable\n\n');
   const source = createSourceFile(
-      options.output, '', ScriptTarget.ES2015, /*setParentNodes=*/false,
+      'result.ts', '', ScriptTarget.ES2015, /*setParentNodes=*/false,
       ScriptKind.TS);
   const printer = createPrinter({newLine: NewLineKind.LineFeed});
 
   for (const cls of classes.entries()) {
     for (const node of cls[1].toNode()) {
       const result = printer.printNode(EmitHint.Unspecified, node, source);
-      writeSync(t, result);
-      writeSync(t, '\n');
+      write(result);
+      write('\n');
     }
-    writeSync(t, '\n');
+    write('\n');
   }
-  closeSync(t);
+}
+
+function write(content: string) {
+  process.stdout.write(content, 'utf-8');
 }
 
 main()
