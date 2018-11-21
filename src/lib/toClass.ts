@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {createEnumDeclaration, createEnumMember, createIntersectionTypeNode, createKeywordTypeNode, createModifiersFromModifierFlags, createParenthesizedType, createStringLiteral, createTypeAliasDeclaration, createTypeLiteralNode, createTypeReferenceNode, createUnionTypeNode, EnumDeclaration, ModifierFlags, SyntaxKind, TypeNode} from 'typescript';
+import {createEnumDeclaration, createEnumMember, createIntersectionTypeNode, createKeywordTypeNode, createModifiersFromModifierFlags, createParenthesizedType, createStringLiteral, createTypeAliasDeclaration, createTypeLiteralNode, createTypeReferenceNode, createUnionTypeNode, EnumDeclaration, ModifierFlags, Statement, SyntaxKind, TypeAliasDeclaration, TypeNode} from 'typescript';
 
 import {withComments} from './comments';
 import {toClassName, toEnumName, toScopedName} from './names';
@@ -33,15 +33,33 @@ export interface ByType {
   decls: BySubject[];
 }
 
+function arrayOf<T>(...args: Array<T|undefined|null>): T[] {
+  return args.filter(
+      (elem): elem is T => elem !== null && typeof elem !== 'undefined');
+}
+
 export class Class {
   private comment?: string;
-  private readonly parents: string[] = [];
+  private readonly children: Class[] = [];
+  private readonly parents: Class[] = [];
   private readonly _props: Property[] = [];
   private readonly _enums: EnumValue[] = [];
-  private isLeaf = true;
+
+  private aliasesBuiltin(): boolean {
+    for (const parent of this.parents) {
+      if (parent instanceof Builtin || parent.aliasesBuiltin()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  isLeaf(): boolean {
+    return this.children.length === 0 && !this.aliasesBuiltin();
+  }
 
   properties() {
-    return this.isLeaf ?
+    return this.isLeaf() ?
         [
           new Property(
               '@type',
@@ -50,6 +68,16 @@ export class Class {
           ...this._props
         ] :
         this._props;
+  }
+
+  protected baseName() {
+    return toClassName(this.subject) + 'Base';
+  }
+  private enumName() {
+    return toClassName(this.subject) + 'Enum';
+  }
+  private className() {
+    return toClassName(this.subject);
   }
 
   constructor(readonly subject: TSubject) {}
@@ -66,10 +94,10 @@ export class Class {
     }
     const s = GetSubClassOf(value);
     if (s) {
-      this.parents.push(toClassName(s.subClassOf));
       const parentClass = classMap.get(s.subClassOf.toString());
       if (parentClass) {
-        parentClass.isLeaf = false;
+        this.parents.push(parentClass);
+        parentClass.children.push(this);
       } else {
         throw new Error(`Couldn't find parent of ${this.subject.toString()}, ${
             s.subClassOf.toString()}`);
@@ -88,18 +116,18 @@ export class Class {
     this._enums.push(e);
   }
 
-  private nonEnumType(): TypeNode {
-    // Parent Part.
-    const parentTypes =
-        this.parents.map(parent => createTypeReferenceNode(parent, []));
-    const parentNode = parentTypes.length === 0 ?
-        null :
-        parentTypes.length === 1 ? parentTypes[0] :
-                                   createUnionTypeNode(parentTypes);
-
+  private baseNode(): TypeNode {
     // Properties part.
     const propLiteral =
         createTypeLiteralNode(this.properties().map(prop => prop.toNode()));
+
+    const parentTypes = this.parents.map(
+        parent => createTypeReferenceNode(parent.baseName(), []));
+    const parentNode = parentTypes.length === 0 ?
+        null :
+        parentTypes.length === 1 ?
+        parentTypes[0] :
+        createParenthesizedType(createIntersectionTypeNode(parentTypes));
 
     if (parentNode && propLiteral.members.length > 0) {
       return createIntersectionTypeNode([parentNode, propLiteral]);
@@ -112,12 +140,38 @@ export class Class {
     }
   }
 
+  private baseDecl(): TypeAliasDeclaration {
+    const baseNode = this.baseNode();
+
+    return createTypeAliasDeclaration(
+        /*decorators=*/[], /*modifiers=*/[], this.baseName(),
+        /*typeParameters=*/[], baseNode);
+  }
+
+  private nonEnumType(): TypeNode {
+    const children = this.children.map(
+        child =>
+            createTypeReferenceNode(child.className(), /*typeArguments=*/[]));
+
+    const childrenNode = children.length === 0 ?
+        null :
+        children.length === 1 ?
+        children[0] :
+        createParenthesizedType(createUnionTypeNode(children));
+
+    if (childrenNode) {
+      return childrenNode;
+    } else {
+      return createTypeReferenceNode(this.baseName(), /*typeArguments=*/[]);
+    }
+  }
+
   private totalType(): TypeNode {
     const isEnum = this._enums.length > 0;
 
     if (isEnum) {
       return createUnionTypeNode([
-        createTypeReferenceNode(toClassName(this.subject) + 'Enum', []),
+        createTypeReferenceNode(this.enumName(), []),
         createParenthesizedType(this.nonEnumType()),
       ]);
     } else {
@@ -125,29 +179,28 @@ export class Class {
     }
   }
 
-  private enumType(): EnumDeclaration|undefined {
+  private enumDecl(): EnumDeclaration|undefined {
     if (this._enums.length === 0) return undefined;
 
     return createEnumDeclaration(
         /* decorators= */[],
-        createModifiersFromModifierFlags(ModifierFlags.Export),
-        toClassName(this.subject) + 'Enum', this._enums.map(e => e.toNode()));
+        createModifiersFromModifierFlags(ModifierFlags.Export), this.enumName(),
+        this._enums.map(e => e.toNode()));
   }
 
   toNode() {
     const typeValue: TypeNode = this.totalType();
-    const enumType = this.enumType();
     const declaration = withComments(
         this.comment,
         createTypeAliasDeclaration(
             /* decorators = */[],
             createModifiersFromModifierFlags(ModifierFlags.Export),
-            toClassName(this.subject),
+            this.className(),
             [],
             typeValue,
             ));
 
-    return enumType ? [enumType, declaration] : [declaration];
+    return arrayOf<Statement>(this.enumDecl(), this.baseDecl(), declaration);
   }
 }
 
@@ -162,6 +215,10 @@ export class Builtin extends Class {
     return [createTypeAliasDeclaration(
         [], createModifiersFromModifierFlags(ModifierFlags.Export), this.name,
         [], createTypeReferenceNode(this.equivTo, []))];
+  }
+
+  protected baseName() {
+    return this.name;
   }
 }
 
