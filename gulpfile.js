@@ -16,6 +16,7 @@
 
 const gulp = require('gulp');
 const tsc = require('gulp-typescript');
+const file = require('gulp-file');
 
 const cpSpwan = require('child_process').spawn;
 const through2 = require('through2');
@@ -29,8 +30,8 @@ function spawn(command, args = [], options = {}) {
   return through2.obj(function(file, _, flush) {
     const cp = cpSpwan(command, args, options);
     cp.stderr.on(
-        'data', (err) => console.error(Buffer.from(err).toString('utf-8')));
-    cp.on('error', (err) => console.log(err));
+        'data', err => console.error(Buffer.from(err).toString('utf-8')));
+    cp.on('error', err => console.log(err));
 
     file.contents = cp.stdout;
     this.push(file);
@@ -40,14 +41,13 @@ function spawn(command, args = [], options = {}) {
   });
 }
 
-
 const nodeProject = tsc.createProject('src/tsconfig.json');
 gulp.task('build-generator', () => {
   return nodeProject.src().pipe(nodeProject()).js.pipe(gulp.dest('built'));
 });
 
 gulp.task('generate-ts', gulp.series('build-generator', () => {
-  return gulp.src('src/lib/types.ts')
+  return file('schema.ts', '', {src: true})
       .pipe(spawn('node', ['built/generator/run.js']))
       .pipe(gulp.dest('built/ts-schema'));
 }));
