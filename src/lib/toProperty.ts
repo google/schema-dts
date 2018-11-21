@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {createKeywordTypeNode, createPropertySignature, createStringLiteral, createToken, createTypeReferenceNode, createUnionTypeNode, PropertySignature, SyntaxKind} from 'typescript';
+import {createArrayTypeNode, createKeywordTypeNode, createPropertySignature, createStringLiteral, createToken, createTypeReferenceNode, createUnionTypeNode, PropertySignature, SyntaxKind, TypeNode} from 'typescript';
 
 import {withComments} from './comments';
 import {toTypeName} from './names';
@@ -57,6 +57,13 @@ export class Property {
   }
 
   private typeNode() {
+    const node = this.scalarTypeNode();
+    return this.key.startsWith('@') ?
+        node :
+        createUnionTypeNode([node, createArrayTypeNode(node)]);
+  }
+
+  private scalarTypeNode() {
     const typeNodes = this.type.types.map(
         type => createTypeReferenceNode(toTypeName(type), []));
     switch (typeNodes.length) {
