@@ -29,11 +29,15 @@ import {load} from './reader';
 
 interface Options {
   verbose: boolean;
+  schema: string;
 }
 function ParseFlags(): Options|undefined {
   const parser = new ArgumentParser(
       {version: '0.0.1', addHelp: true, description: 'schema-dts generator'});
   parser.addArgument('--verbose', {defaultValue: false});
+  parser.addArgument(
+      '--schema',
+      {defaultValue: '3.4', help: 'The version of the schema to load.'});
   return parser.parseArgs();
 }
 
@@ -71,7 +75,7 @@ async function main() {
   const options = ParseFlags();
   if (!options) return;
 
-  const result = load();
+  const result = load(options.schema);
   const groups = await result
                      .pipe(
                          groupBySubject(),

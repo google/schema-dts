@@ -57,11 +57,11 @@ function object(content: string) {
 const totalRegex =
     /\s*<([^<>]+)>\s*<([^<>]+)>\s*((?:<[^<>"]+>)|(?:"(?:[^"]|(?:\\"))+(?:[^\"]|\\")"))\s*\./;
 
-export function load(): Observable<Triple> {
+export function load(version: string): Observable<Triple> {
   return new Observable<Triple>(subscriber => {
     https
         .get(
-            'https://schema.org/version/3.4/schema.nt',
+            `https://schema.org/version/${version}/schema.nt`,
             response => {
               const data: string[] = [];
 

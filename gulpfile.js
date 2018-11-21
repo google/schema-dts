@@ -51,3 +51,12 @@ gulp.task('generate-ts', gulp.series('build-generator', () => {
       .pipe(spawn('node', ['built/generator/run.js']))
       .pipe(gulp.dest('built/ts-schema'));
 }));
+
+gulp.task('generate-package', gulp.series('generate-ts', () => {
+  return gulp.src('built/ts-schema/*.ts')
+      .pipe(tsc({
+        noImplicitAny: true,
+        declaration: true,
+      }))
+      .pipe(gulp.dest('built/schema'));
+}));
