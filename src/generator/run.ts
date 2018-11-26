@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import {ArgumentParser} from 'argparse';
-import {closeSync, openSync, writeSync} from 'fs';
 import {OperatorFunction} from 'rxjs';
 import {groupBy, map, mergeMap, toArray} from 'rxjs/operators';
 import {createPrinter, createSourceFile, EmitHint, NewLineKind, ScriptKind, ScriptTarget} from 'typescript';
