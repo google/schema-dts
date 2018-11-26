@@ -69,7 +69,7 @@
       true,
       [
         "Object",
-        "Use {} or 'object' instead. See http://go/ts-style#redundant-types"
+        "Use {} or 'object' instead."
       ],
       [
         "String",
