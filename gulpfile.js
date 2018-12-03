@@ -58,5 +58,5 @@ gulp.task('generate-package', gulp.series('generate-ts', () => {
         noImplicitAny: true,
         declaration: true,
       }))
-      .pipe(gulp.dest('built/schema'));
+      .pipe(gulp.dest('dist'));
 }));

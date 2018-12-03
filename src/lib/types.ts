@@ -15,17 +15,22 @@
  */
 export class SchemaObject {
   readonly type = 'SchemaObject';
-  constructor(readonly name: string) {}
+  constructor(readonly name: string, readonly layer: string|undefined) {}
 
   toString() {
-    return `https://schema.org/${this.name}`;
+    return this.layer ? `https://${this.layer}.schema.org/${this.name}` :
+                        `https://schema.org/${this.name}`;
   }
 
   static Parse(content: string): SchemaObject|null {
     const schemaObjectResult =
-        /^http(s?):\/\/(www\.)?schema\.org\/(.*)$/.exec(content);
+        /^http(s?):\/\/([a-zA-Z0-9\-_]+\.)?schema\.org\/(.*)$/.exec(content);
     if (schemaObjectResult) {
-      return new SchemaObject(schemaObjectResult[3]);
+      const layerMatch: string|undefined = schemaObjectResult[2];
+      const layer = (layerMatch && layerMatch !== 'www.') ?
+          layerMatch.substring(0, layerMatch.length - 1) :
+          undefined;
+      return new SchemaObject(schemaObjectResult[3], layer);
     }
 
     return null;
@@ -67,13 +72,14 @@ export class W3CNameSpaced {
 }
 export class SchemaString {
   readonly type = 'SchemaString';
-  constructor(readonly value: string) {}
+  constructor(readonly value: string, readonly language: string|undefined) {}
   toString() {
-    return `"${this.value}"`;
+    return this.language ? `"${this.value}@${this.language}` :
+                           `"${this.value}"`;
   }
   static Parse(content: string): SchemaString|null {
-    const result = /^"(([^"]|(\\"))+)"$/.exec(content);
-    if (result) return new SchemaString(result[1]);
+    const result = /^"(([^"]|(\\"))+)"(?:@([a-zA-Z]+))?$/.exec(content);
+    if (result) return new SchemaString(result[1], result[5]);
     return null;
   }
 }
@@ -147,5 +153,23 @@ export class Rdfs {
   static Parse(content: string): Rdfs|null {
     const result = /^rdfs:(.*)$/.exec(content);
     return result && new Rdfs(result[1]);
+  }
+}
+
+export class OneOffClassName {
+  readonly type = 'OneOffClass';
+  private static readonly classes: ReadonlyArray<[string, string]> = [
+    ['http://publications.europa.eu/mdr/eli/index.html', 'ELI'],
+  ];
+
+  constructor(readonly url: string, readonly className: string) {}
+  toString() {
+    return this.url;
+  }
+  static Parse(content: string): OneOffClassName|null {
+    for (const [url, className] of OneOffClassName.classes) {
+      if (url === content) return new OneOffClassName(url, className);
+    }
+    return null;
   }
 }

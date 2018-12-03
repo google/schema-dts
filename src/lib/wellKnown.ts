@@ -35,7 +35,8 @@ export function GetSubClassOf(value: ObjectPredicate):
       value.Predicate.hash === 'subClassOf') {
     if (value.Object.type === 'RdfSchema' || value.Object.type === 'RdfSntax' ||
         value.Object.type === 'SchemaString' || value.Object.type === 'Rdfs' ||
-        value.Object.type === 'WikidataConst') {
+        value.Object.type === 'WikidataConst' ||
+        value.Object.type === 'OneOffClass') {
       console.error(
           `Unexpected object for predicate 'subClassOf': ${value.Object}.`);
       return null;
@@ -43,17 +44,6 @@ export function GetSubClassOf(value: ObjectPredicate):
     return {subClassOf: value.Object};
   }
   return null;
-}
-
-export function IsEnum(values: ObjectPredicate[]): boolean {
-  for (const value of values) {
-    const subClassOf = GetSubClassOf(value);
-    if (subClassOf && subClassOf.subClassOf.type === 'SchemaObject' &&
-        subClassOf.subClassOf.name === 'Enumeration') {
-      return true;
-    }
-  }
-  return false;
 }
 
 export function IsDataType(t: TTypeName): boolean {
@@ -84,16 +74,18 @@ export function GetType(value: ObjectPredicate): TTypeName|null {
   return null;
 }
 
-export function FindType(key: TSubject, values: ObjectPredicate[]): TTypeName {
-  for (const value of values) {
-    const type = GetType(value);
-    if (type) return type;
+export function GetTypes(key: TSubject, values: ReadonlyArray<ObjectPredicate>):
+    ReadonlyArray<TTypeName> {
+  const types = values.map(GetType).filter((t): t is TTypeName => !!t);
+
+  if (types.length === 0) {
+    throw new Error(
+        `No type found for Subject ${key.toString()}. Triples include:\n${
+            values.map(v => `${v.Predicate.toString()} ${v.Object.toString()}`)
+                .join('\n')}`);
   }
 
-  throw new Error(
-      `No type found for Subject ${key.toString()}. Triples include:\n${
-          values.map(v => `${v.Predicate.toString()} ${v.Object.toString()}`)
-              .join('\n')}`);
+  return types;
 }
 
 export function EnsureSubject(type: TTypeName): TSubject {
@@ -103,9 +95,21 @@ export function EnsureSubject(type: TTypeName): TSubject {
   return type;
 }
 
-export function IsClass(type: TTypeName): boolean {
+export function IsClassType(type: TTypeName): boolean {
   return type.type === 'RdfSchema' && type.hash === 'Class';
 }
-export function IsProperty(type: TTypeName): boolean {
+export function IsPropertyType(type: TTypeName): boolean {
   return type.type === 'RdfSntax' && type.hash === 'Property';
+}
+
+export function HasEnumType(types: ReadonlyArray<TTypeName>): boolean {
+  for (const type of types) {
+    // Skip well-known types.
+    if (IsClassType(type) || IsPropertyType(type) || IsDataType(type)) continue;
+
+    // If we're here, this is a 'Type' that is not well known.
+    return true;
+  }
+  // Types are only well-known.
+  return false;
 }

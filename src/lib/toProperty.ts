@@ -31,8 +31,8 @@ export class PropertyType {
     const c = GetComment(value);
     if (c) {
       if (this.comment) {
-        throw new Error(`Attempting to add comment on property ${
-            this.subect.toString()} but one already exists.`);
+        console.error(`Duplicate comments provided on property ${
+            this.subect.toString()}. It will be overwritten.`);
       }
       this.comment = c.comment;
       return true;

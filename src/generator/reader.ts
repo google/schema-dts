@@ -17,7 +17,7 @@ import https from 'https';
 import {Observable} from 'rxjs';
 
 import {TObject, TPredicate, Triple, TSubject} from '../lib/triple';
-import {Rdfs, RdfSchema, RdfSyntax, SchemaObject, SchemaSource, SchemaString, W3CNameSpaced, W3cSkos, WikidataConst} from '../lib/types';
+import {OneOffClassName, Rdfs, RdfSchema, RdfSyntax, SchemaObject, SchemaSource, SchemaString, W3CNameSpaced, W3cSkos, WikidataConst} from '../lib/types';
 
 function verify<T>(
     content: string, ...rest: Array<(content: string) => T | null>): T {
@@ -38,7 +38,8 @@ function unWrap<T>(maker: (content: string) => T | null): (content: string) =>
 
 function subject(content: string) {
   return verify<TSubject>(
-      content, SchemaObject.Parse, SchemaSource.Parse, W3CNameSpaced.Parse);
+      content, SchemaObject.Parse, SchemaSource.Parse, W3CNameSpaced.Parse,
+      OneOffClassName.Parse);
 }
 
 function predicate(content: string) {
@@ -52,16 +53,17 @@ function object(content: string) {
       content, unWrap(SchemaObject.Parse), unWrap(SchemaSource.Parse),
       unWrap(RdfSyntax.Parse), unWrap(RdfSchema.Parse),
       unWrap(WikidataConst.Parse), unWrap(Rdfs.Parse),
-      unWrap(W3CNameSpaced.Parse), SchemaString.Parse);
+      unWrap(W3CNameSpaced.Parse), unWrap(OneOffClassName.Parse),
+      SchemaString.Parse);
 }
 const totalRegex =
-    /\s*<([^<>]+)>\s*<([^<>]+)>\s*((?:<[^<>"]+>)|(?:"(?:[^"]|(?:\\"))+(?:[^\"]|\\")"))\s*\./;
+    /\s*<([^<>]+)>\s*<([^<>]+)>\s*((?:<[^<>"]+>)|(?:"(?:[^"]|(?:\\"))+(?:[^\"]|\\")"(?:@[a-zA-Z]+)?))\s*\./;
 
-export function load(version: string): Observable<Triple> {
+export function load(version: string, file = 'schema.nt'): Observable<Triple> {
   return new Observable<Triple>(subscriber => {
     https
         .get(
-            `https://schema.org/version/${version}/schema.nt`,
+            `https://schema.org/version/${version}/${file}`,
             response => {
               const data: string[] = [];
 
@@ -71,23 +73,49 @@ export function load(version: string): Observable<Triple> {
                     subscriber.error(new Error(`Unexpected ${match}`));
                   }
 
-                  if (match![1] ===
+                  if (match[0].includes('file:///')) {
+                    // Inexplicably, local files end up in the public schema for
+                    // certain layer overlays.
+                    continue;
+                  }
+                  if (match[0] === 'http://meta.schema.org/') {
+                    continue;
+                  }
+
+                  if (match[1] ===
                           'http://www.w3.org/2002/07/owl#equivalentClass' ||
-                      match![1] ===
+                      match[1] ===
                           'http://www.w3.org/2002/07/owl#equivalentProperty' ||
-                      match![1] === 'http://purl.org/dc/terms/source' ||
-                      match![1] ===
+                      match[1] === 'http://purl.org/dc/terms/source' ||
+                      match[1] ===
                           'http://www.w3.org/2000/01/rdf-schema#label' ||
-                      match![1] ===
-                          'http://www.w3.org/2004/02/skos/core#closeMatch') {
+                      match[1] ===
+                          'http://www.w3.org/2004/02/skos/core#closeMatch' ||
+                      match[1] ===
+                          'http://www.w3.org/2004/02/skos/core#exactMatch') {
                     // Skip Equivalent Classes & Properties
                     continue;
                   }
-                  subscriber.next({
-                    Subject: subject(match[0]),
-                    Predicate: predicate(match[1]),
-                    Object: object(match[2])
-                  });
+
+                  if (match[1] === 'http://schema.org/isPartOf') {
+                    // When isPartOf is used as a predicate, is a higher-order
+                    // property describing if a Property or Class is part of a
+                    // specific schema layer. We don't use that information yet,
+                    // so discard it.
+                    continue;
+                  }
+
+                  try {
+                    subscriber.next({
+                      Subject: subject(match[0]),
+                      Predicate: predicate(match[1]),
+                      Object: object(match[2])
+                    });
+                  } catch (parseError) {
+                    throw new Error(`${
+                        parseError.stack ||
+                        String(parseError)} while parsing line ${match}.`);
+                  }
                 }
               }
 

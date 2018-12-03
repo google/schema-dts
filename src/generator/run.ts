@@ -19,16 +19,17 @@ import {groupBy, map, mergeMap, toArray} from 'rxjs/operators';
 import {createPrinter, createSourceFile, EmitHint, NewLineKind, ScriptKind, ScriptTarget} from 'typescript';
 
 import {toScopedName} from '../lib/names';
-import {BySubject, ByType, EnumValue, FindProperties, ProcessClasses} from '../lib/toClass';
+import {BySubject, EnumValue, FindProperties, ProcessClasses, TypedTopic} from '../lib/toClass';
 import {Property, PropertyType} from '../lib/toProperty';
 import {ObjectPredicate, toString, Triple} from '../lib/triple';
-import {FindType, IsClass, IsDataType, IsDomainIncludes, IsProperty} from '../lib/wellKnown';
+import {GetTypes, HasEnumType, IsDomainIncludes} from '../lib/wellKnown';
 
 import {load} from './reader';
 
 interface Options {
   verbose: boolean;
   schema: string;
+  layer: string;
 }
 function ParseFlags(): Options|undefined {
   const parser = new ArgumentParser(
@@ -37,6 +38,10 @@ function ParseFlags(): Options|undefined {
   parser.addArgument(
       '--schema',
       {defaultValue: '3.4', help: 'The version of the schema to load.'});
+  parser.addArgument('--layer', {
+    defaultValue: 'schema.nt',
+    help: 'Which layer of the schema to load? E.g. schema.nt or all-layers.nt.'
+  });
   return parser.parseArgs();
 }
 
@@ -56,35 +61,29 @@ function groupBySubject(): OperatorFunction<Triple, BySubject> {
          );
 }
 
-function groupByType(): OperatorFunction<BySubject, ByType> {
+function asTopic(): OperatorFunction<BySubject, TypedTopic> {
   return (observable) => observable.pipe(
-             groupBy(
-                 bySubject =>
-                     FindType(bySubject.Subject, bySubject.values).toString()),
-             mergeMap(
-                 group => group.pipe(
-                     toArray(),
-                     map(array => ({
-                           type: FindType(array[0].Subject, array[0].values),
-                           decls: array
-                         })))));
+             map(bySubject => ({
+                   ...bySubject,
+                   types: GetTypes(bySubject.Subject, bySubject.values)
+                 })));
 }
 
 async function main() {
   const options = ParseFlags();
   if (!options) return;
 
-  const result = load(options.schema);
-  const groups = await result
+  const result = load(options.schema, options.layer);
+  const topics = await result
                      .pipe(
                          groupBySubject(),
-                         groupByType(),
+                         asTopic(),
                          toArray(),
                          )
                      .toPromise();
 
-  const classes = ProcessClasses(groups);
-  const props = FindProperties(groups);
+  const classes = ProcessClasses(topics);
+  const props = FindProperties(topics);
 
   for (const prop of props) {
     const rest: ObjectPredicate[] = [];
@@ -111,24 +110,19 @@ async function main() {
     }
   }
 
-  for (const group of groups) {
-    // Already Processed
-    if (IsClass(group.type) || IsProperty(group.type)) continue;
-
-    // Skip DataType for now:
-    if (IsDataType(group.type)) continue;
+  // Process Enums
+  for (const topic of topics) {
+    if (!HasEnumType(topic.types)) continue;
 
     // Everything Here should be an enum.
-    for (const x of group.decls) {
-      const enumValue = new EnumValue(x.Subject);
-      const skipped: ObjectPredicate[] = [];
-      for (const v of x.values) {
-        if (!enumValue.add(v, classes)) skipped.push(v);
-      }
+    const enumValue = new EnumValue(topic.Subject);
+    const skipped: ObjectPredicate[] = [];
+    for (const v of topic.values) {
+      if (!enumValue.add(v, classes)) skipped.push(v);
+    }
 
-      if (skipped.length > 0 && options.verbose) {
-        console.error(`Did not process: `, skipped.map(toString));
-      }
+    if (skipped.length > 0 && options.verbose) {
+      console.error(`Did not process: `, skipped.map(toString));
     }
   }
 

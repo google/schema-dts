@@ -23,6 +23,8 @@ export function toClassName(subject: TSubject): string {
       return 'S_' + subject.hash;
     case 'W3CNameSpaced':
       return subject.ns + '_' + subject.hash;
+    case 'OneOffClass':
+      return subject.className;
     default:
       const shouldBeNever: never = subject;
       return shouldBeNever;
@@ -36,7 +38,7 @@ export function toTypeName(object: TObject): string {
     case 'W3CNameSpaced':
       return toClassName(object);
     case 'SchemaString':
-      return object.toString();
+      return `"${object.value}"`;  // Without @lang tag, even if present.
     case 'RdfSchema':
     case 'RdfSntax':
     case 'Rdfs':
@@ -55,6 +57,8 @@ export function toScopedName(subject: TSubject): string {
       return subject.hash;
     case 'W3CNameSpaced':
       return subject.hash;
+    case 'OneOffClass':
+      return subject.className;
     default:
       const shouldBeNever: never = subject;
       return shouldBeNever;

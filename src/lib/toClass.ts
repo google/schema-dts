@@ -20,17 +20,16 @@ import {toClassName, toEnumName, toScopedName} from './names';
 import {Property, PropertyType} from './toProperty';
 import {ObjectPredicate, TObject, TPredicate, TSubject} from './triple';
 import {SchemaObject, SchemaString} from './types';
-import {GetComment, GetSubClassOf, GetType, IsClass, IsProperty, TTypeName} from './wellKnown';
+import {GetComment, GetSubClassOf, GetType, IsClassType, IsDataType, IsPropertyType, TTypeName} from './wellKnown';
 
 export type ClassMap = Map<string, Class>;
 
 export interface BySubject {
   Subject: TSubject;
-  values: ObjectPredicate[];
+  values: ReadonlyArray<ObjectPredicate>;
 }
-export interface ByType {
-  type: TTypeName;
-  decls: BySubject[];
+export interface TypedTopic extends BySubject {
+  types: ReadonlyArray<TTypeName>;
 }
 
 function arrayOf<T>(...args: Array<T|undefined|null>): T[] {
@@ -64,7 +63,10 @@ export class Class {
           new Property(
               '@type',
               new PropertyType(
-                  this.subject, new SchemaString(toScopedName(this.subject)))),
+                  this.subject,
+                  new SchemaString(
+                      toScopedName(this.subject), /*language=*/undefined)),
+              ),
           ...this._props
         ] :
         this._props;
@@ -86,8 +88,8 @@ export class Class {
     const c = GetComment(value);
     if (c) {
       if (this.comment) {
-        throw new Error(`Trying to add comment on class ${
-            this.subject.toString()} but one already exists.`);
+        console.error(`Duplicate comments provided on class ${
+            this.subject.toString()}. It will be overwritten.`);
       }
       this.comment = c.comment;
       return true;
@@ -208,13 +210,19 @@ export class Builtin extends Class {
   constructor(
       private readonly name: string, private readonly equivTo: string,
       private readonly doc?: string) {
-    super(new SchemaObject(name));
+    super(new SchemaObject(name, /*layer=*/undefined));
   }
 
   toNode() {
-    return [createTypeAliasDeclaration(
-        [], createModifiersFromModifierFlags(ModifierFlags.Export), this.name,
-        [], createTypeReferenceNode(this.equivTo, []))];
+    return [
+      withComments(
+          this.doc,
+          createTypeAliasDeclaration(
+              /*decorators=*/[],
+              createModifiersFromModifierFlags(ModifierFlags.Export), this.name,
+              /*typeParameters=*/[],
+              createTypeReferenceNode(this.equivTo, []))),
+    ];
   }
 
   protected baseName() {
@@ -230,8 +238,21 @@ export class EnumValue {
 
   add(value: ObjectPredicate, map: ClassMap) {
     // First, "Type" containment.
+    // A Topic can have multiple types. So the triple we're adding now could
+    // either be:
+    // 1. An already processed well-known type (e.g. the Topic is also a Class,
+    //    as well as being an enum).
+    // 2. The Type of the Enum.
+    //
+    // e.g.: SurgicalProcedure (schema.org/SurgicalProcedure) is both a class
+    //       having the "Class" type, and also an instance of the
+    //       MedicalProcedureType (schema.org/MedicalProcedureType) enum.
+    //       Therefore, an Enum will contain two TTypeName ObjectPredicates:
+    //       one of Type=Class, and another of Type=MedicalProcedureType.
     const type = GetType(value);
     if (type) {
+      if (IsClassType(type) || IsDataType(type)) return true;
+
       const enumObject = map.get(type.toString());
       if (!enumObject) {
         throw new Error(`Couldn't find ${type.toString()} in classes.`);
@@ -280,44 +301,47 @@ const wellKnownTypes = [
   new Builtin('Boolean', 'boolean')
 ];
 
-export function ProcessIfClass(input: ByType): ClassMap|null {
-  if (IsClass(input.type)) {
-    const ret = new Map<string, Class>();
-    for (const wk of wellKnownTypes) {
-      ret.set(wk.subject.toString(), wk);
-    }
-
-    // Forward Declare once
-    for (const clsD of input.decls) {
-      const cls = new Class(clsD.Subject);
-      ret.set(clsD.Subject.toString(), cls);
-    }
-    // Then build
-    for (const clsD of input.decls) {
-      const cls = ret.get(clsD.Subject.toString())!;
-      toClass(cls, clsD, ret);
-    }
-    return ret;
+function ForwardDeclareClasses(topics: ReadonlyArray<TypedTopic>): ClassMap {
+  const classes = new Map<string, Class>();
+  for (const wk of wellKnownTypes) {
+    classes.set(wk.subject.toString(), wk);
+  }
+  for (const topic of topics) {
+    if (!topic.types.some(IsClassType)) continue;
+    classes.set(topic.Subject.toString(), new Class(topic.Subject));
   }
 
-  if (IsProperty(input.type)) {
-    return null;
+  if (classes.size === 0) {
+    throw new Error('Expected Class topics to exist.');
   }
-  return null;
-}
-export function ProcessClasses(input: ByType[]): ClassMap {
-  for (const elem of input) {
-    const result = ProcessIfClass(elem);
-    if (result) {
-      return result;
-    }
-  }
-  throw new Error('Unexpected: Expected a class');
+
+  return classes;
 }
 
-export function FindProperties(input: ByType[]): BySubject[] {
-  for (const elem of input) {
-    if (IsProperty(elem.type)) return elem.decls;
+function BuildClasses(topics: ReadonlyArray<TypedTopic>, classes: ClassMap) {
+  for (const topic of topics) {
+    if (!topic.types.some(IsClassType)) continue;
+
+    const cls = classes.get(topic.Subject.toString());
+    if (!cls) {
+      throw new Error(`Class ${
+          topic.Subject.toString()} should have been forward declared.`);
+    }
+    toClass(cls, topic, classes);
   }
-  throw new Error('Unexpected: Expected a property');
+}
+
+export function ProcessClasses(topics: ReadonlyArray<TypedTopic>): ClassMap {
+  const classes = ForwardDeclareClasses(topics);
+  BuildClasses(topics, classes);
+  return classes;
+}
+
+export function FindProperties(topics: ReadonlyArray<TypedTopic>):
+    ReadonlyArray<BySubject> {
+  const properties = topics.filter(topic => topic.types.some(IsPropertyType));
+  if (properties.length === 0) {
+    throw new Error('Unexpected: Property Topics to exist.');
+  }
+  return properties;
 }
