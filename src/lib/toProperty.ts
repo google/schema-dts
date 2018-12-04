@@ -13,34 +13,65 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {createArrayTypeNode, createKeywordTypeNode, createPropertySignature, createStringLiteral, createToken, createTypeReferenceNode, createUnionTypeNode, PropertySignature, SyntaxKind, TypeNode} from 'typescript';
+import {createArrayTypeNode, createKeywordTypeNode, createPropertySignature, createStringLiteral, createToken, createTypeReferenceNode, createUnionTypeNode, HighlightSpanKind, PropertySignature, SyntaxKind, TypeNode} from 'typescript';
 
 import {withComments} from './comments';
-import {toTypeName} from './names';
-import {TObject, TPredicate, TSubject} from './triple';
-import {GetComment, GetType, IsRangeIncludes} from './wellKnown';
+import {toScopedName, toTypeName} from './names';
+import {ClassMap} from './toClass';
+import {ObjectPredicate, TObject, toString, TSubject, TypedTopic} from './triple';
+import {GetComment, GetType, IsDomainIncludes, IsPropertyType, IsRangeIncludes, IsSupersededBy} from './wellKnown';
 
 export class PropertyType {
-  comment?: string;
   readonly types: TObject[] = [];
-  constructor(readonly subect: TSubject, object?: TObject) {
+
+  constructor(readonly subject: TSubject, object?: TObject) {
     if (object) this.types.push(object);
   }
 
-  add(value: {Predicate: TPredicate; Object: TObject}): boolean {
+  private _comment?: string;
+  private readonly _supersededBy: TObject[] = [];
+
+  get deprecated() {
+    return this._supersededBy.length > 0;
+  }
+
+  get comment() {
+    if (!this.deprecated) return this._comment;
+    const deprecated = `@deprecated Consider using ${
+        this._supersededBy.map(o => o.toString()).join(' or ')} instead.`;
+
+    return this._comment ? `${this._comment}\n${deprecated}` : deprecated;
+  }
+
+  add(value: ObjectPredicate, classes: ClassMap): boolean {
     const c = GetComment(value);
     if (c) {
-      if (this.comment) {
+      if (this._comment) {
         console.error(`Duplicate comments provided on property ${
-            this.subect.toString()}. It will be overwritten.`);
+            this.subject.toString()}. It will be overwritten.`);
       }
-      this.comment = c.comment;
+      this._comment = c.comment;
       return true;
     }
     if (GetType(value)) return true;  // We used types already.
 
     if (IsRangeIncludes(value.Predicate)) {
       this.types.push(value.Object);
+      return true;
+    }
+
+    if (IsDomainIncludes(value.Predicate)) {
+      const cls = classes.get(value.Object.toString());
+      if (!cls) {
+        throw new Error(`Could not find class for ${this.subject.name}, ${
+            toString(value)}.`);
+      }
+      cls.addProp(new Property(toScopedName(this.subject), this));
+      return true;
+    }
+
+    if (IsSupersededBy(value)) {
+      this._supersededBy.push(value.Object);
       return true;
     }
 
@@ -54,6 +85,10 @@ export class Property {
 
   required() {
     return this.key.startsWith('@');
+  }
+
+  get deprecated() {
+    return this.type.deprecated;
   }
 
   private typeNode() {
@@ -86,5 +121,27 @@ export class Property {
             /*typeNode=*/this.typeNode(),
             /*initializer=*/undefined,
             ));
+  }
+}
+
+export function ProcessProperties(
+    topics: ReadonlyArray<TypedTopic>, classes: ClassMap) {
+  for (const topic of topics) {
+    // Skip Topics that have no 'Property' Type.
+    if (!topic.types.some(IsPropertyType)) continue;
+
+    const rest: ObjectPredicate[] = [];
+    const property = new PropertyType(topic.Subject);
+    for (const value of topic.values) {
+      const added = property.add(value, classes);
+      if (!added) {
+        rest.push(value);
+      }
+    }
+    // Go over RangeIncludes or DomainIncludes:
+    if (rest.length > 0) {
+      console.error(`Still unadded for property: ${topic.Subject.name}:\n\t${
+          rest.map(toString).join('\n\t')}`);
+    }
   }
 }

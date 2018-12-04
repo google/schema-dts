@@ -18,11 +18,10 @@ import {OperatorFunction} from 'rxjs';
 import {groupBy, map, mergeMap, toArray} from 'rxjs/operators';
 import {createPrinter, createSourceFile, EmitHint, NewLineKind, ScriptKind, ScriptTarget} from 'typescript';
 
-import {toScopedName} from '../lib/names';
-import {EnumValue, FindProperties, ProcessClasses} from '../lib/toClass';
-import {Property, PropertyType} from '../lib/toProperty';
+import {EnumValue, ProcessClasses} from '../lib/toClass';
+import {ProcessProperties,} from '../lib/toProperty';
 import {ObjectPredicate, Topic, toString, Triple, TypedTopic} from '../lib/triple';
-import {GetTypes, HasEnumType, IsDomainIncludes} from '../lib/wellKnown';
+import {GetTypes, HasEnumType} from '../lib/wellKnown';
 
 import {load} from './reader';
 
@@ -30,6 +29,7 @@ interface Options {
   verbose: boolean;
   schema: string;
   layer: string;
+  deprecated: boolean;
 }
 function ParseFlags(): Options|undefined {
   const parser = new ArgumentParser(
@@ -41,6 +41,10 @@ function ParseFlags(): Options|undefined {
   parser.addArgument('--layer', {
     defaultValue: 'schema',
     help: 'Which layer of the schema to load? E.g. schema or all-layers.'
+  });
+  parser.addArgument('--deprecated', {
+    defaultValue: {defaultValue: true},
+    help: 'Whether to include deprecated Classes and Properties.'
   });
   return parser.parseArgs();
 }
@@ -83,32 +87,7 @@ async function main() {
                      .toPromise();
 
   const classes = ProcessClasses(topics);
-  const props = FindProperties(topics);
-
-  for (const prop of props) {
-    const rest: ObjectPredicate[] = [];
-    const property = new PropertyType(prop.Subject);
-    for (const value of prop.values) {
-      const added = property.add(value);
-      if (IsDomainIncludes(value.Predicate)) {
-        const cls = classes.get(value.Object.toString());
-        if (!cls) {
-          throw new Error(`Could not find class for ${
-              prop.Subject.toString()}, ${toString(value)}.`);
-        }
-        cls.addProp(new Property(toScopedName(prop.Subject), property));
-      } else if (!added) {
-        rest.push(value);
-      }
-    }
-    // Go over RangeIncludes or DomainIncludes:
-    if (rest.length > 0 && options.verbose) {
-      console.error(`Still unadded: ${prop.Subject.toString()}:`);
-      for (const unadded of rest) {
-        console.error(`  ${toString(unadded)}`);
-      }
-    }
-  }
+  ProcessProperties(topics, classes);
 
   // Process Enums
   for (const topic of topics) {
@@ -132,8 +111,10 @@ async function main() {
       ScriptKind.TS);
   const printer = createPrinter({newLine: NewLineKind.LineFeed});
 
-  for (const cls of classes.entries()) {
-    for (const node of cls[1].toNode()) {
+  for (const cls of classes.values()) {
+    if (cls.deprecated && !options.deprecated) continue;
+
+    for (const node of cls.toNode(!options.deprecated)) {
       const result = printer.printNode(EmitHint.Unspecified, node, source);
       write(result);
       write('\n');

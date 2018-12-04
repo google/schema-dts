@@ -21,12 +21,12 @@ import {Property, PropertyType} from './toProperty';
 import {ObjectPredicate, TObject, Topic, TPredicate, TSubject, TypedTopic} from './triple';
 import {SchemaString, UrlNode} from './types';
 import {arrayOf} from './util';
-import {GetComment, GetSubClassOf, GetType, IsClass, IsClassType, IsDataType, IsPropertyType, IsSupersededBy,} from './wellKnown';
+import {GetComment, GetSubClassOf, GetType, IsClass, IsClassType, IsDataType, IsSupersededBy} from './wellKnown';
 
 export type ClassMap = Map<string, Class>;
 
 export class Class {
-  private comment?: string;
+  private _comment?: string;
   private readonly children: Class[] = [];
   private readonly parents: Class[] = [];
   private readonly _props: Property[] = [];
@@ -40,6 +40,17 @@ export class Class {
       }
     }
     return false;
+  }
+
+  get deprecated() {
+    return this._supersededBy.length > 0;
+  }
+
+  get comment() {
+    if (!this.deprecated) return this._comment;
+    const deprecated = `@deprecated Use ${
+        this._supersededBy.map(c => c.className()).join(' or ')} instead.`;
+    return this._comment ? `${this._comment}\n${deprecated}` : deprecated;
   }
 
   isLeaf(): boolean {
@@ -76,11 +87,11 @@ export class Class {
       classMap: ClassMap): boolean {
     const c = GetComment(value);
     if (c) {
-      if (this.comment) {
+      if (this._comment) {
         console.error(`Duplicate comments provided on class ${
             this.subject.toString()}. It will be overwritten.`);
       }
-      this.comment = c.comment;
+      this._comment = c.comment;
       return true;
     }
     const s = GetSubClassOf(value);
@@ -118,10 +129,13 @@ export class Class {
     this._enums.push(e);
   }
 
-  private baseNode(): TypeNode {
+  private baseNode(skipDeprecatedProperties: boolean): TypeNode {
     // Properties part.
-    const propLiteral =
-        createTypeLiteralNode(this.properties().map(prop => prop.toNode()));
+    const propLiteral = createTypeLiteralNode(
+        this.properties()
+            .filter(
+                property => !property.deprecated || !skipDeprecatedProperties)
+            .map(prop => prop.toNode()));
 
     const parentTypes = this.parents.map(
         parent => createTypeReferenceNode(parent.baseName(), []));
@@ -142,8 +156,8 @@ export class Class {
     }
   }
 
-  private baseDecl(): TypeAliasDeclaration {
-    const baseNode = this.baseNode();
+  private baseDecl(skipDeprecatedProperties: boolean): TypeAliasDeclaration {
+    const baseNode = this.baseNode(skipDeprecatedProperties);
 
     return createTypeAliasDeclaration(
         /*decorators=*/[], /*modifiers=*/[], this.baseName(),
@@ -190,7 +204,7 @@ export class Class {
         this._enums.map(e => e.toNode()));
   }
 
-  toNode() {
+  toNode(skipDeprecatedProperties: boolean) {
     const typeValue: TypeNode = this.totalType();
     const declaration = withComments(
         this.comment,
@@ -202,7 +216,8 @@ export class Class {
             typeValue,
             ));
 
-    return arrayOf<Statement>(this.enumDecl(), this.baseDecl(), declaration);
+    return arrayOf<Statement>(
+        this.enumDecl(), this.baseDecl(skipDeprecatedProperties), declaration);
   }
 }
 
@@ -353,13 +368,4 @@ export function ProcessClasses(topics: ReadonlyArray<TypedTopic>): ClassMap {
   const classes = ForwardDeclareClasses(topics);
   BuildClasses(topics, classes);
   return classes;
-}
-
-export function FindProperties(topics: ReadonlyArray<TypedTopic>):
-    ReadonlyArray<Topic> {
-  const properties = topics.filter(topic => topic.types.some(IsPropertyType));
-  if (properties.length === 0) {
-    throw new Error('Unexpected: Property Topics to exist.');
-  }
-  return properties;
 }

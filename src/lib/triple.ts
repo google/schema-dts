@@ -41,7 +41,7 @@ export interface TypedTopic extends Topic {
 
 export function toString(o: Triple|ObjectPredicate): string {
   return ((o as Triple).Subject) ?
-      `{ ${(o as Triple).Subject.toString()} ${o.Predicate.toString()} ${
-          o.Object.toString()} }` :
-      `{ Predicate: ${o.Predicate.toString()} Object: ${o.Object.toString()}}`;
+      `(${(o as Triple).Subject.name}, ${o.Predicate.name}, ${
+          o.Object.toString()})` :
+      `(${o.Predicate.name}, ${o.Object.toString()})`;
 }
