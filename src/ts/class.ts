@@ -248,3 +248,23 @@ export class Builtin extends Class {
     return this.subject.name;
   }
 }
+
+/**
+ * Defines a Sort order between Class declarations.
+ *
+ * DataTypes come first, followed by all regular classes. Within each group,
+ * class names are ordered alphabetically in UTF-16 code units order.
+ */
+export function Sort(a: Class, b: Class): number {
+  if (a instanceof Builtin) {
+    if (b instanceof Builtin) {
+      return a.subject.name.localeCompare(b.subject.name);
+    } else {
+      return -1;
+    }
+  } else if (b instanceof Builtin) {
+    return +1;
+  } else {
+    return a.subject.name.localeCompare(b.subject.name);
+  }
+}

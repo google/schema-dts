@@ -24,6 +24,7 @@ import {ProcessProperties,} from '../transform/toProperty';
 import {load} from '../triples/reader';
 import {Topic, Triple, TypedTopic} from '../triples/triple';
 import {GetTypes} from '../triples/wellKnown';
+import {Sort} from '../ts/class';
 
 import {ParseFlags} from './args';
 
@@ -68,6 +69,7 @@ async function main() {
   const classes = ProcessClasses(topics);
   ProcessProperties(topics, classes);
   ProcessEnums(topics, classes);
+  const sorted = Array.from(classes.values()).sort(Sort);
 
   write('// tslint:disable\n\n');
   const source = createSourceFile(
@@ -75,7 +77,7 @@ async function main() {
       ScriptKind.TS);
   const printer = createPrinter({newLine: NewLineKind.LineFeed});
 
-  for (const cls of classes.values()) {
+  for (const cls of sorted) {
     if (cls.deprecated && !options.deprecated) continue;
 
     for (const node of cls.toNode(!options.deprecated)) {
