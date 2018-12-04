@@ -48,19 +48,19 @@ export class Class {
     return this._supersededBy.length > 0;
   }
 
-  get comment() {
+  private get comment() {
     if (!this.deprecated) return this._comment;
     const deprecated = `@deprecated Use ${
         this._supersededBy.map(c => c.className()).join(' or ')} instead.`;
     return this._comment ? `${this._comment}\n${deprecated}` : deprecated;
   }
 
-  isLeaf(): boolean {
+  private get isLeaf(): boolean {
     return this.children.length === 0 && !this.aliasesBuiltin();
   }
 
-  properties() {
-    return this.isLeaf() ?
+  private properties() {
+    return this.isLeaf ?
         [
           new Property(
               '@type',

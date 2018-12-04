@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import {createArrayTypeNode, createKeywordTypeNode, createPropertySignature, createStringLiteral, createToken, createTypeReferenceNode, createUnionTypeNode, HighlightSpanKind, PropertySignature, SyntaxKind, TypeNode} from 'typescript';
 
 import {toScopedName, toTypeName} from '../triples/names';
@@ -24,17 +25,12 @@ import {withComments} from './util/comments';
 
 
 export class PropertyType {
-  readonly types: TObject[] = [];
-
-  constructor(readonly subject: TSubject, object?: TObject) {
-    if (object) this.types.push(object);
-  }
-
+  private readonly types: TObject[] = [];
   private _comment?: string;
   private readonly _supersededBy: TObject[] = [];
 
-  get deprecated() {
-    return this._supersededBy.length > 0;
+  constructor(private readonly subject: TSubject, object?: TObject) {
+    if (object) this.types.push(object);
   }
 
   get comment() {
@@ -43,6 +39,10 @@ export class PropertyType {
         this._supersededBy.map(o => o.toString()).join(' or ')} instead.`;
 
     return this._comment ? `${this._comment}\n${deprecated}` : deprecated;
+  }
+
+  get deprecated() {
+    return this._supersededBy.length > 0;
   }
 
   add(value: ObjectPredicate, classes: ClassMap): boolean {
@@ -79,6 +79,19 @@ export class PropertyType {
 
     return false;
   }
+
+  scalarTypeNode() {
+    const typeNodes =
+        this.types.map(type => createTypeReferenceNode(toTypeName(type), []));
+    switch (typeNodes.length) {
+      case 0:
+        return createKeywordTypeNode(SyntaxKind.NeverKeyword);
+      case 1:
+        return typeNodes[0];
+      default:
+        return createUnionTypeNode(typeNodes);
+    }
+  }
 }
 
 export class Property {
@@ -94,23 +107,10 @@ export class Property {
   }
 
   private typeNode() {
-    const node = this.scalarTypeNode();
+    const node = this.type.scalarTypeNode();
     return this.key.startsWith('@') ?
         node :
         createUnionTypeNode([node, createArrayTypeNode(node)]);
-  }
-
-  private scalarTypeNode() {
-    const typeNodes = this.type.types.map(
-        type => createTypeReferenceNode(toTypeName(type), []));
-    switch (typeNodes.length) {
-      case 0:
-        return createKeywordTypeNode(SyntaxKind.NeverKeyword);
-      case 1:
-        return typeNodes[0];
-      default:
-        return createUnionTypeNode(typeNodes);
-    }
   }
 
   toNode(): PropertySignature {
