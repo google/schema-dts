@@ -34,17 +34,36 @@ interface Options {
 function ParseFlags(): Options|undefined {
   const parser = new ArgumentParser(
       {version: '0.0.1', addHelp: true, description: 'schema-dts generator'});
-  parser.addArgument('--verbose', {defaultValue: false});
-  parser.addArgument(
-      '--schema',
-      {defaultValue: '3.4', help: 'The version of the schema to load.'});
+
+  const verbose = parser.addMutuallyExclusiveGroup({required: false});
+  verbose.addArgument(
+      '--verbose', {defaultValue: false, action: 'storeTrue', dest: 'verbose'});
+  verbose.addArgument('--noverbose', {action: 'storeFalse', dest: 'verbose'});
+
+  parser.addArgument('--schema', {
+    defaultValue: '3.4',
+    help: 'The version of the schema to load.',
+    metavar: 'version',
+    dest: 'schema'
+  });
   parser.addArgument('--layer', {
     defaultValue: 'schema',
-    help: 'Which layer of the schema to load? E.g. schema or all-layers.'
+    help: 'Which layer of the schema to load? E.g. schema or all-layers.',
+    metavar: 'name_of_file',
+    dest: 'layer'
   });
-  parser.addArgument('--deprecated', {
+
+  const deprecated = parser.addMutuallyExclusiveGroup({required: false});
+  deprecated.addArgument('--deprecated', {
     defaultValue: {defaultValue: true},
-    help: 'Whether to include deprecated Classes and Properties.'
+    help: 'Include deprecated Classes and Properties.',
+    action: 'storeTrue',
+    dest: 'deprecated'
+  });
+  deprecated.addArgument('--nodeprecated', {
+    help: 'Skip deprecated Classes and Properties.',
+    action: 'storeFalse',
+    dest: 'deprecated'
   });
   return parser.parseArgs();
 }
