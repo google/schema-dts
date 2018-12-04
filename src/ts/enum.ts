@@ -15,12 +15,12 @@
  */
 import {createEnumMember, createStringLiteral} from 'typescript';
 
-import {withComments} from './comments';
-import {toEnumName} from './names';
-import {ClassMap} from './toClass';
-import {ObjectPredicate, toString, TSubject, TypedTopic} from './triple';
-import {GetComment, GetType, HasEnumType, IsClassType, IsDataType} from './wellKnown';
+import {toEnumName} from '../triples/names';
+import {ObjectPredicate, TSubject} from '../triples/triple';
+import {GetComment, GetType, IsClassType, IsDataType} from '../triples/wellKnown';
 
+import {ClassMap} from './class';
+import {withComments} from './util/comments';
 
 export class EnumValue {
   readonly INSTANCE = 'EnumValue';
@@ -73,26 +73,5 @@ export class EnumValue {
         createEnumMember(
             toEnumName(this.value),
             createStringLiteral(this.value.toString())));
-  }
-}
-
-export function ProcessEnums(
-    topics: ReadonlyArray<TypedTopic>, classes: ClassMap) {
-  // Process Enums
-  for (const topic of topics) {
-    if (!HasEnumType(topic.types)) continue;
-
-    // Everything Here should be an enum.
-    const enumValue = new EnumValue(topic.Subject);
-    const skipped: ObjectPredicate[] = [];
-    for (const v of topic.values) {
-      if (!enumValue.add(v, classes)) skipped.push(v);
-    }
-
-    if (skipped.length > 0) {
-      console.error(
-          `For Enum Item ${topic.Subject.name}, did not process: `,
-          skipped.map(toString));
-    }
   }
 }

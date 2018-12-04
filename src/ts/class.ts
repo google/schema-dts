@@ -15,14 +15,15 @@
  */
 import {createEnumDeclaration, createIntersectionTypeNode, createKeywordTypeNode, createModifiersFromModifierFlags, createParenthesizedType, createTypeAliasDeclaration, createTypeLiteralNode, createTypeReferenceNode, createUnionTypeNode, EnumDeclaration, ModifierFlags, Statement, SyntaxKind, TypeAliasDeclaration, TypeNode} from 'typescript';
 
-import {withComments} from './comments';
-import {toClassName, toScopedName} from './names';
-import {EnumValue} from './toEnum';
-import {Property, PropertyType} from './toProperty';
-import {ObjectPredicate, TObject, Topic, TPredicate, TSubject, TypedTopic} from './triple';
-import {SchemaString, UrlNode} from './types';
-import {arrayOf} from './util';
-import {GetComment, GetSubClassOf, GetType, IsClass, IsSupersededBy} from './wellKnown';
+import {toClassName, toScopedName} from '../triples/names';
+import {TObject, TPredicate, TSubject} from '../triples/triple';
+import {SchemaString, UrlNode} from '../triples/types';
+import {GetComment, GetSubClassOf, GetType, IsSupersededBy} from '../triples/wellKnown';
+
+import {EnumValue} from './enum';
+import {Property, PropertyType} from './property';
+import {arrayOf} from './util/arrayof';
+import {withComments} from './util/comments';
 
 export type ClassMap = Map<string, Class>;
 
@@ -245,74 +246,4 @@ export class Builtin extends Class {
   protected baseName() {
     return this.subject.name;
   }
-}
-
-export function toClass(cls: Class, topic: Topic, map: ClassMap): Class {
-  const rest: ObjectPredicate[] = [];
-  for (const value of topic.values) {
-    const added = cls.add(value, map);
-    if (!added) rest.push(value);
-  }
-
-  if (rest.length > 0) {
-    console.error(`Class ${cls.subject.name}: Did not add [${
-        rest.map(r => `(${r.Predicate.name} ${r.Object.toString()})`)
-            .join(',')}]`);
-  }
-  return cls;
-}
-
-const wellKnownTypes = [
-  new Builtin('http://schema.org/Text', 'string', 'Data type: Text.'),
-  new Builtin('http://schema.org/Number', 'number', 'Data type: Number.'),
-  new Builtin(
-      'http://schema.org/Time', 'string',
-      'DateTime represented in string, e.g. 2017-01-04T17:10:00-05:00.'),
-  new Builtin(
-      'http://schema.org/Date', 'string',
-      'A date value in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">' +
-          'ISO 8601 date format</a>.'),
-  new Builtin(
-      'http://schema.org/DateTime', 'string',
-      'A combination of date and time of day in the form ' +
-          '[-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] ' +
-          '(see Chapter 5.4 of ISO 8601).'),
-  new Builtin(
-      'http://schema.org/Boolean', 'boolean', 'Boolean: True or False.'),
-];
-
-function ForwardDeclareClasses(topics: ReadonlyArray<TypedTopic>): ClassMap {
-  const classes = new Map<string, Class>();
-  for (const wk of wellKnownTypes) {
-    classes.set(wk.subject.toString(), wk);
-  }
-  for (const topic of topics) {
-    if (!IsClass(topic)) continue;
-    classes.set(topic.Subject.toString(), new Class(topic.Subject));
-  }
-
-  if (classes.size === 0) {
-    throw new Error('Expected Class topics to exist.');
-  }
-
-  return classes;
-}
-
-function BuildClasses(topics: ReadonlyArray<TypedTopic>, classes: ClassMap) {
-  for (const topic of topics) {
-    if (!IsClass(topic)) continue;
-
-    const cls = classes.get(topic.Subject.toString());
-    if (!cls) {
-      throw new Error(`Class ${
-          topic.Subject.toString()} should have been forward declared.`);
-    }
-    toClass(cls, topic, classes);
-  }
-}
-
-export function ProcessClasses(topics: ReadonlyArray<TypedTopic>): ClassMap {
-  const classes = ForwardDeclareClasses(topics);
-  BuildClasses(topics, classes);
-  return classes;
 }

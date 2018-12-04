@@ -39,7 +39,7 @@ export interface TypedTopic extends Topic {
   types: ReadonlyArray<TTypeName>;
 }
 
-export function toString(o: Triple|ObjectPredicate): string {
+export function Format(o: Triple|ObjectPredicate): string {
   return ((o as Triple).Subject) ?
       `(${(o as Triple).Subject.name}, ${o.Predicate.name}, ${
           o.Object.toString()})` :

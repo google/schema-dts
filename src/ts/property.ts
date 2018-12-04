@@ -15,11 +15,13 @@
  */
 import {createArrayTypeNode, createKeywordTypeNode, createPropertySignature, createStringLiteral, createToken, createTypeReferenceNode, createUnionTypeNode, HighlightSpanKind, PropertySignature, SyntaxKind, TypeNode} from 'typescript';
 
-import {withComments} from './comments';
-import {toScopedName, toTypeName} from './names';
-import {ClassMap} from './toClass';
-import {ObjectPredicate, TObject, toString, TSubject, TypedTopic} from './triple';
-import {GetComment, GetType, IsDomainIncludes, IsPropertyType, IsRangeIncludes, IsSupersededBy} from './wellKnown';
+import {toScopedName, toTypeName} from '../triples/names';
+import {Format, ObjectPredicate, TObject, TSubject} from '../triples/triple';
+import {GetComment, GetType, IsDomainIncludes, IsRangeIncludes, IsSupersededBy} from '../triples/wellKnown';
+
+import {ClassMap} from './class';
+import {withComments} from './util/comments';
+
 
 export class PropertyType {
   readonly types: TObject[] = [];
@@ -63,8 +65,8 @@ export class PropertyType {
     if (IsDomainIncludes(value.Predicate)) {
       const cls = classes.get(value.Object.toString());
       if (!cls) {
-        throw new Error(`Could not find class for ${this.subject.name}, ${
-            toString(value)}.`);
+        throw new Error(
+            `Could not find class for ${this.subject.name}, ${Format(value)}.`);
       }
       cls.addProp(new Property(toScopedName(this.subject), this));
       return true;
@@ -121,27 +123,5 @@ export class Property {
             /*typeNode=*/this.typeNode(),
             /*initializer=*/undefined,
             ));
-  }
-}
-
-export function ProcessProperties(
-    topics: ReadonlyArray<TypedTopic>, classes: ClassMap) {
-  for (const topic of topics) {
-    // Skip Topics that have no 'Property' Type.
-    if (!topic.types.some(IsPropertyType)) continue;
-
-    const rest: ObjectPredicate[] = [];
-    const property = new PropertyType(topic.Subject);
-    for (const value of topic.values) {
-      const added = property.add(value, classes);
-      if (!added) {
-        rest.push(value);
-      }
-    }
-    // Go over RangeIncludes or DomainIncludes:
-    if (rest.length > 0) {
-      console.error(`Still unadded for property: ${topic.Subject.name}:\n\t${
-          rest.map(toString).join('\n\t')}`);
-    }
   }
 }

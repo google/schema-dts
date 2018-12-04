@@ -16,8 +16,8 @@
 import https from 'https';
 import {Observable} from 'rxjs';
 
-import {TObject, Triple} from '../lib/triple';
-import {Rdfs, SchemaString, UrlNode} from '../lib/types';
+import {TObject, Triple} from '../triples/triple';
+import {Rdfs, SchemaString, UrlNode} from '../triples/types';
 
 function verify<T>(
     content: string, ...rest: Array<(content: string) => T | null>): T {

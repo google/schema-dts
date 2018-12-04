@@ -17,11 +17,11 @@ import {OperatorFunction} from 'rxjs';
 import {groupBy, map, mergeMap, toArray} from 'rxjs/operators';
 import {createPrinter, createSourceFile, EmitHint, NewLineKind, ScriptKind, ScriptTarget} from 'typescript';
 
-import {ProcessClasses} from '../lib/toClass';
-import {ProcessEnums} from '../lib/toEnum';
-import {ProcessProperties,} from '../lib/toProperty';
-import {Topic, Triple, TypedTopic} from '../lib/triple';
-import {GetTypes} from '../lib/wellKnown';
+import {ProcessClasses} from '../transform/toClass';
+import {ProcessEnums} from '../transform/toEnum';
+import {ProcessProperties,} from '../transform/toProperty';
+import {Topic, Triple, TypedTopic} from '../triples/triple';
+import {GetTypes} from '../triples/wellKnown';
 
 import {ParseFlags} from './args';
 import {load} from './reader';
