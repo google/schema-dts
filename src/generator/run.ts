@@ -17,10 +17,11 @@ import {OperatorFunction} from 'rxjs';
 import {groupBy, map, mergeMap, toArray} from 'rxjs/operators';
 import {createPrinter, createSourceFile, EmitHint, NewLineKind, ScriptKind, ScriptTarget} from 'typescript';
 
-import {EnumValue, ProcessClasses} from '../lib/toClass';
+import {ProcessClasses} from '../lib/toClass';
+import {ProcessEnums} from '../lib/toEnum';
 import {ProcessProperties,} from '../lib/toProperty';
-import {ObjectPredicate, Topic, toString, Triple, TypedTopic} from '../lib/triple';
-import {GetTypes, HasEnumType} from '../lib/wellKnown';
+import {Topic, Triple, TypedTopic} from '../lib/triple';
+import {GetTypes} from '../lib/wellKnown';
 
 import {ParseFlags} from './args';
 import {load} from './reader';
@@ -64,22 +65,7 @@ async function main() {
 
   const classes = ProcessClasses(topics);
   ProcessProperties(topics, classes);
-
-  // Process Enums
-  for (const topic of topics) {
-    if (!HasEnumType(topic.types)) continue;
-
-    // Everything Here should be an enum.
-    const enumValue = new EnumValue(topic.Subject);
-    const skipped: ObjectPredicate[] = [];
-    for (const v of topic.values) {
-      if (!enumValue.add(v, classes)) skipped.push(v);
-    }
-
-    if (skipped.length > 0 && options.verbose) {
-      console.error(`Did not process: `, skipped.map(toString));
-    }
-  }
+  ProcessEnums(topics, classes);
 
   write('// tslint:disable\n\n');
   const source = createSourceFile(

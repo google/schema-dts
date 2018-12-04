@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {createEnumDeclaration, createEnumMember, createIntersectionTypeNode, createKeywordTypeNode, createModifiersFromModifierFlags, createParenthesizedType, createStringLiteral, createTypeAliasDeclaration, createTypeLiteralNode, createTypeReferenceNode, createUnionTypeNode, EnumDeclaration, ModifierFlags, Statement, SyntaxKind, TypeAliasDeclaration, TypeNode} from 'typescript';
+import {createEnumDeclaration, createIntersectionTypeNode, createKeywordTypeNode, createModifiersFromModifierFlags, createParenthesizedType, createTypeAliasDeclaration, createTypeLiteralNode, createTypeReferenceNode, createUnionTypeNode, EnumDeclaration, ModifierFlags, Statement, SyntaxKind, TypeAliasDeclaration, TypeNode} from 'typescript';
 
 import {withComments} from './comments';
-import {toClassName, toEnumName, toScopedName} from './names';
+import {toClassName, toScopedName} from './names';
+import {EnumValue} from './toEnum';
 import {Property, PropertyType} from './toProperty';
 import {ObjectPredicate, TObject, Topic, TPredicate, TSubject, TypedTopic} from './triple';
 import {SchemaString, UrlNode} from './types';
 import {arrayOf} from './util';
-import {GetComment, GetSubClassOf, GetType, IsClass, IsClassType, IsDataType, IsSupersededBy} from './wellKnown';
+import {GetComment, GetSubClassOf, GetType, IsClass, IsSupersededBy} from './wellKnown';
 
 export type ClassMap = Map<string, Class>;
 
@@ -243,60 +244,6 @@ export class Builtin extends Class {
 
   protected baseName() {
     return this.subject.name;
-  }
-}
-
-export class EnumValue {
-  readonly INSTANCE = 'EnumValue';
-
-  private comment?: string;
-  constructor(private readonly value: TSubject) {}
-
-  add(value: ObjectPredicate, map: ClassMap) {
-    // First, "Type" containment.
-    // A Topic can have multiple types. So the triple we're adding now could
-    // either be:
-    // 1. An already processed well-known type (e.g. the Topic is also a Class,
-    //    as well as being an enum).
-    // 2. The Type of the Enum.
-    //
-    // e.g.: SurgicalProcedure (schema.org/SurgicalProcedure) is both a class
-    //       having the "Class" type, and also an instance of the
-    //       MedicalProcedureType (schema.org/MedicalProcedureType) enum.
-    //       Therefore, an Enum will contain two TTypeName ObjectPredicates:
-    //       one of Type=Class, and another of Type=MedicalProcedureType.
-    const type = GetType(value);
-    if (type) {
-      if (IsClassType(type) || IsDataType(type)) return true;
-
-      const enumObject = map.get(type.toString());
-      if (!enumObject) {
-        throw new Error(`Couldn't find ${type.toString()} in classes.`);
-      }
-      enumObject.addEnum(this);
-      return true;
-    }
-
-    // Comment.
-    const comment = GetComment(value);
-    if (comment) {
-      if (this.comment) {
-        throw new Error(`Attempt to add comment on ${
-            this.value.toString()} enum but one already exists.`);
-      }
-      this.comment = comment.comment;
-      return true;
-    }
-
-    return false;
-  }
-
-  toNode() {
-    return withComments(
-        this.comment,
-        createEnumMember(
-            toEnumName(this.value),
-            createStringLiteral(this.value.toString())));
   }
 }
 
