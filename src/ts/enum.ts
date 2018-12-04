@@ -15,13 +15,16 @@
  */
 import {createEnumMember, createStringLiteral} from 'typescript';
 
-import {toEnumName} from '../triples/names';
 import {ObjectPredicate, TSubject} from '../triples/triple';
 import {GetComment, GetType, IsClassType, IsDataType} from '../triples/wellKnown';
 
 import {ClassMap} from './class';
 import {withComments} from './util/comments';
+import {toEnumName} from './util/names';
 
+/**
+ * Corresponds to a value that belongs to an Enumeration.
+ */
 export class EnumValue {
   readonly INSTANCE = 'EnumValue';
 

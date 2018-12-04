@@ -51,11 +51,14 @@ function object(content: string) {
 const totalRegex =
     /\s*<([^<>]+)>\s*<([^<>]+)>\s*((?:<[^<>"]+>)|(?:"(?:[^"]|(?:\\"))+(?:[^\"]|\\")"(?:@[a-zA-Z]+)?))\s*\./;
 
-export function load(version: string, file = 'schema.nt'): Observable<Triple> {
+/**
+ * Loads schema all Triples from a given Schema file and version.
+ */
+export function load(version: string, fileName: string): Observable<Triple> {
   return new Observable<Triple>(subscriber => {
     https
         .get(
-            `https://schema.org/version/${version}/${file}.nt`,
+            `https://schema.org/version/${version}/${fileName}.nt`,
             response => {
               const data: string[] = [];
 

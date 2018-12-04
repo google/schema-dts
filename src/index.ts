@@ -15,13 +15,10 @@
  */
 
 // Public Declarations only:
-export {Options} from './cli/args';
-
 export {ProcessClasses} from './transform/toClass';
 export {ProcessEnums} from './transform/toEnum';
 export {ProcessProperties} from './transform/toProperty';
 
-export * from './triples/names';
 export {load as loadTriples} from './triples/reader';
 export * from './triples/triple';
 export * from './triples/types';

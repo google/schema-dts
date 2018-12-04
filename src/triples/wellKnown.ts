@@ -16,19 +16,26 @@
 import {ObjectPredicate, TPredicate, TSubject, TTypeName, TypedTopic} from './triple';
 import {UrlNode} from './types';
 
+/** Whether the context corresponds to rdf-schema. */
 export function IsRdfSchema(value: UrlNode): boolean {
   return value.context.hostname === 'www.w3.org' &&
       value.context.path[value.context.path.length - 1] === 'rdf-schema';
 }
+/** Whether the context corresponds to rdf-syntax. */
 export function IsRdfSyntax(value: UrlNode): boolean {
   return value.context.hostname === 'www.w3.org' &&
       value.context.path[value.context.path.length - 1].match(
           /^\d\d-rdf-syntax-ns$/) !== null;
 }
+/** Whether the context corresponds to schema.org. */
 export function IsSchemaObject(value: UrlNode): boolean {
   return value.context.hostname === 'schema.org';
 }
 
+/**
+ * If an ObjectPredicate represents a comment, returns the comment. Otherwise
+ * returns null.
+ */
 export function GetComment(value: ObjectPredicate): {comment: string}|null {
   if (IsRdfSchema(value.Predicate) && value.Predicate.name === 'comment') {
     if (value.Object.type === 'SchemaString') {
@@ -40,9 +47,12 @@ export function GetComment(value: ObjectPredicate): {comment: string}|null {
   return null;
 }
 
-export type TParentClassName = UrlNode;
-export function GetSubClassOf(value: ObjectPredicate):
-    {subClassOf: TParentClassName}|null {
+/**
+ * If an ObjectPredicate represents a subClass relation, returns the parent
+ * class. Otherwise returns null.
+ */
+export function GetSubClassOf(value: ObjectPredicate): {subClassOf: TSubject}|
+    null {
   if (IsRdfSchema(value.Predicate) && value.Predicate.name === 'subClassOf') {
     if (value.Object.type === 'SchemaString' || value.Object.type === 'Rdfs') {
       throw new Error(
@@ -53,10 +63,12 @@ export function GetSubClassOf(value: ObjectPredicate):
   return null;
 }
 
+/** Returns true iff a node corresponds to http://schema.org/DataType */
 export function IsDataType(t: TTypeName): boolean {
   return IsSchemaObject(t) && t.name === 'DataType';
 }
 
+/** Returns true iff a Topic represents a non-DataType class. */
 export function IsClass(topic: TypedTopic): boolean {
   // Skip all Native types. These are covered in wellKnownTypes.
   if (topic.types.some(IsDataType)) return false;
@@ -70,17 +82,29 @@ export function IsClass(topic: TypedTopic): boolean {
   return true;
 }
 
+/**
+ * Returns true iff a Predicate corresponds to http://schema.org/domainIncludes
+ */
 export function IsDomainIncludes(value: TPredicate): boolean {
   return IsSchemaObject(value) && value.name === 'domainIncludes';
 }
+/**
+ * Returns true iff a Predicate corresponds to http://schema.org/rangeIncludes
+ */
 export function IsRangeIncludes(value: TPredicate): boolean {
   return IsSchemaObject(value) && value.name === 'rangeIncludes';
 }
-export function IsSupersededBy(value: ObjectPredicate): boolean {
-  return IsSchemaObject(value.Predicate) &&
-      value.Predicate.name === 'supersededBy';
+/**
+ * Returns true iff a Predicate corresponds to a http://schema.org/supersededBy.
+ */
+export function IsSupersededBy(value: TPredicate): boolean {
+  return IsSchemaObject(value) && value.name === 'supersededBy';
 }
 
+/**
+ * If an ObjectPredicate corresponds to a
+ * http://www.w3.org/1999/02/22-rdf-syntax-ns#type, returns a Type it describes.
+ */
 export function GetType(value: ObjectPredicate): TTypeName|null {
   if (IsRdfSyntax(value.Predicate) && value.Predicate.name === 'type') {
     if (value.Object.type === 'Rdfs' || value.Object.type === 'SchemaString') {
@@ -91,6 +115,10 @@ export function GetType(value: ObjectPredicate): TTypeName|null {
   return null;
 }
 
+/**
+ * Returns all Nodes described by a Topic's
+ * http://www.w3.org/1999/02/22-rdf-syntax-ns#type predicates.
+ */
 export function GetTypes(key: TSubject, values: ReadonlyArray<ObjectPredicate>):
     ReadonlyArray<TTypeName> {
   const types = values.map(GetType).filter((t): t is TTypeName => !!t);
@@ -108,13 +136,28 @@ export function GetTypes(key: TSubject, values: ReadonlyArray<ObjectPredicate>):
   return types;
 }
 
+/**
+ * Returns true iff a Type corresponds to
+ * http://www.w3.org/2000/01/rdf-schema#Class
+ */
 export function IsClassType(type: TTypeName): boolean {
   return IsRdfSchema(type) && type.name === 'Class';
 }
+
+/**
+ * Returns true iff a Type corresponds to
+ * http://www.w3.org/1999/02/22-rdf-syntax-ns#Property
+ */
 export function IsPropertyType(type: TTypeName): boolean {
   return IsRdfSyntax(type) && type.name === 'Property';
 }
 
+/**
+ * Returns true iff a Subject has a Type indicating it is an Enum value.
+ *
+ * Enum Values have, in addition to other Data or Class types, another object as
+ * its "Type".
+ */
 export function HasEnumType(types: ReadonlyArray<TTypeName>): boolean {
   for (const type of types) {
     // Skip well-known types.

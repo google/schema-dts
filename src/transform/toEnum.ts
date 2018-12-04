@@ -20,6 +20,11 @@ import {HasEnumType} from '../triples/wellKnown';
 import {ClassMap} from '../ts/class';
 import {EnumValue} from '../ts/enum';
 
+/**
+ * Annotates classes with any Enum values they blong to.
+ * @param topics a sequence of processed triples describing an Ontology.
+ * @param classes return value of `ProcessClasses`.
+ */
 export function ProcessEnums(
     topics: ReadonlyArray<TypedTopic>, classes: ClassMap) {
   // Process Enums

@@ -16,7 +16,6 @@
 import {createEnumDeclaration, createIntersectionTypeNode, createKeywordTypeNode, createModifiersFromModifierFlags, createParenthesizedType, createTypeAliasDeclaration, createTypeLiteralNode, createTypeReferenceNode, createUnionTypeNode, EnumDeclaration, ModifierFlags, Statement, SyntaxKind, TypeAliasDeclaration, TypeNode} from 'typescript';
 
 import {Log} from '../logging';
-import {toClassName, toScopedName} from '../triples/names';
 import {TObject, TPredicate, TSubject} from '../triples/triple';
 import {SchemaString, UrlNode} from '../triples/types';
 import {GetComment, GetSubClassOf, GetType, IsSupersededBy} from '../triples/wellKnown';
@@ -25,9 +24,22 @@ import {EnumValue} from './enum';
 import {Property, PropertyType} from './property';
 import {arrayOf} from './util/arrayof';
 import {withComments} from './util/comments';
+import {toClassName, toScopedName} from './util/names';
 
+/** Maps fully qualified IDs of each Class to the class itself. */
 export type ClassMap = Map<string, Class>;
 
+/**
+ * Represents a "Class" in Schema.org, except in cases where it is better
+ * described by Builtin (i.e. is a DataType).
+ *
+ * In TypeScript, this corresponds to a collection of declarations:
+ * 1. If the class has enum values, an Enum declaration.
+ * 2. If the class has properties, the properties in an object literal.
+ * 3. If the class has children,
+ *        a type union over all children.
+ *    otherwise, a "type" property.
+ */
 export class Class {
   private _comment?: string;
   private readonly children: Class[] = [];
@@ -110,7 +122,7 @@ export class Class {
       return true;
     }
 
-    if (IsSupersededBy(value)) {
+    if (IsSupersededBy(value.Predicate)) {
       const supersededBy = classMap.get(value.Object.toString());
       if (!supersededBy) {
         throw new Error(`Couldn't find class ${
@@ -224,6 +236,10 @@ export class Class {
   }
 }
 
+/**
+ * Represents a DataType. A "Native" Schema.org object that is best represented
+ * in JSON-LD and JavaScript as a typedef to a native type.
+ */
 export class Builtin extends Class {
   constructor(
       url: string, private readonly equivTo: string,

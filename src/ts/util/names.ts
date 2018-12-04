@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {TObject, TSubject} from './triple';
+import {TObject, TSubject} from '../../triples/triple';
 
 export function toClassName(subject: TSubject): string {
   return subject.name;

@@ -16,6 +16,7 @@
 
 import {URL} from 'url';
 
+/** Describes URL components of a "Context". */
 export interface ReadonlyUrl {
   readonly href: string;
   readonly protocol: string;
@@ -34,6 +35,10 @@ function fromString(urlString: string): ReadonlyUrl {
   };
 }
 
+/**
+ * In-memory representation of a node in a Triple corresponding to a URL.
+ * @example <http://schema.org/domainIncludes>
+ */
 export class UrlNode {
   readonly type = 'UrlNode';
   constructor(
@@ -70,6 +75,12 @@ export class UrlNode {
   }
 }
 
+/**
+ * In-memory representation of a node in a Triple corresponding to a string
+ * literal.
+ * @example "BodyOfWater"
+ * @example "BodyOfWater"@en
+ */
 export class SchemaString {
   readonly type = 'SchemaString';
   constructor(readonly value: string, readonly language: string|undefined) {}
@@ -84,6 +95,11 @@ export class SchemaString {
   }
 }
 
+/**
+ * In-memory representation of a compact Node corresponding to a relative RDFS
+ * reference.
+ * @example <rdfs:label>
+ */
 export class Rdfs {
   readonly type = 'Rdfs';
   constructor(readonly label: string) {}

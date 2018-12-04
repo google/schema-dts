@@ -17,14 +17,16 @@
 import {createArrayTypeNode, createKeywordTypeNode, createPropertySignature, createStringLiteral, createToken, createTypeReferenceNode, createUnionTypeNode, HighlightSpanKind, PropertySignature, SyntaxKind, TypeNode} from 'typescript';
 
 import {Log} from '../logging';
-import {toScopedName, toTypeName} from '../triples/names';
 import {Format, ObjectPredicate, TObject, TSubject} from '../triples/triple';
 import {GetComment, GetType, IsDomainIncludes, IsRangeIncludes, IsSupersededBy} from '../triples/wellKnown';
 
 import {ClassMap} from './class';
 import {withComments} from './util/comments';
+import {toScopedName, toTypeName} from './util/names';
 
-
+/**
+ * A "class" of properties, not associated with any particuar object.
+ */
 export class PropertyType {
   private readonly types: TObject[] = [];
   private _comment?: string;
@@ -73,7 +75,7 @@ export class PropertyType {
       return true;
     }
 
-    if (IsSupersededBy(value)) {
+    if (IsSupersededBy(value.Predicate)) {
       this._supersededBy.push(value.Object);
       return true;
     }
@@ -95,6 +97,9 @@ export class PropertyType {
   }
 }
 
+/**
+ * A Property on a particular object.
+ */
 export class Property {
   constructor(
       private readonly key: string, private readonly type: PropertyType) {}

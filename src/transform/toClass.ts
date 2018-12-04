@@ -83,6 +83,14 @@ function BuildClasses(topics: ReadonlyArray<TypedTopic>, classes: ClassMap) {
   }
 }
 
+/**
+ * Produce a mapping of all Classes within the Ontology. The resulting classes
+ * are empty and only describes their names, comments, and inheritance
+ * relations.
+ *
+ * @param topics a sequence of processed triples describing an Ontology.
+ * @returns ClassMap Mapping fully qualified ID of each type to a Class.
+ */
 export function ProcessClasses(topics: ReadonlyArray<TypedTopic>): ClassMap {
   const classes = ForwardDeclareClasses(topics);
   BuildClasses(topics, classes);
