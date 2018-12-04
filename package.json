@@ -11,9 +11,11 @@
     }
   ],
   "files": [
-    "dist/bin/**/*"
+    "dist/gen/**/*"
   ],
-  "bin": "./dist/bin/cli/cli.js",
+  "types": "./dist/gen/index.d.ts",
+  "main": "./dist/gen/index.js",
+  "bin": "./dist/gen/cli/cli.js",
   "devDependencies": {
     "@types/node": "^10.12.9",
     "gulp": "^4.0.0",
