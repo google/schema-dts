@@ -95,21 +95,3 @@ export class Rdfs {
     return result && new Rdfs(result[1]);
   }
 }
-
-// export class OneOffClassName {
-//   readonly type = 'OneOffClass';
-//   private static readonly classes: ReadonlyArray<[string, string]> = [
-//     ['http://publications.europa.eu/mdr/eli/index.html', 'ELI'],
-//   ];
-
-//   constructor(readonly url: string, readonly className: string) {}
-//   toString() {
-//     return this.url;
-//   }
-//   static Parse(content: string): OneOffClassName|null {
-//     for (const [url, className] of OneOffClassName.classes) {
-//       if (url === content) return new OneOffClassName(url, className);
-//     }
-//     return null;
-//   }
-// }
