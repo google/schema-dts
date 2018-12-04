@@ -16,33 +16,16 @@
 import {TObject, TSubject} from './triple';
 
 export function toClassName(subject: TSubject): string {
-  switch (subject.type) {
-    case 'SchemaObject':
-      return subject.name;
-    case 'SchemaSource':
-      return 'S_' + subject.hash;
-    case 'W3CNameSpaced':
-      return subject.ns + '_' + subject.hash;
-    case 'OneOffClass':
-      return subject.className;
-    default:
-      const shouldBeNever: never = subject;
-      return shouldBeNever;
-  }
+  return subject.name;
 }
 
 export function toTypeName(object: TObject): string {
   switch (object.type) {
-    case 'SchemaObject':
-    case 'SchemaSource':
-    case 'W3CNameSpaced':
+    case 'UrlNode':
       return toClassName(object);
     case 'SchemaString':
       return `"${object.value}"`;  // Without @lang tag, even if present.
-    case 'RdfSchema':
-    case 'RdfSntax':
     case 'Rdfs':
-    case 'WikidataConst':
       throw new Error('Not sure yet about ' + JSON.stringify(object));
     default:
       throw new Error(`Unrecognized ${JSON.stringify(object)}`);
@@ -50,19 +33,7 @@ export function toTypeName(object: TObject): string {
 }
 
 export function toScopedName(subject: TSubject): string {
-  switch (subject.type) {
-    case 'SchemaObject':
-      return subject.name;
-    case 'SchemaSource':
-      return subject.hash;
-    case 'W3CNameSpaced':
-      return subject.hash;
-    case 'OneOffClass':
-      return subject.className;
-    default:
-      const shouldBeNever: never = subject;
-      return shouldBeNever;
-  }
+  return subject.name;
 }
 
 export function toEnumName(subject: TSubject): string {

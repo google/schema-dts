@@ -19,8 +19,8 @@ import {withComments} from './comments';
 import {toClassName, toEnumName, toScopedName} from './names';
 import {Property, PropertyType} from './toProperty';
 import {ObjectPredicate, TObject, TPredicate, TSubject} from './triple';
-import {SchemaObject, SchemaString} from './types';
-import {GetComment, GetSubClassOf, GetType, IsClassType, IsDataType, IsPropertyType, TTypeName} from './wellKnown';
+import {SchemaString, UrlNode} from './types';
+import {GetComment, GetSubClassOf, GetType, IsClassType, IsDataType, IsPropertyType, IsSupersededBy, TTypeName} from './wellKnown';
 
 export type ClassMap = Map<string, Class>;
 
@@ -43,6 +43,7 @@ export class Class {
   private readonly parents: Class[] = [];
   private readonly _props: Property[] = [];
   private readonly _enums: EnumValue[] = [];
+  private readonly _supersededBy: Class[] = [];
 
   private aliasesBuiltin(): boolean {
     for (const parent of this.parents) {
@@ -101,9 +102,20 @@ export class Class {
         this.parents.push(parentClass);
         parentClass.children.push(this);
       } else {
-        throw new Error(`Couldn't find parent of ${this.subject.toString()}, ${
+        throw new Error(`Couldn't find parent of ${this.subject.name}, ${
             s.subClassOf.toString()}`);
       }
+      return true;
+    }
+
+    if (IsSupersededBy(value)) {
+      const supersededBy = classMap.get(value.Object.toString());
+      if (!supersededBy) {
+        throw new Error(`Couldn't find class ${
+            value.Object.toString()}, which supersedes class ${
+            this.subject.name}`);
+      }
+      this._supersededBy.push(supersededBy);
       return true;
     }
 
@@ -208,9 +220,9 @@ export class Class {
 
 export class Builtin extends Class {
   constructor(
-      private readonly name: string, private readonly equivTo: string,
-      private readonly doc?: string) {
-    super(new SchemaObject(name, /*layer=*/undefined));
+      url: string, private readonly equivTo: string,
+      private readonly doc: string) {
+    super(UrlNode.Parse(url));
   }
 
   toNode() {
@@ -219,14 +231,15 @@ export class Builtin extends Class {
           this.doc,
           createTypeAliasDeclaration(
               /*decorators=*/[],
-              createModifiersFromModifierFlags(ModifierFlags.Export), this.name,
+              createModifiersFromModifierFlags(ModifierFlags.Export),
+              this.subject.name,
               /*typeParameters=*/[],
               createTypeReferenceNode(this.equivTo, []))),
     ];
   }
 
   protected baseName() {
-    return this.name;
+    return this.subject.name;
   }
 }
 
@@ -290,16 +303,46 @@ export function toClass(cls: Class, group: BySubject, map: ClassMap): Class {
     const added = cls.add(value, map);
     if (!added) rest.push(value);
   }
+
+  if (rest.length > 0) {
+    console.error(`Class ${cls.subject.name}: Did not add [${
+        rest.map(r => `(${r.Predicate.name} ${r.Object.toString()})`)
+            .join(',')}]`);
+  }
   return cls;
 }
 
 const wellKnownTypes = [
-  new Builtin('Text', 'string'), new Builtin('Number', 'number'),
+  new Builtin('http://schema.org/Text', 'string', 'Data type: Text.'),
+  new Builtin('http://schema.org/Number', 'number', 'Data type: Number.'),
   new Builtin(
-      'Time', 'string',
+      'http://schema.org/Time', 'string',
       'DateTime represented in string, e.g. 2017-01-04T17:10:00-05:00.'),
-  new Builtin('Boolean', 'boolean')
+  new Builtin(
+      'http://schema.org/Date', 'string',
+      'A date value in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">' +
+          'ISO 8601 date format</a>.'),
+  new Builtin(
+      'http://schema.org/DateTime', 'string',
+      'A combination of date and time of day in the form ' +
+          '[-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] ' +
+          '(see Chapter 5.4 of ISO 8601).'),
+  new Builtin(
+      'http://schema.org/Boolean', 'boolean', 'Boolean: True or False.'),
 ];
+
+function IsClass(topic: TypedTopic): boolean {
+  // Skip all Native types. These are covered in wellKnownTypes.
+  if (topic.types.some(IsDataType)) return false;
+
+  // Skip the DataType Type itself.
+  if (IsDataType(topic.Subject)) return false;
+
+  // Skip anything that isn't a class.
+  if (!topic.types.some(IsClassType)) return false;
+
+  return true;
+}
 
 function ForwardDeclareClasses(topics: ReadonlyArray<TypedTopic>): ClassMap {
   const classes = new Map<string, Class>();
@@ -307,7 +350,7 @@ function ForwardDeclareClasses(topics: ReadonlyArray<TypedTopic>): ClassMap {
     classes.set(wk.subject.toString(), wk);
   }
   for (const topic of topics) {
-    if (!topic.types.some(IsClassType)) continue;
+    if (!IsClass(topic)) continue;
     classes.set(topic.Subject.toString(), new Class(topic.Subject));
   }
 
@@ -320,7 +363,7 @@ function ForwardDeclareClasses(topics: ReadonlyArray<TypedTopic>): ClassMap {
 
 function BuildClasses(topics: ReadonlyArray<TypedTopic>, classes: ClassMap) {
   for (const topic of topics) {
-    if (!topic.types.some(IsClassType)) continue;
+    if (!IsClass(topic)) continue;
 
     const cls = classes.get(topic.Subject.toString());
     if (!cls) {

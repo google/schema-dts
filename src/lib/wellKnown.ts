@@ -14,32 +14,39 @@
  * limitations under the License.
  */
 import {ObjectPredicate, TPredicate, TSubject} from './triple';
-import {RdfSchema, RdfSyntax, SchemaObject, SchemaSource, W3CNameSpaced} from './types';
+import {UrlNode} from './types';
+
+export function IsRdfSchema(value: UrlNode): boolean {
+  return value.context.hostname === 'www.w3.org' &&
+      value.context.path[value.context.path.length - 1] === 'rdf-schema';
+}
+export function IsRdfSyntax(value: UrlNode): boolean {
+  return value.context.hostname === 'www.w3.org' &&
+      value.context.path[value.context.path.length - 1].match(
+          /^\d\d-rdf-syntax-ns$/) !== null;
+}
+export function IsSchemaObject(value: UrlNode): boolean {
+  return value.context.hostname === 'schema.org';
+}
 
 export function GetComment(value: ObjectPredicate): {comment: string}|null {
-  if (value.Predicate.type === 'RdfSchema' &&
-      value.Predicate.hash === 'comment') {
+  if (IsRdfSchema(value.Predicate) && value.Predicate.name === 'comment') {
     if (value.Object.type === 'SchemaString') {
       return {comment: value.Object.value};
     }
-    console.error(
+    throw new Error(
         `Unexpected Comment predicate with non-string object: ${value}.`);
   }
   return null;
 }
 
-export type TParentClassName = SchemaObject|SchemaSource|W3CNameSpaced;
+export type TParentClassName = UrlNode;
 export function GetSubClassOf(value: ObjectPredicate):
     {subClassOf: TParentClassName}|null {
-  if (value.Predicate.type === 'RdfSchema' &&
-      value.Predicate.hash === 'subClassOf') {
-    if (value.Object.type === 'RdfSchema' || value.Object.type === 'RdfSntax' ||
-        value.Object.type === 'SchemaString' || value.Object.type === 'Rdfs' ||
-        value.Object.type === 'WikidataConst' ||
-        value.Object.type === 'OneOffClass') {
-      console.error(
+  if (IsRdfSchema(value.Predicate) && value.Predicate.name === 'subClassOf') {
+    if (value.Object.type === 'SchemaString' || value.Object.type === 'Rdfs') {
+      throw new Error(
           `Unexpected object for predicate 'subClassOf': ${value.Object}.`);
-      return null;
     }
     return {subClassOf: value.Object};
   }
@@ -47,29 +54,27 @@ export function GetSubClassOf(value: ObjectPredicate):
 }
 
 export function IsDataType(t: TTypeName): boolean {
-  switch (t.type) {
-    case 'SchemaObject':
-      return t.name === 'DataType';
-    default:
-      return false;
-  }
+  return IsSchemaObject(t) && t.name === 'DataType';
 }
 
 export function IsDomainIncludes(value: TPredicate): boolean {
-  return value.type === 'SchemaObject' && value.name === 'domainIncludes';
+  return IsSchemaObject(value) && value.name === 'domainIncludes';
 }
 export function IsRangeIncludes(value: TPredicate): boolean {
-  return value.type === 'SchemaObject' && value.name === 'rangeIncludes';
+  return IsSchemaObject(value) && value.name === 'rangeIncludes';
+}
+export function IsSupersededBy(value: ObjectPredicate): boolean {
+  return IsSchemaObject(value.Predicate) &&
+      value.Predicate.name === 'supersededBy';
 }
 
-export type TTypeName = RdfSchema|RdfSyntax|SchemaObject;
+export type TTypeName = UrlNode;
 export function GetType(value: ObjectPredicate): TTypeName|null {
-  if (value.Predicate.type === 'RdfSntax' && value.Predicate.hash === 'type') {
-    if (value.Object.type === 'RdfSchema' || value.Object.type === 'RdfSntax' ||
-        value.Object.type === 'SchemaObject') {
-      return value.Object;
+  if (IsRdfSyntax(value.Predicate) && value.Predicate.name === 'type') {
+    if (value.Object.type === 'Rdfs' || value.Object.type === 'SchemaString') {
+      throw new Error(`Unexpected type ${value.Object}`);
     }
-    throw new Error(`Unexpected type ${value.Object}`);
+    return value.Object;
   }
   return null;
 }
@@ -79,27 +84,23 @@ export function GetTypes(key: TSubject, values: ReadonlyArray<ObjectPredicate>):
   const types = values.map(GetType).filter((t): t is TTypeName => !!t);
 
   if (types.length === 0) {
-    throw new Error(
-        `No type found for Subject ${key.toString()}. Triples include:\n${
-            values.map(v => `${v.Predicate.toString()} ${v.Object.toString()}`)
-                .join('\n')}`);
+    throw new Error(`No type found for Subject ${
+        key.toString()}. Triples include:\n${
+        values
+            .map(
+                v => `${v.Predicate.toString()}: ${
+                    JSON.stringify(v.Predicate)}\n\t=> ${v.Object.toString()}`)
+            .join('\n')}`);
   }
 
   return types;
 }
 
-export function EnsureSubject(type: TTypeName): TSubject {
-  if (type.type === 'RdfSntax' || type.type === 'RdfSchema') {
-    throw new Error(`Expected ${type.toString()} to be a Subject.`);
-  }
-  return type;
-}
-
 export function IsClassType(type: TTypeName): boolean {
-  return type.type === 'RdfSchema' && type.hash === 'Class';
+  return IsRdfSchema(type) && type.name === 'Class';
 }
 export function IsPropertyType(type: TTypeName): boolean {
-  return type.type === 'RdfSntax' && type.hash === 'Property';
+  return IsRdfSyntax(type) && type.name === 'Property';
 }
 
 export function HasEnumType(types: ReadonlyArray<TTypeName>): boolean {

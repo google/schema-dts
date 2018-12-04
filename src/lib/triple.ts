@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {OneOffClassName, Rdfs, RdfSchema, RdfSyntax, SchemaObject, SchemaSource, SchemaString, W3CNameSpaced, W3cSkos, WikidataConst} from './types';
+import {Rdfs, SchemaString, UrlNode} from './types';
 
 export interface Triple {
-  readonly Subject: SchemaObject|SchemaSource|W3CNameSpaced|OneOffClassName;
-  readonly Predicate: RdfSchema|RdfSyntax|SchemaObject|W3cSkos;
-  readonly Object:|SchemaObject|SchemaSource|SchemaString|RdfSchema|RdfSyntax|
-      Rdfs|WikidataConst|W3CNameSpaced|OneOffClassName;
+  readonly Subject: UrlNode;
+  readonly Predicate: UrlNode;
+  readonly Object: UrlNode|SchemaString|Rdfs;
 }
 export type TSubject = Triple['Subject'];
 export type TPredicate = Triple['Predicate'];

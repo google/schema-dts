@@ -39,8 +39,8 @@ function ParseFlags(): Options|undefined {
       '--schema',
       {defaultValue: '3.4', help: 'The version of the schema to load.'});
   parser.addArgument('--layer', {
-    defaultValue: 'schema.nt',
-    help: 'Which layer of the schema to load? E.g. schema.nt or all-layers.nt.'
+    defaultValue: 'schema',
+    help: 'Which layer of the schema to load? E.g. schema or all-layers.'
   });
   return parser.parseArgs();
 }

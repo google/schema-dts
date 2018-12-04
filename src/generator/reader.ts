@@ -16,8 +16,8 @@
 import https from 'https';
 import {Observable} from 'rxjs';
 
-import {TObject, TPredicate, Triple, TSubject} from '../lib/triple';
-import {OneOffClassName, Rdfs, RdfSchema, RdfSyntax, SchemaObject, SchemaSource, SchemaString, W3CNameSpaced, W3cSkos, WikidataConst} from '../lib/types';
+import {TObject, Triple} from '../lib/triple';
+import {Rdfs, SchemaString, UrlNode} from '../lib/types';
 
 function verify<T>(
     content: string, ...rest: Array<(content: string) => T | null>): T {
@@ -37,24 +37,16 @@ function unWrap<T>(maker: (content: string) => T | null): (content: string) =>
 }
 
 function subject(content: string) {
-  return verify<TSubject>(
-      content, SchemaObject.Parse, SchemaSource.Parse, W3CNameSpaced.Parse,
-      OneOffClassName.Parse);
+  return UrlNode.Parse(content);
 }
 
 function predicate(content: string) {
-  return verify<TPredicate>(
-      content, RdfSyntax.Parse, RdfSchema.Parse, SchemaObject.Parse,
-      W3cSkos.Parse);
+  return UrlNode.Parse(content);
 }
 
 function object(content: string) {
   return verify<TObject>(
-      content, unWrap(SchemaObject.Parse), unWrap(SchemaSource.Parse),
-      unWrap(RdfSyntax.Parse), unWrap(RdfSchema.Parse),
-      unWrap(WikidataConst.Parse), unWrap(Rdfs.Parse),
-      unWrap(W3CNameSpaced.Parse), unWrap(OneOffClassName.Parse),
-      SchemaString.Parse);
+      content, unWrap(Rdfs.Parse), unWrap(UrlNode.Parse), SchemaString.Parse);
 }
 const totalRegex =
     /\s*<([^<>]+)>\s*<([^<>]+)>\s*((?:<[^<>"]+>)|(?:"(?:[^"]|(?:\\"))+(?:[^\"]|\\")"(?:@[a-zA-Z]+)?))\s*\./;
@@ -63,7 +55,7 @@ export function load(version: string, file = 'schema.nt'): Observable<Triple> {
   return new Observable<Triple>(subscriber => {
     https
         .get(
-            `https://schema.org/version/${version}/${file}`,
+            `https://schema.org/version/${version}/${file}.nt`,
             response => {
               const data: string[] = [];
 
