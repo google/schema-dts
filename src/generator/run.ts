@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {ArgumentParser} from 'argparse';
 import {OperatorFunction} from 'rxjs';
 import {groupBy, map, mergeMap, toArray} from 'rxjs/operators';
 import {createPrinter, createSourceFile, EmitHint, NewLineKind, ScriptKind, ScriptTarget} from 'typescript';
@@ -23,50 +22,8 @@ import {ProcessProperties,} from '../lib/toProperty';
 import {ObjectPredicate, Topic, toString, Triple, TypedTopic} from '../lib/triple';
 import {GetTypes, HasEnumType} from '../lib/wellKnown';
 
+import {ParseFlags} from './args';
 import {load} from './reader';
-
-interface Options {
-  verbose: boolean;
-  schema: string;
-  layer: string;
-  deprecated: boolean;
-}
-function ParseFlags(): Options|undefined {
-  const parser = new ArgumentParser(
-      {version: '0.0.1', addHelp: true, description: 'schema-dts generator'});
-
-  const verbose = parser.addMutuallyExclusiveGroup({required: false});
-  verbose.addArgument(
-      '--verbose', {defaultValue: false, action: 'storeTrue', dest: 'verbose'});
-  verbose.addArgument('--noverbose', {action: 'storeFalse', dest: 'verbose'});
-
-  parser.addArgument('--schema', {
-    defaultValue: '3.4',
-    help: 'The version of the schema to load.',
-    metavar: 'version',
-    dest: 'schema'
-  });
-  parser.addArgument('--layer', {
-    defaultValue: 'schema',
-    help: 'Which layer of the schema to load? E.g. schema or all-layers.',
-    metavar: 'name_of_file',
-    dest: 'layer'
-  });
-
-  const deprecated = parser.addMutuallyExclusiveGroup({required: false});
-  deprecated.addArgument('--deprecated', {
-    defaultValue: {defaultValue: true},
-    help: 'Include deprecated Classes and Properties.',
-    action: 'storeTrue',
-    dest: 'deprecated'
-  });
-  deprecated.addArgument('--nodeprecated', {
-    help: 'Skip deprecated Classes and Properties.',
-    action: 'storeFalse',
-    dest: 'deprecated'
-  });
-  return parser.parseArgs();
-}
 
 function groupBySubject(): OperatorFunction<Triple, Topic> {
   return (observable) => observable.pipe(
