@@ -21,11 +21,11 @@ import {SetOptions} from '../logging';
 import {ProcessClasses} from '../transform/toClass';
 import {ProcessEnums} from '../transform/toEnum';
 import {ProcessProperties,} from '../transform/toProperty';
+import {load} from '../triples/reader';
 import {Topic, Triple, TypedTopic} from '../triples/triple';
 import {GetTypes} from '../triples/wellKnown';
 
 import {ParseFlags} from './args';
-import {load} from './reader';
 
 function groupBySubject(): OperatorFunction<Triple, Topic> {
   return (observable) => observable.pipe(

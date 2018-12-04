@@ -43,20 +43,20 @@ function spawn(command, args = [], options = {}) {
 
 const nodeProject = tsc.createProject('src/tsconfig.json');
 gulp.task('build-generator', () => {
-  return nodeProject.src().pipe(nodeProject()).js.pipe(gulp.dest('built'));
+  return nodeProject.src().pipe(nodeProject()).js.pipe(gulp.dest('built/bin'));
 });
 
 gulp.task('generate-ts', gulp.series('build-generator', () => {
   return file('schema.ts', '', {src: true})
-      .pipe(spawn('node', ['built/generator/run.js']))
+      .pipe(spawn('node', ['built/bin/cli/cli.js']))
       .pipe(gulp.dest('built/ts-schema'));
 }));
 
-gulp.task('generate-package', gulp.series('generate-ts', () => {
+gulp.task('generate-package', gulp.series('generate-ts', gulp.parallel(() => {
   return gulp.src('built/ts-schema/*.ts')
       .pipe(tsc({
         noImplicitAny: true,
         declaration: true,
       }))
-      .pipe(gulp.dest('dist'));
-}));
+      .pipe(gulp.dest('dist/schema'));
+}, () => gulp.src('built/bin/**/*').pipe(gulp.dest('dist/bin')))));
