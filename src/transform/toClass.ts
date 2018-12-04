@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import {Log} from '../logging';
 import {ObjectPredicate, Topic, TypedTopic} from '../triples/triple';
 import {IsClass} from '../triples/wellKnown';
 import {Builtin, Class, ClassMap} from '../ts/class';
@@ -26,7 +27,7 @@ function toClass(cls: Class, topic: Topic, map: ClassMap): Class {
   }
 
   if (rest.length > 0) {
-    console.error(`Class ${cls.subject.name}: Did not add [${
+    Log(`Class ${cls.subject.name}: Did not add [${
         rest.map(r => `(${r.Predicate.name} ${r.Object.toString()})`)
             .join(',')}]`);
   }

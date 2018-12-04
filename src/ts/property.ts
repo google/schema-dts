@@ -16,6 +16,7 @@
 
 import {createArrayTypeNode, createKeywordTypeNode, createPropertySignature, createStringLiteral, createToken, createTypeReferenceNode, createUnionTypeNode, HighlightSpanKind, PropertySignature, SyntaxKind, TypeNode} from 'typescript';
 
+import {Log} from '../logging';
 import {toScopedName, toTypeName} from '../triples/names';
 import {Format, ObjectPredicate, TObject, TSubject} from '../triples/triple';
 import {GetComment, GetType, IsDomainIncludes, IsRangeIncludes, IsSupersededBy} from '../triples/wellKnown';
@@ -49,7 +50,7 @@ export class PropertyType {
     const c = GetComment(value);
     if (c) {
       if (this._comment) {
-        console.error(`Duplicate comments provided on property ${
+        Log(`Duplicate comments provided on property ${
             this.subject.toString()}. It will be overwritten.`);
       }
       this._comment = c.comment;

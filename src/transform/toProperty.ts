@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import {Log} from '../logging';
 import {Format, ObjectPredicate, TypedTopic} from '../triples/triple';
 import {IsPropertyType} from '../triples/wellKnown';
 import {ClassMap} from '../ts/class';
@@ -34,7 +35,7 @@ export function ProcessProperties(
     }
     // Go over RangeIncludes or DomainIncludes:
     if (rest.length > 0) {
-      console.error(`Still unadded for property: ${topic.Subject.name}:\n\t${
+      Log(`Still unadded for property: ${topic.Subject.name}:\n\t${
           rest.map(Format).join('\n\t')}`);
     }
   }

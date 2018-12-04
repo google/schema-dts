@@ -17,6 +17,7 @@ import {OperatorFunction} from 'rxjs';
 import {groupBy, map, mergeMap, toArray} from 'rxjs/operators';
 import {createPrinter, createSourceFile, EmitHint, NewLineKind, ScriptKind, ScriptTarget} from 'typescript';
 
+import {SetOptions} from '../logging';
 import {ProcessClasses} from '../transform/toClass';
 import {ProcessEnums} from '../transform/toEnum';
 import {ProcessProperties,} from '../transform/toProperty';
@@ -53,6 +54,7 @@ function asTopic(): OperatorFunction<Topic, TypedTopic> {
 async function main() {
   const options = ParseFlags();
   if (!options) return;
+  SetOptions(options);
 
   const result = load(options.schema, options.layer);
   const topics = await result

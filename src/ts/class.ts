@@ -15,6 +15,7 @@
  */
 import {createEnumDeclaration, createIntersectionTypeNode, createKeywordTypeNode, createModifiersFromModifierFlags, createParenthesizedType, createTypeAliasDeclaration, createTypeLiteralNode, createTypeReferenceNode, createUnionTypeNode, EnumDeclaration, ModifierFlags, Statement, SyntaxKind, TypeAliasDeclaration, TypeNode} from 'typescript';
 
+import {Log} from '../logging';
 import {toClassName, toScopedName} from '../triples/names';
 import {TObject, TPredicate, TSubject} from '../triples/triple';
 import {SchemaString, UrlNode} from '../triples/types';
@@ -90,7 +91,7 @@ export class Class {
     const c = GetComment(value);
     if (c) {
       if (this._comment) {
-        console.error(`Duplicate comments provided on class ${
+        Log(`Duplicate comments provided on class ${
             this.subject.toString()}. It will be overwritten.`);
       }
       this._comment = c.comment;

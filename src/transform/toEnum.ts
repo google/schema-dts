@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import {Log} from '../logging';
 import {Format, ObjectPredicate, TypedTopic} from '../triples/triple';
 import {HasEnumType} from '../triples/wellKnown';
 import {ClassMap} from '../ts/class';
@@ -33,9 +34,8 @@ export function ProcessEnums(
     }
 
     if (skipped.length > 0) {
-      console.error(
-          `For Enum Item ${topic.Subject.name}, did not process: `,
-          skipped.map(Format));
+      Log(`For Enum Item ${topic.Subject.name}, did not process:\n\t${
+          skipped.map(Format).join('\n\t')}`);
     }
   }
 }
