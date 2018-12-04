@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {ObjectPredicate, TPredicate, TSubject} from './triple';
+import {ObjectPredicate, TPredicate, TSubject, TTypeName, TypedTopic} from './triple';
 import {UrlNode} from './types';
 
 export function IsRdfSchema(value: UrlNode): boolean {
@@ -57,6 +57,19 @@ export function IsDataType(t: TTypeName): boolean {
   return IsSchemaObject(t) && t.name === 'DataType';
 }
 
+export function IsClass(topic: TypedTopic): boolean {
+  // Skip all Native types. These are covered in wellKnownTypes.
+  if (topic.types.some(IsDataType)) return false;
+
+  // Skip the DataType Type itself.
+  if (IsDataType(topic.Subject)) return false;
+
+  // Skip anything that isn't a class.
+  if (!topic.types.some(IsClassType)) return false;
+
+  return true;
+}
+
 export function IsDomainIncludes(value: TPredicate): boolean {
   return IsSchemaObject(value) && value.name === 'domainIncludes';
 }
@@ -68,7 +81,6 @@ export function IsSupersededBy(value: ObjectPredicate): boolean {
       value.Predicate.name === 'supersededBy';
 }
 
-export type TTypeName = UrlNode;
 export function GetType(value: ObjectPredicate): TTypeName|null {
   if (IsRdfSyntax(value.Predicate) && value.Predicate.name === 'type') {
     if (value.Object.type === 'Rdfs' || value.Object.type === 'SchemaString') {

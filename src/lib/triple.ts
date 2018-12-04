@@ -29,6 +29,16 @@ export interface ObjectPredicate {
   Predicate: TPredicate;
 }
 
+export type TTypeName = UrlNode;
+
+export interface Topic {
+  Subject: TSubject;
+  values: ReadonlyArray<ObjectPredicate>;
+}
+export interface TypedTopic extends Topic {
+  types: ReadonlyArray<TTypeName>;
+}
+
 export function toString(o: Triple|ObjectPredicate): string {
   return ((o as Triple).Subject) ?
       `{ ${(o as Triple).Subject.toString()} ${o.Predicate.toString()} ${

@@ -19,9 +19,9 @@ import {groupBy, map, mergeMap, toArray} from 'rxjs/operators';
 import {createPrinter, createSourceFile, EmitHint, NewLineKind, ScriptKind, ScriptTarget} from 'typescript';
 
 import {toScopedName} from '../lib/names';
-import {BySubject, EnumValue, FindProperties, ProcessClasses, TypedTopic} from '../lib/toClass';
+import {EnumValue, FindProperties, ProcessClasses} from '../lib/toClass';
 import {Property, PropertyType} from '../lib/toProperty';
-import {ObjectPredicate, toString, Triple} from '../lib/triple';
+import {ObjectPredicate, Topic, toString, Triple, TypedTopic} from '../lib/triple';
 import {GetTypes, HasEnumType, IsDomainIncludes} from '../lib/wellKnown';
 
 import {load} from './reader';
@@ -45,7 +45,7 @@ function ParseFlags(): Options|undefined {
   return parser.parseArgs();
 }
 
-function groupBySubject(): OperatorFunction<Triple, BySubject> {
+function groupBySubject(): OperatorFunction<Triple, Topic> {
   return (observable) => observable.pipe(
              groupBy(triple => triple.Subject.toString()),
              mergeMap(
@@ -61,7 +61,7 @@ function groupBySubject(): OperatorFunction<Triple, BySubject> {
          );
 }
 
-function asTopic(): OperatorFunction<BySubject, TypedTopic> {
+function asTopic(): OperatorFunction<Topic, TypedTopic> {
   return (observable) => observable.pipe(
              map(bySubject => ({
                    ...bySubject,

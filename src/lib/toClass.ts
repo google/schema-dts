@@ -18,24 +18,12 @@ import {createEnumDeclaration, createEnumMember, createIntersectionTypeNode, cre
 import {withComments} from './comments';
 import {toClassName, toEnumName, toScopedName} from './names';
 import {Property, PropertyType} from './toProperty';
-import {ObjectPredicate, TObject, TPredicate, TSubject} from './triple';
+import {ObjectPredicate, TObject, Topic, TPredicate, TSubject, TypedTopic} from './triple';
 import {SchemaString, UrlNode} from './types';
-import {GetComment, GetSubClassOf, GetType, IsClassType, IsDataType, IsPropertyType, IsSupersededBy, TTypeName} from './wellKnown';
+import {arrayOf} from './util';
+import {GetComment, GetSubClassOf, GetType, IsClass, IsClassType, IsDataType, IsPropertyType, IsSupersededBy,} from './wellKnown';
 
 export type ClassMap = Map<string, Class>;
-
-export interface BySubject {
-  Subject: TSubject;
-  values: ReadonlyArray<ObjectPredicate>;
-}
-export interface TypedTopic extends BySubject {
-  types: ReadonlyArray<TTypeName>;
-}
-
-function arrayOf<T>(...args: Array<T|undefined|null>): T[] {
-  return args.filter(
-      (elem): elem is T => elem !== null && typeof elem !== 'undefined');
-}
 
 export class Class {
   private comment?: string;
@@ -297,9 +285,9 @@ export class EnumValue {
   }
 }
 
-export function toClass(cls: Class, group: BySubject, map: ClassMap): Class {
+export function toClass(cls: Class, topic: Topic, map: ClassMap): Class {
   const rest: ObjectPredicate[] = [];
-  for (const value of group.values) {
+  for (const value of topic.values) {
     const added = cls.add(value, map);
     if (!added) rest.push(value);
   }
@@ -330,19 +318,6 @@ const wellKnownTypes = [
   new Builtin(
       'http://schema.org/Boolean', 'boolean', 'Boolean: True or False.'),
 ];
-
-function IsClass(topic: TypedTopic): boolean {
-  // Skip all Native types. These are covered in wellKnownTypes.
-  if (topic.types.some(IsDataType)) return false;
-
-  // Skip the DataType Type itself.
-  if (IsDataType(topic.Subject)) return false;
-
-  // Skip anything that isn't a class.
-  if (!topic.types.some(IsClassType)) return false;
-
-  return true;
-}
 
 function ForwardDeclareClasses(topics: ReadonlyArray<TypedTopic>): ClassMap {
   const classes = new Map<string, Class>();
@@ -381,7 +356,7 @@ export function ProcessClasses(topics: ReadonlyArray<TypedTopic>): ClassMap {
 }
 
 export function FindProperties(topics: ReadonlyArray<TypedTopic>):
-    ReadonlyArray<BySubject> {
+    ReadonlyArray<Topic> {
   const properties = topics.filter(topic => topic.types.some(IsPropertyType));
   if (properties.length === 0) {
     throw new Error('Unexpected: Property Topics to exist.');
