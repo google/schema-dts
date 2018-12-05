@@ -52,11 +52,22 @@ gulp.task('generate-ts', gulp.series('build-generator', () => {
       .pipe(gulp.dest('built/ts-schema'));
 }));
 
-gulp.task('generate-package', gulp.series('generate-ts', gulp.parallel(() => {
-  return gulp.src('built/ts-schema/*.ts')
-      .pipe(tsc({
-        noImplicitAny: true,
-        declaration: true,
-      }))
-      .pipe(gulp.dest('dist/schema'));
-}, () => gulp.src('built/gen/**/*').pipe(gulp.dest('dist/gen')))));
+gulp.task(
+    'prepare-package',
+    () => gulp.src(['README.md', 'LICENSE']).pipe(gulp.dest('dist/schema')));
+
+gulp.task(
+    'generate-package',
+    gulp.series(
+        gulp.parallel('generate-ts', 'prepare-package'),
+        gulp.parallel(
+            () => {
+              return gulp.src('built/ts-schema/*.ts')
+                  .pipe(tsc({
+                    noImplicitAny: true,
+                    declaration: true,
+                  }))
+                  .pipe(gulp.dest('dist/schema'));
+            },
+            () => gulp.src('built/gen/**/*').pipe(gulp.dest('dist/gen'))),
+        ));

@@ -1,4 +1,6 @@
 node_modules/
-built/
-dist/
+built
+dist/gen/*
+dist/schema/*
+!dist/schema/package.json
 package-lock.json

@@ -19,9 +19,8 @@ your project:
 
 ### Manually using the Schema Typings generator
 
-    npm install
-    gulp build-generator
-    node built/generator/run.js --schema=3.4
+    npm install schema-dts-gen
+    node dist/gen/cli/cli.js --schema=3.4
 
 ## Developers
 

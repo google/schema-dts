@@ -1,0 +1,33 @@
+{
+  "name": "schema-dts",
+  "version": "0.1.0",
+  "displayName": "schema-dts: latest Schema.org TypeScript Declarations",
+  "description": "A TypeScript package with latest Schema.Org Schema Typings",
+  "authors": [
+    {
+      "name": "Eyas Sharaiha",
+      "email": "eyas@google.com",
+      "url": "https://eyas.sh/"
+    }
+  ],
+  "files": [
+    "**/*"
+  ],
+  "types": "./schema.d.ts",
+  "main": "./schema.js",
+  "devDependencies": {},
+  "dependencies": {},
+  "peerDependencies": {
+    "typescript": "^3.1.6"
+  },
+  "keywords": [
+    "typescript",
+    "tsd",
+    "dts",
+    "schema.org"
+  ],
+  "homepage": "https://github.com/google/schema-dts#readme",
+  "bugs": "https://github.com/google/schema-dts/issues",
+  "repository": "github:google/schema-dts",
+  "license": "Apache-2.0"
+}
