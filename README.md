@@ -1,6 +1,6 @@
 # schema-dts
 
-TypeScript Typings &amp; .tsd Generation for Schema.org
+TypeScript Typings &amp; .d.ts Generation for Schema.org
 
 Schema DTS provides a set of TypeScript typings for
 [schema.org](https://schema.org) schema. The typings are exposed as complete
