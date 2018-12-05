@@ -20,7 +20,7 @@ your project:
 ### Manually using the Schema Typings generator
 
     npm install schema-dts-gen
-    node dist/gen/cli/cli.js --schema=3.4
+    npx schema-dts-gen --schema=3.4
 
 ## Developers
 
