@@ -13,44 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {OperatorFunction} from 'rxjs';
-import {groupBy, map, mergeMap, toArray} from 'rxjs/operators';
-import {createPrinter, createSourceFile, EmitHint, NewLineKind, ScriptKind, ScriptTarget} from 'typescript';
 
 import {SetOptions} from '../logging';
-import {ProcessClasses} from '../transform/toClass';
-import {ProcessEnums} from '../transform/toEnum';
-import {ProcessProperties,} from '../transform/toProperty';
+import {WriteDeclarations} from '../transform/transform';
 import {load} from '../triples/reader';
-import {Topic, Triple, TypedTopic} from '../triples/triple';
-import {GetTypes} from '../triples/wellKnown';
-import {Sort} from '../ts/class';
 
 import {ParseFlags} from './args';
-
-function groupBySubject(): OperatorFunction<Triple, Topic> {
-  return (observable) => observable.pipe(
-             groupBy(triple => triple.Subject.toString()),
-             mergeMap(
-                 group => group.pipe(
-                     toArray(),
-                     map(array => ({
-                           Subject: array[0].Subject,  // All are the same
-                           values: array.map(
-                               ({Object, Predicate}) => ({Predicate, Object}))
-                         })),
-
-                     )),
-         );
-}
-
-function asTopic(): OperatorFunction<Topic, TypedTopic> {
-  return (observable) => observable.pipe(
-             map(bySubject => ({
-                   ...bySubject,
-                   types: GetTypes(bySubject.Subject, bySubject.values)
-                 })));
-}
 
 async function main() {
   const options = ParseFlags();
@@ -58,35 +26,7 @@ async function main() {
   SetOptions(options);
 
   const result = load(options.schema, options.layer);
-  const topics = await result
-                     .pipe(
-                         groupBySubject(),
-                         asTopic(),
-                         toArray(),
-                         )
-                     .toPromise();
-
-  const classes = ProcessClasses(topics);
-  ProcessProperties(topics, classes);
-  ProcessEnums(topics, classes);
-  const sorted = Array.from(classes.values()).sort(Sort);
-
-  write('// tslint:disable\n\n');
-  const source = createSourceFile(
-      'result.ts', '', ScriptTarget.ES2015, /*setParentNodes=*/false,
-      ScriptKind.TS);
-  const printer = createPrinter({newLine: NewLineKind.LineFeed});
-
-  for (const cls of sorted) {
-    if (cls.deprecated && !options.deprecated) continue;
-
-    for (const node of cls.toNode(!options.deprecated)) {
-      const result = printer.printNode(EmitHint.Unspecified, node, source);
-      write(result);
-      write('\n');
-    }
-    write('\n');
-  }
+  await WriteDeclarations(result, options.deprecated, write);
 }
 
 function write(content: string) {

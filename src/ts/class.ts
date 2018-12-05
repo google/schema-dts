@@ -18,7 +18,7 @@ import {createEnumDeclaration, createIntersectionTypeNode, createKeywordTypeNode
 import {Log} from '../logging';
 import {TObject, TPredicate, TSubject} from '../triples/triple';
 import {SchemaString, UrlNode} from '../triples/types';
-import {GetComment, GetSubClassOf, GetType, IsSupersededBy} from '../triples/wellKnown';
+import {GetComment, GetSubClassOf, IsSupersededBy} from '../triples/wellKnown';
 
 import {EnumValue} from './enum';
 import {Property, PropertyType} from './property';
@@ -132,8 +132,6 @@ export class Class {
       this._supersededBy.push(supersededBy);
       return true;
     }
-
-    if (GetType(value)) return true;  // We used types already.
 
     return false;
   }

@@ -18,7 +18,7 @@ import {createArrayTypeNode, createKeywordTypeNode, createPropertySignature, cre
 
 import {Log} from '../logging';
 import {Format, ObjectPredicate, TObject, TSubject} from '../triples/triple';
-import {GetComment, GetType, IsDomainIncludes, IsRangeIncludes, IsSupersededBy} from '../triples/wellKnown';
+import {GetComment, IsDomainIncludes, IsRangeIncludes, IsSupersededBy} from '../triples/wellKnown';
 
 import {ClassMap} from './class';
 import {withComments} from './util/comments';
@@ -58,7 +58,6 @@ export class PropertyType {
       this._comment = c.comment;
       return true;
     }
-    if (GetType(value)) return true;  // We used types already.
 
     if (IsRangeIncludes(value.Predicate)) {
       this.types.push(value.Object);

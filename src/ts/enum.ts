@@ -15,8 +15,8 @@
  */
 import {createEnumMember, createStringLiteral} from 'typescript';
 
-import {ObjectPredicate, TSubject} from '../triples/triple';
-import {GetComment, GetType, IsClassType, IsDataType} from '../triples/wellKnown';
+import {ObjectPredicate, TSubject, TTypeName} from '../triples/triple';
+import {GetComment, IsClassType, IsDataType} from '../triples/wellKnown';
 
 import {ClassMap} from './class';
 import {withComments} from './util/comments';
@@ -29,34 +29,34 @@ export class EnumValue {
   readonly INSTANCE = 'EnumValue';
 
   private comment?: string;
-  constructor(private readonly value: TSubject) {}
-
-  add(value: ObjectPredicate, map: ClassMap) {
-    // First, "Type" containment.
-    // A Topic can have multiple types. So the triple we're adding now could
-    // either be:
-    // 1. An already processed well-known type (e.g. the Topic is also a Class,
-    //    as well as being an enum).
-    // 2. The Type of the Enum.
-    //
-    // e.g.: SurgicalProcedure (schema.org/SurgicalProcedure) is both a class
-    //       having the "Class" type, and also an instance of the
-    //       MedicalProcedureType (schema.org/MedicalProcedureType) enum.
-    //       Therefore, an Enum will contain two TTypeName ObjectPredicates:
-    //       one of Type=Class, and another of Type=MedicalProcedureType.
-    const type = GetType(value);
-    if (type) {
-      if (IsClassType(type) || IsDataType(type)) return true;
+  constructor(
+      private readonly value: TSubject, types: ReadonlyArray<TTypeName>,
+      map: ClassMap) {
+    for (const type of types) {
+      // "Type" containment.
+      // A Topic can have multiple types. So the triple we're adding now could
+      // either be:
+      // 1. An already processed well-known type (e.g. the Topic is also a
+      // Class,
+      //    as well as being an enum).
+      // 2. The Type of the Enum.
+      //
+      // e.g.: SurgicalProcedure (schema.org/SurgicalProcedure) is both a class
+      //       having the "Class" type, and also an instance of the
+      //       MedicalProcedureType (schema.org/MedicalProcedureType) enum.
+      //       Therefore, an Enum will contain two TTypeName ObjectPredicates:
+      //       one of Type=Class, and another of Type=MedicalProcedureType.
+      if (IsClassType(type) || IsDataType(type)) return;
 
       const enumObject = map.get(type.toString());
       if (!enumObject) {
         throw new Error(`Couldn't find ${type.toString()} in classes.`);
       }
       enumObject.addEnum(this);
-      return true;
     }
+  }
 
-    // Comment.
+  add(value: ObjectPredicate) {
     const comment = GetComment(value);
     if (comment) {
       if (this.comment) {

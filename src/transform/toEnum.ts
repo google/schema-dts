@@ -32,10 +32,11 @@ export function ProcessEnums(
     if (!HasEnumType(topic.types)) continue;
 
     // Everything Here should be an enum.
-    const enumValue = new EnumValue(topic.Subject);
+    const enumValue = new EnumValue(topic.Subject, topic.types, classes);
+
     const skipped: ObjectPredicate[] = [];
     for (const v of topic.values) {
-      if (!enumValue.add(v, classes)) skipped.push(v);
+      if (!enumValue.add(v)) skipped.push(v);
     }
 
     if (skipped.length > 0) {

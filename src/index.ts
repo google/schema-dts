@@ -15,9 +15,7 @@
  */
 
 // Public Declarations only:
-export {ProcessClasses} from './transform/toClass';
-export {ProcessEnums} from './transform/toEnum';
-export {ProcessProperties} from './transform/toProperty';
+export {WriteDeclarations} from './transform/transform';
 
 export {load as loadTriples} from './triples/reader';
 export * from './triples/triple';

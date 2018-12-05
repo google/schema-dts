@@ -95,10 +95,17 @@ export function IsRangeIncludes(value: TPredicate): boolean {
   return IsSchemaObject(value) && value.name === 'rangeIncludes';
 }
 /**
- * Returns true iff a Predicate corresponds to a http://schema.org/supersededBy.
+ * Returns true iff a Predicate corresponds to http://schema.org/supersededBy.
  */
 export function IsSupersededBy(value: TPredicate): boolean {
   return IsSchemaObject(value) && value.name === 'supersededBy';
+}
+/**
+ * Returns true iff a Predicate corresponds to
+ * http://www.w3.org/1999/02/22-rdf-syntax-ns#type.
+ */
+export function IsType(predicate: TPredicate): boolean {
+  return IsRdfSyntax(predicate) && predicate.name === 'type';
 }
 
 /**
@@ -106,7 +113,7 @@ export function IsSupersededBy(value: TPredicate): boolean {
  * http://www.w3.org/1999/02/22-rdf-syntax-ns#type, returns a Type it describes.
  */
 export function GetType(value: ObjectPredicate): TTypeName|null {
-  if (IsRdfSyntax(value.Predicate) && value.Predicate.name === 'type') {
+  if (IsType(value.Predicate)) {
     if (value.Object.type === 'Rdfs' || value.Object.type === 'SchemaString') {
       throw new Error(`Unexpected type ${value.Object}`);
     }
