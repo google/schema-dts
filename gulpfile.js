@@ -17,6 +17,7 @@
 const gulp = require('gulp');
 const tsc = require('gulp-typescript');
 const file = require('gulp-file');
+const del = require('del');
 
 const cpSpwan = require('child_process').spawn;
 const through2 = require('through2');
@@ -41,6 +42,13 @@ function spawn(command, args = [], options = {}) {
   });
 }
 
+gulp.task('clean', () => del([
+                     'built',
+                     'dist/gen',
+                     'dist/schema/**/*',
+                     '!dist/schema/package.json',
+                   ]));
+
 const nodeProject = tsc.createProject('src/tsconfig.json');
 gulp.task('build-generator', () => {
   return nodeProject.src().pipe(nodeProject()).pipe(gulp.dest('built/gen'));
@@ -59,6 +67,7 @@ gulp.task(
 gulp.task(
     'generate-package',
     gulp.series(
+        'clean',
         gulp.parallel('generate-ts', 'prepare-package'),
         gulp.parallel(
             () => {
