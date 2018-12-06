@@ -109,7 +109,7 @@ export class Rdfs {
     return `rdfs:${this.label}`;
   }
   static Parse(content: string): Rdfs|null {
-    const result = /^rdfs:(.*)$/.exec(content);
+    const result = /^rdfs:(.+)$/.exec(content);
     return result && new Rdfs(result[1]);
   }
 }
