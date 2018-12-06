@@ -19,12 +19,14 @@
   "devDependencies": {
     "@types/argparse": "^1.0.35",
     "@types/node": "^10.12.9",
+    "@types/jasmine": "^3.3.1",
     "child_process": "^1.0.2",
     "clang-format": "^1.2.4",
     "del": "^3.0.0",
     "gulp": "^4.0.0",
     "gulp-file": "^0.4.0",
     "gulp-typescript": "^5.0.0-alpha.3",
+    "jasmine": "^3.3.1",
     "rxjs": "^6.3.3",
     "through2": "^3.0.0",
     "tslint": "^5.11.0",
@@ -47,6 +49,7 @@
   "repository": "github:google/schema-dts",
   "license": "Apache-2.0",
   "scripts": {
-    "build-gen": "gulp build-generator"
+    "build-gen": "tsc -p src",
+    "test": "tsc -p src && tsc -p tests/ && jasmine --config=tests/support/jasmine.json"
   }
 }

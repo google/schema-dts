@@ -44,19 +44,19 @@ function spawn(command, args = [], options = {}) {
 
 gulp.task('clean', () => del([
                      'built',
-                     'dist/gen',
+                     'dist/src',
                      'dist/schema/**/*',
                      '!dist/schema/package.json',
                    ]));
 
 const nodeProject = tsc.createProject('src/tsconfig.json');
 gulp.task('build-generator', () => {
-  return nodeProject.src().pipe(nodeProject()).pipe(gulp.dest('built/gen'));
+  return nodeProject.src().pipe(nodeProject()).pipe(gulp.dest('built/src'));
 });
 
 gulp.task('generate-ts', gulp.series('build-generator', () => {
   return file('schema.ts', '', {src: true})
-      .pipe(spawn('node', ['built/gen/cli/cli.js']))
+      .pipe(spawn('node', ['built/src/cli/cli.js']))
       .pipe(gulp.dest('built/ts-schema'));
 }));
 
@@ -78,5 +78,5 @@ gulp.task(
                   }))
                   .pipe(gulp.dest('dist/schema'));
             },
-            () => gulp.src('built/gen/**/*').pipe(gulp.dest('dist/gen'))),
+            () => gulp.src('built/src/**/*').pipe(gulp.dest('dist/gen'))),
         ));
