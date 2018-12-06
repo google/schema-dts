@@ -1,11 +1,6 @@
 {
+  "extends": "../tsproject.json",
   "compilerOptions": {
-    "strict": true,
-    "outDir": "../built/",
-    "target": "es2015",
-    "module": "commonjs",
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "declaration": true,
+    "outDir": "../built/src",
   }
 }

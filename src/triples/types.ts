@@ -30,7 +30,7 @@ function fromString(urlString: string): ReadonlyUrl {
     href: url.href,
     protocol: url.protocol,
     hostname: url.hostname,
-    path: url.pathname.split('/'),
+    path: url.pathname.slice(1).split('/'),
     search: url.search
   };
 }
@@ -90,7 +90,9 @@ export class SchemaString {
   }
   static Parse(content: string): SchemaString|null {
     const result = /^"(([^"]|(\\"))+)"(?:@([a-zA-Z]+))?$/.exec(content);
-    if (result) return new SchemaString(result[1], result[5]);
+    if (result) {
+      return new SchemaString(result[1].replace(/\\"/g, '"'), result[4]);
+    }
     return null;
   }
 }
@@ -107,7 +109,7 @@ export class Rdfs {
     return `rdfs:${this.label}`;
   }
   static Parse(content: string): Rdfs|null {
-    const result = /^rdfs:(.*)$/.exec(content);
+    const result = /^rdfs:(.+)$/.exec(content);
     return result && new Rdfs(result[1]);
   }
 }

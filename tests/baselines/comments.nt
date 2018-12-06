@@ -1,0 +1,6 @@
+<http://schema.org/name> <http://schema.org/rangeIncludes> <http://schema.org/Text> .
+<http://schema.org/name> <http://schema.org/domainIncludes> <http://schema.org/Thing> .
+<http://schema.org/name> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
+<http://schema.org/Thing> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
+<http://schema.org/name> <http://www.w3.org/2000/01/rdf-schema#comment> "Names are great!" .
+<http://schema.org/Thing> <http://www.w3.org/2000/01/rdf-schema#comment> "Things are amazing!" .

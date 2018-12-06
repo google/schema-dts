@@ -150,5 +150,10 @@
       true,
       "Copyright \\d{4} Google LLC"
     ]
+  },
+  "linterOptions": {
+    "exclude": [
+      "tests/baselines"
+    ]
   }
 }
