@@ -1,14 +1,24 @@
 # schema-dts
 
-TypeScript Typings &amp; .d.ts Generation for Schema.org
+JSON-LD TypeScript types for Schema.org vocabulary.
 
-Schema DTS provides a set of TypeScript typings for
-[schema.org](https://schema.org) schema. The typings are exposed as complete
-sets of discriminated type unions, allowing for easy completions and stricter
-validation.
+**schema-dts** provides TypeScript definitions for
+[Schema.org](https://schema.org/) vocabulary in JSON-LD format. The typings are
+exposed as complete sets of discriminated type unions, allowing for easy
+completions and stricter validation.
 
-This repository contains `generate-schema-dts`, the Node.js-based script that
-generates the `schema-dts` package.
+![Example of Code Completion using schema-dts](./example-1.gif)
+
+This repository contains two NPM packages:
+
+*   **[schema-dts-gen](https://www.npmjs.com/package/schema-dts-gen)** Providing
+    a command-line tool to generate TypeScript files based on a specific Schema
+    version and layer.
+*   **[schema-dts](https://www.npmjs.com/package/schema-dts)** Pre-packaged
+    TypeScript typings of latest Schema.org schema, without
+    [pending](https://pending.schema.org/) and other non-core layers.
+
+Note: This is not an officially supported Google product.
 
 ## Usage
 
@@ -16,6 +26,8 @@ To use the typings for your project, simply add the `schema-dts` NPM package to
 your project:
 
     npm install schema-dts
+
+Then you can use it as follows:
 
 ### Manually using the Schema Typings generator
 
