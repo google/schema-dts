@@ -50,6 +50,19 @@ function object(content: string) {
 }
 const totalRegex =
     /\s*<([^<>]+)>\s*<([^<>]+)>\s*((?:<[^<>"]+>)|(?:"(?:[^"]|(?:\\"))+(?:[^\"]|\\")"(?:@[a-zA-Z]+)?))\s*\./;
+export function toTripleStrings(data: string[]) {
+  const linearTriples = data.join('')
+                            .split(totalRegex)
+                            .map(s => s.trim())
+                            .filter(s => s.length > 0);
+
+  return linearTriples.reduce((result, _, index, array) => {
+    if (index % 3 === 0) {
+      result.push(array.slice(index, index + 3));
+    }
+    return result;
+  }, [] as string[][]);
+}
 
 /**
  * Loads schema all Triples from a given Schema file and version.
@@ -62,78 +75,20 @@ export function load(version: string, fileName: string): Observable<Triple> {
             response => {
               const data: string[] = [];
 
-              function process(triples: string[][]): void {
-                for (const match of triples) {
-                  if (match.length !== 3) {
-                    subscriber.error(new Error(`Unexpected ${match}`));
-                  }
-
-                  if (match[0].includes('file:///')) {
-                    // Inexplicably, local files end up in the public schema for
-                    // certain layer overlays.
-                    continue;
-                  }
-                  if (match[0] === 'http://meta.schema.org/') {
-                    continue;
-                  }
-
-                  if (match[1] ===
-                          'http://www.w3.org/2002/07/owl#equivalentClass' ||
-                      match[1] ===
-                          'http://www.w3.org/2002/07/owl#equivalentProperty' ||
-                      match[1] === 'http://purl.org/dc/terms/source' ||
-                      match[1] ===
-                          'http://www.w3.org/2000/01/rdf-schema#label' ||
-                      match[1] ===
-                          'http://www.w3.org/2004/02/skos/core#closeMatch' ||
-                      match[1] ===
-                          'http://www.w3.org/2004/02/skos/core#exactMatch') {
-                    // Skip Equivalent Classes & Properties
-                    continue;
-                  }
-
-                  if (match[1] === 'http://schema.org/isPartOf') {
-                    // When isPartOf is used as a predicate, is a higher-order
-                    // property describing if a Property or Class is part of a
-                    // specific schema layer. We don't use that information yet,
-                    // so discard it.
-                    continue;
-                  }
-
-                  try {
-                    subscriber.next({
-                      Subject: subject(match[0]),
-                      Predicate: predicate(match[1]),
-                      Object: object(match[2])
-                    });
-                  } catch (parseError) {
-                    throw new Error(`${
-                        parseError.stack ||
-                        String(parseError)} while parsing line ${match}.`);
-                  }
-                }
-              }
-
               response.on('data', (chunkB: Buffer) => {
                 const chunk = chunkB.toString('utf-8');
                 data.push(chunk);
               });
 
               response.on('end', () => {
-                const linearTriples = data.join('')
-                                          .split(totalRegex)
-                                          .map(s => s.trim())
-                                          .filter(s => s.length > 0);
-
-                const triples =
-                    linearTriples.reduce((result, value, index, array) => {
-                      if (index % 3 === 0) {
-                        result.push(array.slice(index, index + 3));
-                      }
-                      return result;
-                    }, [] as string[][]);
-
-                process(triples);
+                try {
+                  const triples = toTripleStrings(data);
+                  for (const triple of process(triples)) {
+                    subscriber.next(triple);
+                  }
+                } catch (error) {
+                  subscriber.error(error);
+                }
 
                 subscriber.complete();
               });
@@ -144,4 +99,51 @@ export function load(version: string, fileName: string): Observable<Triple> {
             })
         .on('error', e => subscriber.error(e));
   });
+}
+
+export function* process(triples: string[][]): Iterable<Triple> {
+  for (const match of triples) {
+    if (match.length !== 3) {
+      throw Error(`Unexpected ${match}`);
+    }
+
+    if (match[0].includes('file:///')) {
+      // Inexplicably, local files end up in the public schema for
+      // certain layer overlays.
+      continue;
+    }
+    if (match[0] === 'http://meta.schema.org/') {
+      continue;
+    }
+
+    if (match[1] === 'http://www.w3.org/2002/07/owl#equivalentClass' ||
+        match[1] === 'http://www.w3.org/2002/07/owl#equivalentProperty' ||
+        match[1] === 'http://purl.org/dc/terms/source' ||
+        match[1] === 'http://www.w3.org/2000/01/rdf-schema#label' ||
+        match[1] === 'http://www.w3.org/2004/02/skos/core#closeMatch' ||
+        match[1] === 'http://www.w3.org/2004/02/skos/core#exactMatch') {
+      // Skip Equivalent Classes & Properties
+      continue;
+    }
+
+    if (match[1] === 'http://schema.org/isPartOf') {
+      // When isPartOf is used as a predicate, is a higher-order
+      // property describing if a Property or Class is part of a
+      // specific schema layer. We don't use that information yet,
+      // so discard it.
+      continue;
+    }
+
+    try {
+      yield {
+        Subject: subject(match[0]),
+        Predicate: predicate(match[1]),
+        Object: object(match[2])
+      };
+    } catch (parseError) {
+      throw new Error(`${
+          parseError.stack ||
+          String(parseError)} while parsing line ${match}.`);
+    }
+  }
 }
