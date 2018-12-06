@@ -1,0 +1,9 @@
+language: node_js
+node_js:
+  - "node"
+
+# TODO: Remove, and rely on 'npm test'
+script: npm run build-gen
+
+git:
+  depth: 1

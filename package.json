@@ -45,5 +45,8 @@
   "homepage": "https://github.com/google/schema-dts#readme",
   "bugs": "https://github.com/google/schema-dts/issues",
   "repository": "github:google/schema-dts",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "scripts": {
+    "build-gen": "gulp build-generator"
+  }
 }
