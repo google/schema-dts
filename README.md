@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/google/schema-dts.svg?branch=master)](https://travis-ci.org/google/schema-dts)
+[![schema-dts npm version](https://badge.fury.io/js/schema-dts.svg)](https://www.npmjs.com/package/schema-dts)
+[![schema-dts-gen version](https://badge.fury.io/js/schema-dts-gen.svg)](https://www.npmjs.com/package/schema-dts-gen)
+
 # schema-dts
 
 JSON-LD TypeScript types for Schema.org vocabulary.
