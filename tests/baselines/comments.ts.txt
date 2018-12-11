@@ -3,7 +3,7 @@
 /** Boolean: True or False. */
 export type Boolean = boolean;
 
-/** A date value in <a href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>. */
+/** A date value in {@link http://en.wikipedia.org/wiki/ISO_8601 ISO 8601 date format}. */
 export type Date = string;
 
 /** A combination of date and time of day in the form [-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] (see Chapter 5.4 of ISO 8601). */
@@ -20,9 +20,15 @@ export type Time = string;
 
 type ThingBase = {
     "@type": "Thing";
-    /** Names are great! */
+    /** Names are great! {@link X Y} */
     "name"?: Text | Text[];
 };
-/** Things are amazing! */
+/**
+ * Things are amazing!
+ *
+ * - Foo
+ * - Bar
+ * - _Baz_, and __Bat__
+ */
 export type Thing = ThingBase;
 
