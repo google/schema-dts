@@ -20,11 +20,12 @@ import {TObject, TPredicate, TSubject} from '../triples/triple';
 import {SchemaString, UrlNode} from '../triples/types';
 import {GetComment, GetSubClassOf, IsSupersededBy} from '../triples/wellKnown';
 
+import {Context} from './context';
 import {EnumValue} from './enum';
-import {Property, PropertyType} from './property';
+import {Property, PropertyType, TypeProperty} from './property';
 import {arrayOf} from './util/arrayof';
 import {withComments} from './util/comments';
-import {toClassName, toScopedName} from './util/names';
+import {toClassName} from './util/names';
 
 /** Maps fully qualified IDs of each Class to the class itself. */
 export type ClassMap = Map<string, Class>;
@@ -73,18 +74,8 @@ export class Class {
   }
 
   private properties() {
-    return this.isLeaf ?
-        [
-          new Property(
-              '@type',
-              new PropertyType(
-                  this.subject,
-                  new SchemaString(
-                      toScopedName(this.subject), /*language=*/undefined)),
-              ),
-          ...this._props
-        ] :
-        this._props;
+    return this.isLeaf ? [new TypeProperty(this.subject), ...this._props] :
+                         this._props;
   }
 
   protected baseName() {
@@ -142,13 +133,14 @@ export class Class {
     this._enums.push(e);
   }
 
-  private baseNode(skipDeprecatedProperties: boolean): TypeNode {
+  private baseNode(skipDeprecatedProperties: boolean, context: Context):
+      TypeNode {
     // Properties part.
     const propLiteral = createTypeLiteralNode(
         this.properties()
             .filter(
                 property => !property.deprecated || !skipDeprecatedProperties)
-            .map(prop => prop.toNode()));
+            .map(prop => prop.toNode(context)));
 
     const parentTypes = this.parents.map(
         parent => createTypeReferenceNode(parent.baseName(), []));
@@ -169,8 +161,9 @@ export class Class {
     }
   }
 
-  private baseDecl(skipDeprecatedProperties: boolean): TypeAliasDeclaration {
-    const baseNode = this.baseNode(skipDeprecatedProperties);
+  private baseDecl(skipDeprecatedProperties: boolean, context: Context):
+      TypeAliasDeclaration {
+    const baseNode = this.baseNode(skipDeprecatedProperties, context);
 
     return createTypeAliasDeclaration(
         /*decorators=*/[], /*modifiers=*/[], this.baseName(),
@@ -217,7 +210,7 @@ export class Class {
         this._enums.map(e => e.toNode()));
   }
 
-  toNode(skipDeprecatedProperties: boolean) {
+  toNode(context: Context, skipDeprecatedProperties: boolean) {
     const typeValue: TypeNode = this.totalType();
     const declaration = withComments(
         this.comment,
@@ -230,7 +223,8 @@ export class Class {
             ));
 
     return arrayOf<Statement>(
-        this.enumDecl(), this.baseDecl(skipDeprecatedProperties), declaration);
+        this.enumDecl(), this.baseDecl(skipDeprecatedProperties, context),
+        declaration);
   }
 }
 

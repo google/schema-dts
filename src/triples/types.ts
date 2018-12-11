@@ -34,6 +34,14 @@ function fromString(urlString: string): ReadonlyUrl {
     search: url.search
   };
 }
+function pathEqual(
+    first: ReadonlyArray<string>, second: ReadonlyArray<string>) {
+  if (first.length !== second.length) return false;
+  for (let i = 0; i < first.length; ++i) {
+    if (first[i] !== second[i]) return false;
+  }
+  return true;
+}
 
 /**
  * In-memory representation of a node in a Triple corresponding to a URL.
@@ -47,6 +55,26 @@ export class UrlNode {
 
   toString() {
     return this.href;
+  }
+
+  matchesContext(contextString: string): boolean {
+    const context = fromString(contextString);
+    if (this.context.protocol !== context.protocol) {
+      // Schema.org schema uses 'http:' as protocol, but increasingly Schema.org
+      // recommends using https: instead.
+      //
+      // If UrlNode is http and provided context is https, consider this a match
+      // still...
+      if (this.context.protocol === 'http:' && context.protocol === 'https:') {
+        // Ignore.
+      } else {
+        return false;
+      }
+    }
+
+    return this.context.hostname === context.hostname &&
+        pathEqual(this.context.path, context.path) &&
+        this.context.search === context.search;
   }
 
   static Parse(urlString: string): UrlNode {

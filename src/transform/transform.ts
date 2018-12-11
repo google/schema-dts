@@ -19,6 +19,7 @@ import {createPrinter, createSourceFile, EmitHint, NewLineKind, ScriptKind, Scri
 import {asTopicArray} from '../triples/operators';
 import {Triple} from '../triples/triple';
 import {Sort} from '../ts/class';
+import {Context} from '../ts/context';
 
 import {ProcessClasses} from './toClass';
 import {ProcessEnums} from './toEnum';
@@ -40,6 +41,7 @@ import {ProcessProperties,} from './toProperty';
 export async function WriteDeclarations(
     triples: Observable<Triple>,
     includeDeprecated: boolean,
+    context: Context,
     write: (content: string) => Promise<void>| void,
 ) {
   const topics = await triples.pipe(asTopicArray()).toPromise();
@@ -55,10 +57,13 @@ export async function WriteDeclarations(
       ScriptKind.TS);
   const printer = createPrinter({newLine: NewLineKind.LineFeed});
 
+  write(printer.printNode(EmitHint.Unspecified, context.toNode(), source));
+  write('\n\n');
+
   for (const cls of sorted) {
     if (cls.deprecated && !includeDeprecated) continue;
 
-    for (const node of cls.toNode(!includeDeprecated)) {
+    for (const node of cls.toNode(context, !includeDeprecated)) {
       const result = printer.printNode(EmitHint.Unspecified, node, source);
       await write(result);
       await write('\n');

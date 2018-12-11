@@ -32,10 +32,6 @@ export function toTypeName(object: TObject): string {
   }
 }
 
-export function toScopedName(subject: TSubject): string {
-  return subject.name;
-}
-
 export function toEnumName(subject: TSubject): string {
-  return toScopedName(subject).replace(/[^A-Za-z0-9_]/g, '_');
+  return (subject.name).replace(/[^A-Za-z0-9_]/g, '_');
 }
