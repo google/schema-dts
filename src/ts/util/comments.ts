@@ -14,20 +14,106 @@
  * limitations under the License.
  */
 
+import {Parser} from 'htmlparser2';
 import {Node, setSyntheticLeadingComments, SyntaxKind} from 'typescript';
+
+const replacer: Array<[RegExp, string]> = [
+  [/\\n/g, ''],
+  [/\\u2014/gi, '\u2014'],
+  [/\\u2019/gi, '\u2019'],
+  [/\\u00A3/gi, '\u00A3'],
+];
+function replace(str: string): string {
+  for (const [regexp, replacement] of replacer) {
+    str = str.replace(regexp, replacement);
+  }
+  return str;
+}
+function parseComment(comment: string): string {
+  const result: string[] = [];
+  const parser = new Parser({
+    ontext: text => result.push(replace(text)),
+    onopentag: (tag, attrs) => {
+      switch (tag) {
+        case 'a':
+          result.push(`{@link ${attrs['href']} `);
+          break;
+        case 'em':
+        case 'i':
+          result.push('_');
+          break;
+        case 'strong':
+        case 'b':
+          result.push('__');
+          break;
+        case 'br':
+          result.push('\n');
+          break;
+        case 'li':
+          result.push('- ');
+          break;
+        case 'code':
+        case 'pre':
+          result.push('`');
+          break;
+        case 'ul':
+          // Ignore
+          break;
+        default:
+          throw new Error(`Unknown tag "${tag}".`);
+      }
+    },
+    onclosetag: tag => {
+      switch (tag) {
+        case 'a':
+          result.push('}');
+          break;
+        case 'em':
+        case 'i':
+          result.push('_');
+          break;
+        case 'strong':
+        case 'b':
+          result.push('__');
+          break;
+        case 'li':
+          result.push('\n');
+          break;
+        case 'code':
+        case 'pre':
+          result.push('`');
+          break;
+        case 'ul':
+        case 'br':
+          // Ignore
+          break;
+        default:
+          throw new Error(`Unknown tag "${tag}".`);
+      }
+    }
+  });
+  parser.write(comment);
+  parser.end();
+
+  const lines = (result.join('')).split('\n');
+  if (lines[lines.length - 1] === '') {
+    lines.pop();
+  }
+
+  // Hack to get JSDOCs working. Microsoft does not expose JSDOC-creation API.
+  return lines.length === 1 ? `* ${lines[0]} ` :
+                              ('*\n * ' + lines.join('\n * ') + '\n ');
+}
 
 export function withComments<T extends Node>(
     comment: string|undefined, node: T): T {
   if (!comment) return node;
 
-  return setSyntheticLeadingComments(
-      node,
-      [{
-        text: `* ${comment} `,  // Hack to get JSDOCs working. Microsoft does
-                                // not expose JSDOC-creation API.
-        kind: SyntaxKind.MultiLineCommentTrivia,
-        hasTrailingNewLine: true,
-        pos: -1,
-        end: -1,
-      }]);
+  return setSyntheticLeadingComments(node, [{
+                                       text: parseComment(comment),
+                                       kind: SyntaxKind.MultiLineCommentTrivia,
+                                       hasTrailingNewLine: true,
+                                       pos: -1,
+                                       end: -1,
+                                     }]);
 }
