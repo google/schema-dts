@@ -20,6 +20,7 @@ export interface Options {
   schema: string;
   layer: string;
   deprecated: boolean;
+  context: string;
 }
 export function ParseFlags(): Options|undefined {
   const parser = new ArgumentParser(
@@ -41,6 +42,18 @@ export function ParseFlags(): Options|undefined {
     help: 'Which layer of the schema to load? E.g. schema or all-layers.',
     metavar: 'name_of_file',
     dest: 'layer'
+  });
+  parser.addArgument('--context', {
+    defaultValue: 'https://schema.org',
+    help: 'Single URL or comma-separated key:value pairs defining the ' +
+        'intended \'@context\' for the generated JSON-LD typings. ' +
+        'By default, this is \'https://schema.org\`. Alternatively: ' +
+        '--context=rdf:http://www.w3.org/2000/01/rdf-schema,' +
+        'schema:https://schema.org\n' +
+        'would result in \'rdf:\' being a prefix for any RDF Schema ' +
+        'property, and \'schema:\' being a prefix for any Schema.org property.',
+    metavar: 'key1:url,key2:url,...',
+    dest: 'context'
   });
 
   const deprecated = parser.addMutuallyExclusiveGroup({required: false});

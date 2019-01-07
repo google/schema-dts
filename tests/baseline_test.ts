@@ -28,6 +28,7 @@ import {switchMap} from 'rxjs/operators';
 import {WriteDeclarations} from '../src/transform/transform';
 import {process, toTripleStrings} from '../src/triples/reader';
 import {Triple} from '../src/triples/triple';
+import {Context} from '../src/ts/context';
 
 import {addMatchers} from './helpers/baseline';
 
@@ -68,9 +69,12 @@ function getTriples(file: string): Observable<Triple> {
 
 async function getResult(triples: Observable<Triple>) {
   const result: string[] = [];
-  await WriteDeclarations(triples, true, content => {
-    result.push(content);
-  });
+  const context = new Context();
+  context.setUrlContext('https://schema.org');
+  await WriteDeclarations(
+      triples, /*includeDeprecated=*/true, context, content => {
+        result.push(content);
+      });
   return result.join('');
 }
 

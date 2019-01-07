@@ -21,8 +21,9 @@ import {Format, ObjectPredicate, TObject, TSubject} from '../triples/triple';
 import {GetComment, IsDomainIncludes, IsRangeIncludes, IsSupersededBy} from '../triples/wellKnown';
 
 import {ClassMap} from './class';
+import {Context} from './context';
 import {withComments} from './util/comments';
-import {toScopedName, toTypeName} from './util/names';
+import {toTypeName} from './util/names';
 
 /**
  * A "class" of properties, not associated with any particuar object.
@@ -32,9 +33,7 @@ export class PropertyType {
   private _comment?: string;
   private readonly _supersededBy: TObject[] = [];
 
-  constructor(private readonly subject: TSubject, object?: TObject) {
-    if (object) this.types.push(object);
-  }
+  constructor(private readonly subject: TSubject) {}
 
   get comment() {
     if (!this.deprecated) return this._comment;
@@ -70,7 +69,7 @@ export class PropertyType {
         throw new Error(
             `Could not find class for ${this.subject.name}, ${Format(value)}.`);
       }
-      cls.addProp(new Property(toScopedName(this.subject), this));
+      cls.addProp(new Property(this.subject, this));
       return true;
     }
 
@@ -101,11 +100,7 @@ export class PropertyType {
  */
 export class Property {
   constructor(
-      private readonly key: string, private readonly type: PropertyType) {}
-
-  required() {
-    return this.key.startsWith('@');
-  }
+      private readonly key: TSubject, private readonly type: PropertyType) {}
 
   get deprecated() {
     return this.type.deprecated;
@@ -113,20 +108,36 @@ export class Property {
 
   private typeNode() {
     const node = this.type.scalarTypeNode();
-    return this.key.startsWith('@') ?
-        node :
-        createUnionTypeNode([node, createArrayTypeNode(node)]);
+    return createUnionTypeNode([node, createArrayTypeNode(node)]);
   }
 
-  toNode(): PropertySignature {
+  toNode(context: Context): PropertySignature {
     return withComments(
         this.type.comment,
         createPropertySignature(
             /* modifiers= */[],
-            createStringLiteral(this.key),
-            this.required() ? undefined : createToken(SyntaxKind.QuestionToken),
+            createStringLiteral(context.getScopedName(this.key)),
+            createToken(SyntaxKind.QuestionToken),
             /*typeNode=*/this.typeNode(),
             /*initializer=*/undefined,
             ));
   }
+}
+
+export class TypeProperty {
+  constructor(private readonly className: TSubject) {}
+
+  toNode(context: Context) {
+    return createPropertySignature(
+        /* modifiers= */[], createStringLiteral('@type'),
+        /* questionToken= */ undefined,
+        /* typeNode= */
+        createTypeReferenceNode(
+            `"${context.getScopedName(this.className)}"`,
+            /*typeArguments=*/undefined,
+            ),
+        /* initializer= */ undefined);
+  }
+
+  readonly deprecated = false;
 }

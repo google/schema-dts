@@ -17,8 +17,27 @@
 import {SetOptions} from '../logging';
 import {WriteDeclarations} from '../transform/transform';
 import {load} from '../triples/reader';
+import {Context} from '../ts/context';
 
 import {ParseFlags} from './args';
+
+function parseContext(flag: string) {
+  const keyVals = flag.split(',');
+  const context = new Context();
+  if (keyVals.length === 1) {
+    context.setUrlContext(flag);
+  } else {
+    for (const keyVal of keyVals) {
+      const match = /^([^:]+):(.+)$/g.exec(keyVal);
+      if (!match || match[1] === undefined || match[2] === undefined) {
+        throw new Error(`Unknown value ${keyVal} in --context flag.`);
+      }
+      context.addNamedContext(match[1], match[2]);
+    }
+  }
+  context.validate();
+  return context;
+}
 
 async function main() {
   const options = ParseFlags();
@@ -26,7 +45,8 @@ async function main() {
   SetOptions(options);
 
   const result = load(options.schema, options.layer);
-  await WriteDeclarations(result, options.deprecated, write);
+  const context = parseContext(options.context);
+  await WriteDeclarations(result, options.deprecated, context, write);
 }
 
 function write(content: string) {
