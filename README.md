@@ -26,17 +26,40 @@ Note: This is not an officially supported Google product.
 
 ## Usage
 
-To use the typings for your project, simply add the `schema-dts` NPM package to
-your project:
+To use the typings for your project, simply add the
+[`schema-dts`](https://www.npmjs.com/package/schema-dts) NPM package to your
+project:
 
     npm install schema-dts
 
-Then you can use it as follows:
+Then you can use it by importing `"schema-dts"`.
 
-### Manually using the Schema Typings generator
+# Schema Typings Generator
+
+The Schema Typings Generator is available in the
+[**`schema-dts-gen`**](https://www.npmjs.com/package/schema-dts-gen) package.
 
     npm install schema-dts-gen
     npx schema-dts-gen --schema=3.4
+
+Command line usage:
+
+- **`schema`** and **`layer`**: Used to load the actual Schema definition:
+
+      https://schema.org/version/${schema}/${layer}.nt
+
+- **`context`**: Defaults to `https://schema.org`, the value or values to be
+  used with the `"@context"` property.
+
+  Can be either a single URL, or a comma separated list of two or more name:URL
+  pairs.
+
+  The context affects names of string properties in types, as well as the values
+  of an object's `"@type"`.
+
+- **`deprecated`**/**`nodeprecated`**: Whether or not to include deprecated
+  Schema.org types and properties. When included, these types will still be
+  marked with `@deprecated` JSDOC tags.
 
 ## Developers
 
