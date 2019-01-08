@@ -10,7 +10,7 @@ JSON-LD TypeScript types for Schema.org vocabulary.
 exposed as complete sets of discriminated type unions, allowing for easy
 completions and stricter validation.
 
-![Example of Code Completion using schema-dts](./example-1.gif)
+![Example of Code Completion using schema-dts](../../example-1.gif)
 
 Note: This is not an officially supported Google product.
 
