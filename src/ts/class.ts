@@ -172,6 +172,7 @@ export class Class {
   }
 
   private nonEnumType(): TypeNode {
+    this.children.sort((a, b) => CompareKeys(a.subject, b.subject));
     const children = this.children.map(
         child =>
             createTypeReferenceNode(child.className(), /*typeArguments=*/[]));
