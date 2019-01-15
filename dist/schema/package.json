@@ -24,7 +24,13 @@
     "typescript",
     "tsd",
     "dts",
-    "schema.org"
+    "schema.org",
+    "Semantic Web",
+    "semantic-web",
+    "Linked Data",
+    "linked-data",
+    "jsonld",
+    "JSON-LD"
   ],
   "homepage": "https://github.com/google/schema-dts#readme",
   "bugs": "https://github.com/google/schema-dts/issues",
