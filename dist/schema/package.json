@@ -1,6 +1,6 @@
 {
   "name": "schema-dts",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "displayName": "schema-dts: latest Schema.org TypeScript Declarations",
   "description": "A TypeScript package with latest Schema.Org Schema Typings",
   "authors": [
@@ -24,7 +24,13 @@
     "typescript",
     "tsd",
     "dts",
-    "schema.org"
+    "schema.org",
+    "Semantic Web",
+    "semantic-web",
+    "Linked Data",
+    "linked-data",
+    "jsonld",
+    "JSON-LD"
   ],
   "homepage": "https://github.com/google/schema-dts#readme",
   "bugs": "https://github.com/google/schema-dts/issues",

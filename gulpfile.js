@@ -47,6 +47,7 @@ gulp.task('clean', () => del([
                      'dist/src',
                      'dist/schema/**/*',
                      '!dist/schema/package.json',
+                     '!dist/schema/README.md',
                    ]));
 
 const nodeProject = tsc.createProject('src/tsconfig.json');
@@ -62,7 +63,7 @@ gulp.task('generate-ts', gulp.series('build-generator', () => {
 
 gulp.task(
     'prepare-package',
-    () => gulp.src(['README.md', 'LICENSE']).pipe(gulp.dest('dist/schema')));
+    () => gulp.src(['LICENSE']).pipe(gulp.dest('dist/schema')));
 
 gulp.task(
     'generate-package',
