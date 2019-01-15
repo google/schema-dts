@@ -99,8 +99,7 @@ export class PropertyType {
  * A Property on a particular object.
  */
 export class Property {
-  constructor(
-      private readonly key: TSubject, private readonly type: PropertyType) {}
+  constructor(readonly key: TSubject, private readonly type: PropertyType) {}
 
   get deprecated() {
     return this.type.deprecated;

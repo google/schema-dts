@@ -17,12 +17,12 @@ import {createEnumDeclaration, createIntersectionTypeNode, createKeywordTypeNode
 
 import {Log} from '../logging';
 import {TObject, TPredicate, TSubject} from '../triples/triple';
-import {SchemaString, UrlNode} from '../triples/types';
+import {UrlNode} from '../triples/types';
 import {GetComment, GetSubClassOf, IsSupersededBy} from '../triples/wellKnown';
 
 import {Context} from './context';
 import {EnumValue} from './enum';
-import {Property, PropertyType, TypeProperty} from './property';
+import {Property, TypeProperty} from './property';
 import {arrayOf} from './util/arrayof';
 import {withComments} from './util/comments';
 import {toClassName} from './util/names';
@@ -74,6 +74,7 @@ export class Class {
   }
 
   private properties() {
+    this._props.sort((a, b) => CompareKeys(a.key, b.key));
     return this.isLeaf ? [new TypeProperty(this.subject), ...this._props] :
                          this._props;
   }
@@ -273,6 +274,13 @@ export function Sort(a: Class, b: Class): number {
   } else if (b instanceof Builtin) {
     return +1;
   } else {
-    return a.subject.name.localeCompare(b.subject.name);
+    return CompareKeys(a.subject, b.subject);
   }
+}
+
+function CompareKeys(a: TSubject, b: TSubject): number {
+  const byName = a.name.localeCompare(b.name);
+  if (byName !== 0) return byName;
+
+  return a.href.localeCompare(b.href);
 }
