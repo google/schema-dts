@@ -204,6 +204,7 @@ export class Class {
 
   private enumDecl(): EnumDeclaration|undefined {
     if (this._enums.length === 0) return undefined;
+    this._enums.sort((a, b) => CompareKeys(a.value, b.value));
 
     return createEnumDeclaration(
         /* decorators= */[],

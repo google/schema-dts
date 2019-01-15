@@ -30,7 +30,7 @@ export class EnumValue {
 
   private comment?: string;
   constructor(
-      private readonly value: TSubject, types: ReadonlyArray<TTypeName>,
+      readonly value: TSubject, types: ReadonlyArray<TTypeName>,
       map: ClassMap) {
     for (const type of types) {
       // "Type" containment.
