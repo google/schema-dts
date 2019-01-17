@@ -83,7 +83,8 @@ export class PropertyType {
 
   scalarTypeNode() {
     const typeNodes =
-        this.types.map(type => createTypeReferenceNode(toTypeName(type), []));
+        this.types.sort((a, b) => toTypeName(a).localeCompare(toTypeName(b)))
+            .map(type => createTypeReferenceNode(toTypeName(type), []));
     switch (typeNodes.length) {
       case 0:
         return createKeywordTypeNode(SyntaxKind.NeverKeyword);
@@ -99,8 +100,7 @@ export class PropertyType {
  * A Property on a particular object.
  */
 export class Property {
-  constructor(
-      private readonly key: TSubject, private readonly type: PropertyType) {}
+  constructor(readonly key: TSubject, private readonly type: PropertyType) {}
 
   get deprecated() {
     return this.type.deprecated;

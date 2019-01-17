@@ -1,0 +1,36 @@
+// tslint:disable
+
+/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
+export type WithContext<T extends Thing> = T & {
+    "@context": "https://schema.org";
+};
+
+/** Boolean: True or False. */
+export type Boolean = boolean;
+
+/** A date value in {@link http://en.wikipedia.org/wiki/ISO_8601 ISO 8601 date format}. */
+export type Date = string;
+
+/** A combination of date and time of day in the form [-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] (see Chapter 5.4 of ISO 8601). */
+export type DateTime = string;
+
+/** Data type: Number. */
+export type Number = number;
+
+/** Data type: Text. */
+export type Text = string;
+
+/** DateTime represented in string, e.g. 2017-01-04T17:10:00-05:00. */
+export type Time = string;
+
+export enum ThingEnum {
+    a = "http://schema.org/a",
+    b = "http://schema.org/b",
+    c = "http://schema.org/c",
+    d = "http://schema.org/d"
+}
+type ThingBase = {
+    "@type": "Thing";
+};
+export type Thing = ThingEnum | (ThingBase);
+
