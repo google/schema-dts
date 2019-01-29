@@ -1,6 +1,6 @@
 {
   "name": "schema-dts",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "displayName": "schema-dts: latest Schema.org TypeScript Declarations",
   "description": "A TypeScript package with latest Schema.Org Schema Typings",
   "authors": [

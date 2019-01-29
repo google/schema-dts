@@ -1,6 +1,6 @@
 {
   "name": "schema-dts-gen",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "displayName": "schema-dts Generator",
   "description": "Generate TypeScript Definitions for Schema.org Schema",
   "authors": [
