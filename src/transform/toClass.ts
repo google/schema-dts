@@ -17,7 +17,7 @@
 import {Log} from '../logging';
 import {ObjectPredicate, Topic, TypedTopic} from '../triples/triple';
 import {IsClass} from '../triples/wellKnown';
-import {Builtin, Class, ClassMap} from '../ts/class';
+import {BooleanEnum, Builtin, Class, ClassMap} from '../ts/class';
 
 function toClass(cls: Class, topic: Topic, map: ClassMap): Class {
   const rest: ObjectPredicate[] = [];
@@ -49,8 +49,9 @@ const wellKnownTypes = [
       'A combination of date and time of day in the form ' +
           '[-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] ' +
           '(see Chapter 5.4 of ISO 8601).'),
-  new Builtin(
-      'http://schema.org/Boolean', 'boolean', 'Boolean: True or False.'),
+  new BooleanEnum(
+      'http://schema.org/Boolean', 'https://schema.org/True',
+      'https://schema.org/False', 'Boolean: True or False.'),
 ];
 
 function ForwardDeclareClasses(topics: ReadonlyArray<TypedTopic>): ClassMap {

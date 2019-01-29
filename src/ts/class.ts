@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {createEnumDeclaration, createIntersectionTypeNode, createKeywordTypeNode, createModifiersFromModifierFlags, createParenthesizedType, createTypeAliasDeclaration, createTypeLiteralNode, createTypeReferenceNode, createUnionTypeNode, EnumDeclaration, ModifierFlags, Statement, SyntaxKind, TypeAliasDeclaration, TypeNode} from 'typescript';
+import {createEnumDeclaration, createEnumMember, createIntersectionTypeNode, createKeywordTypeNode, createModifiersFromModifierFlags, createParenthesizedType, createStringLiteral, createTypeAliasDeclaration, createTypeLiteralNode, createTypeReferenceNode, createUnionTypeNode, DeclarationStatement, EnumDeclaration, ModifierFlags, Statement, SyntaxKind, TypeAliasDeclaration, TypeNode} from 'typescript';
 
 import {Log} from '../logging';
 import {TObject, TPredicate, TSubject} from '../triples/triple';
@@ -238,11 +238,11 @@ export class Class {
 export class Builtin extends Class {
   constructor(
       url: string, private readonly equivTo: string,
-      private readonly doc: string) {
+      protected readonly doc: string) {
     super(UrlNode.Parse(url));
   }
 
-  toNode() {
+  toNode(): DeclarationStatement[] {
     return [
       withComments(
           this.doc,
@@ -257,6 +257,25 @@ export class Builtin extends Class {
 
   protected baseName() {
     return this.subject.name;
+  }
+}
+export class BooleanEnum extends Builtin {
+  constructor(
+      url: string, private trueUrl: string, private falseUrl: string,
+      doc: string) {
+    super(url, '', doc);
+  }
+
+  toNode(): DeclarationStatement[] {
+    return [withComments(
+        this.doc,
+        createEnumDeclaration(
+            /*decotrators=*/[],
+            createModifiersFromModifierFlags(ModifierFlags.Export),
+            this.subject.name, [
+              createEnumMember('True', createStringLiteral(this.trueUrl)),
+              createEnumMember('False', createStringLiteral(this.falseUrl)),
+            ]))];
   }
 }
 
