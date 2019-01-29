@@ -6,7 +6,10 @@ export type WithContext<T extends Thing> = T & {
 };
 
 /** Boolean: True or False. */
-export type Boolean = boolean;
+export enum Boolean {
+    True = "https://schema.org/True",
+    False = "https://schema.org/False"
+}
 
 /** A date value in {@link http://en.wikipedia.org/wiki/ISO_8601 ISO 8601 date format}. */
 export type Date = string;
