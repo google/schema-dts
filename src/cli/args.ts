@@ -38,7 +38,7 @@ export function ParseFlags(): Options|undefined {
     dest: 'schema'
   });
   parser.addArgument('--layer', {
-    defaultValue: 'schema',
+    defaultValue: 'all-layers',
     help: 'Which layer of the schema to load? E.g. schema or all-layers.',
     metavar: 'name_of_file',
     dest: 'layer'
