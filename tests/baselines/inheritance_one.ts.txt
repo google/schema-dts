@@ -35,5 +35,7 @@ export type Person = PersonBase;
 type ThingBase = {
     "name"?: Text | Text[];
 };
-export type Thing = Person;
+export type Thing = ({
+    "@type": "Thing";
+} & ThingBase) | Person;
 
