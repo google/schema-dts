@@ -171,7 +171,7 @@ export class Class {
         /*typeParameters=*/[], baseNode);
   }
 
-  private nonEnumType(): TypeNode {
+  private nonEnumType(context: Context): TypeNode {
     this.children.sort((a, b) => CompareKeys(a.subject, b.subject));
     const children = this.children.map(
         child =>
@@ -184,22 +184,29 @@ export class Class {
         createParenthesizedType(createUnionTypeNode(children));
 
     if (childrenNode) {
-      return childrenNode;
+      return createUnionTypeNode([
+        createIntersectionTypeNode([
+          createTypeLiteralNode(
+              [new TypeProperty(this.subject).toNode(context)]),
+          createTypeReferenceNode(this.baseName(), /*typeArguments=*/[])
+        ]),
+        childrenNode
+      ]);
     } else {
       return createTypeReferenceNode(this.baseName(), /*typeArguments=*/[]);
     }
   }
 
-  private totalType(): TypeNode {
+  private totalType(context: Context): TypeNode {
     const isEnum = this._enums.length > 0;
 
     if (isEnum) {
       return createUnionTypeNode([
         createTypeReferenceNode(this.enumName(), []),
-        createParenthesizedType(this.nonEnumType()),
+        createParenthesizedType(this.nonEnumType(context)),
       ]);
     } else {
-      return this.nonEnumType();
+      return this.nonEnumType(context);
     }
   }
 
@@ -214,7 +221,7 @@ export class Class {
   }
 
   toNode(context: Context, skipDeprecatedProperties: boolean) {
-    const typeValue: TypeNode = this.totalType();
+    const typeValue: TypeNode = this.totalType(context);
     const declaration = withComments(
         this.comment,
         createTypeAliasDeclaration(
