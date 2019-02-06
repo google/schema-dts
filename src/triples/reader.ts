@@ -67,11 +67,11 @@ export function toTripleStrings(data: string[]) {
 /**
  * Loads schema all Triples from a given Schema file and version.
  */
-export function load(version: string, fileName: string): Observable<Triple> {
+export function load(url: string): Observable<Triple> {
   return new Observable<Triple>(subscriber => {
     https
         .get(
-            `https://schema.org/version/${version}/${fileName}.nt`,
+            url,
             response => {
               const data: string[] = [];
 
