@@ -4,11 +4,10 @@
   "displayName": "schema-dts Generator",
   "description": "Generate TypeScript Definitions for Schema.org Schema",
   "authors": [
-    {
-      "name": "Eyas Sharaiha",
-      "email": "eyas@google.com",
-      "url": "https://eyas.sh/"
-    }
+    "Eyas Sharaiha <eyas@google.com> (https://eyas.sh/)"
+  ],
+  "maintainers": [
+    "Eyas Sharaiha <npm@eyas.sh> (https://eyas.sh/)"
   ],
   "files": [
     "dist/gen/**/*"
