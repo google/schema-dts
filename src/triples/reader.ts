@@ -16,6 +16,8 @@
 import https from 'https';
 import {Observable} from 'rxjs';
 
+import {Log} from '../logging';
+
 import {TObject, Triple} from './triple';
 import {Rdfs, SchemaString, UrlNode} from './types';
 
@@ -73,6 +75,22 @@ export function load(url: string): Observable<Triple> {
         .get(
             url,
             response => {
+              Log(`Got Response ${response.statusCode}: ${
+                  response.statusMessage}.`);
+              if (response.statusCode !== 200) {
+                subscriber.error(
+                    `Got Errored Response ${response.statusCode}: ${
+                        response.statusMessage}.` +
+                    (response.headers.location ?
+                         `\nLocation: ${response.headers.location}` :
+                         '') +
+                    (response.headers['content-location'] ?
+                         `\nContent-Loadtion: ${
+                             response.headers['content-location']}` :
+                         ''));
+                return;
+              }
+
               const data: string[] = [];
 
               response.on('data', (chunkB: Buffer) => {
@@ -87,6 +105,7 @@ export function load(url: string): Observable<Triple> {
                     subscriber.next(triple);
                   }
                 } catch (error) {
+                  Log(`Caught Error on end: ${error}`);
                   subscriber.error(error);
                 }
 
@@ -94,6 +113,7 @@ export function load(url: string): Observable<Triple> {
               });
 
               response.on('error', error => {
+                Log(`Saw error: ${error}`);
                 subscriber.error(error);
               });
             })
