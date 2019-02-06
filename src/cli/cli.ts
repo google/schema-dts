@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {SetOptions} from '../logging';
+import {Log, SetOptions} from '../logging';
 import {WriteDeclarations} from '../transform/transform';
 import {load} from '../triples/reader';
 import {Context} from '../ts/context';
@@ -47,6 +47,7 @@ async function main() {
   const ontologyUrl = IsCustom(options) ?
       options.ontology :
       `https://schema.org/version/${options.schema}/${options.layer}.nt`;
+  Log(`Loading Ontology from URL: ${ontologyUrl}`);
 
   const result = load(ontologyUrl);
   const context = parseContext(options.context);
