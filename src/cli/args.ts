@@ -15,13 +15,40 @@
  */
 import {ArgumentParser} from 'argparse';
 
-export interface Options {
-  verbose: boolean;
+export interface StandardOntology {
+  /**
+   * The version of the schema to use, formatted as a string.
+   * @example
+   * "3.4"
+   */
   schema: string;
+
+  /**
+   * The "layer" of the schema to use.
+   * @example <caption>The "Standard" approved schema</caption>
+   * "schema"
+   * @example <caption> Standard and pending schema, and extensions available
+   * on Schema.org</caption>
+   * "all-layers"
+   */
   layer: string;
+}
+export interface CustomOntology {
+  /** HTTPS URL to an .nt file defining a custom ontology. */
+  ontology: string;
+}
+
+export type Options = (StandardOntology|CustomOntology)&{
+  verbose: boolean;
   deprecated: boolean;
   context: string;
+};
+
+export function IsCustom(options: StandardOntology|
+                         CustomOntology): options is CustomOntology {
+  return typeof (options as Partial<CustomOntology>).ontology === 'string';
 }
+
 export function ParseFlags(): Options|undefined {
   const parser = new ArgumentParser(
       {version: '0.0.1', addHelp: true, description: 'schema-dts generator'});
@@ -54,6 +81,15 @@ export function ParseFlags(): Options|undefined {
         'property, and \'schema:\' being a prefix for any Schema.org property.',
     metavar: 'key1:url,key2:url,...',
     dest: 'context'
+  });
+  parser.addArgument('--ontology', {
+    defaultValue: undefined,
+    help: 'HTTPS URL to a custom .nt file defining an entirely self-' +
+        'sufficient schema. The schema must still be described in terms of ' +
+        'Schema.org DataTypes, as well as rdf/rdfs concepts like \'type\', ' +
+        '\'domainIncludes\', and \'rangeIncludes\'.',
+    metavar: 'https://url.to/schema.nt',
+    dest: 'ontology'
   });
 
   const deprecated = parser.addMutuallyExclusiveGroup({required: false});

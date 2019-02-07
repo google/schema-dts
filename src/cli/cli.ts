@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import {SetOptions} from '../logging';
+import {Log, SetOptions} from '../logging';
 import {WriteDeclarations} from '../transform/transform';
 import {load} from '../triples/reader';
 import {Context} from '../ts/context';
 
-import {ParseFlags} from './args';
+import {IsCustom, ParseFlags} from './args';
 
 function parseContext(flag: string) {
   const keyVals = flag.split(',');
@@ -44,7 +44,12 @@ async function main() {
   if (!options) return;
   SetOptions(options);
 
-  const result = load(options.schema, options.layer);
+  const ontologyUrl = IsCustom(options) ?
+      options.ontology :
+      `https://schema.org/version/${options.schema}/${options.layer}.nt`;
+  Log(`Loading Ontology from URL: ${ontologyUrl}`);
+
+  const result = load(ontologyUrl);
   const context = parseContext(options.context);
   await WriteDeclarations(result, options.deprecated, context, write);
 }
