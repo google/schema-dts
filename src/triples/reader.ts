@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import https from 'https';
-import {Observable} from 'rxjs';
+import {Observable, Subscriber, TeardownLogic} from 'rxjs';
 
 import {Log} from '../logging';
 
@@ -71,54 +71,59 @@ export function toTripleStrings(data: string[]) {
  */
 export function load(url: string): Observable<Triple> {
   return new Observable<Triple>(subscriber => {
-    https
-        .get(
-            url,
-            response => {
-              Log(`Got Response ${response.statusCode}: ${
-                  response.statusMessage}.`);
-              if (response.statusCode !== 200) {
-                subscriber.error(
-                    `Got Errored Response ${response.statusCode}: ${
-                        response.statusMessage}.` +
-                    (response.headers.location ?
-                         `\nLocation: ${response.headers.location}` :
-                         '') +
-                    (response.headers['content-location'] ?
-                         `\nContent-Loadtion: ${
-                             response.headers['content-location']}` :
-                         ''));
+    handleUrl(url, subscriber);
+  });
+}
+
+function handleUrl(url: string, subscriber: Subscriber<Triple>): TeardownLogic {
+  https
+      .get(
+          url,
+          response => {
+            Log(`Got Response ${response.statusCode}: ${
+                response.statusMessage}.`);
+            if (response.statusCode !== 200) {
+              const location = response.headers['location'] ||
+                  response.headers['content-location'];
+
+              if (location) {
+                Log(`Handling redirect to ${location}...`);
+                handleUrl(location, subscriber);
                 return;
               }
 
-              const data: string[] = [];
+              subscriber.error(`Got Errored Response ${response.statusCode}: ${
+                  response.statusMessage}.`);
+              return;
+            }
 
-              response.on('data', (chunkB: Buffer) => {
-                const chunk = chunkB.toString('utf-8');
-                data.push(chunk);
-              });
+            const data: string[] = [];
 
-              response.on('end', () => {
-                try {
-                  const triples = toTripleStrings(data);
-                  for (const triple of process(triples)) {
-                    subscriber.next(triple);
-                  }
-                } catch (error) {
-                  Log(`Caught Error on end: ${error}`);
-                  subscriber.error(error);
+            response.on('data', (chunkB: Buffer) => {
+              const chunk = chunkB.toString('utf-8');
+              data.push(chunk);
+            });
+
+            response.on('end', () => {
+              try {
+                const triples = toTripleStrings(data);
+                for (const triple of process(triples)) {
+                  subscriber.next(triple);
                 }
-
-                subscriber.complete();
-              });
-
-              response.on('error', error => {
-                Log(`Saw error: ${error}`);
+              } catch (error) {
+                Log(`Caught Error on end: ${error}`);
                 subscriber.error(error);
-              });
-            })
-        .on('error', e => subscriber.error(e));
-  });
+              }
+
+              subscriber.complete();
+            });
+
+            response.on('error', error => {
+              Log(`Saw error: ${error}`);
+              subscriber.error(error);
+            });
+          })
+      .on('error', e => subscriber.error(e));
 }
 
 export function* process(triples: string[][]): Iterable<Triple> {
