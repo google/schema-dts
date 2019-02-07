@@ -20,6 +20,8 @@ export interface StandardOntology {
    * The version of the schema to use, formatted as a string.
    * @example
    * "3.4"
+   * @example
+   * "latest"
    */
   schema: string;
 
@@ -59,8 +61,9 @@ export function ParseFlags(): Options|undefined {
   verbose.addArgument('--noverbose', {action: 'storeFalse', dest: 'verbose'});
 
   parser.addArgument('--schema', {
-    defaultValue: '3.4',
-    help: 'The version of the schema to load.',
+    defaultValue: 'latest',
+    help: 'The version of the schema to load. Use \'latest\' for the most ' +
+        'recent version publsihed on Schema.org.',
     metavar: 'version',
     dest: 'schema'
   });
