@@ -1,14 +1,13 @@
 {
   "name": "schema-dts",
   "version": "0.3.1",
-  "displayName": "schema-dts: latest Schema.org TypeScript Declarations",
-  "description": "A TypeScript package with latest Schema.Org Schema Typings",
+  "displayName": "schema-dts: Strongly-typed Schema.org vocabulary declarations",
+  "description": "A TypeScript package with latest Schema.org Schema Typings",
   "authors": [
-    {
-      "name": "Eyas Sharaiha",
-      "email": "eyas@google.com",
-      "url": "https://eyas.sh/"
-    }
+    "Eyas Sharaiha <eyas@google.com> (https://eyas.sh/)"
+  ],
+  "maintainers": [
+    "Eyas Sharaiha <npm@eyas.sh> (https://eyas.sh/)"
   ],
   "files": [
     "**/*"
