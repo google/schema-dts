@@ -4,4 +4,3 @@ dist/gen/*
 dist/schema/*
 !dist/schema/package.json
 !dist/schema/README.md
-package-lock.json
