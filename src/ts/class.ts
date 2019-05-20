@@ -74,6 +74,11 @@ export class Class {
     return this._props;
   }
 
+  private get allowString(): boolean {
+    return this._allowStringType ||
+        this.parents.some(parent => parent.allowString);
+  }
+
   protected baseName() {
     return toClassName(this.subject) + 'Base';
   }

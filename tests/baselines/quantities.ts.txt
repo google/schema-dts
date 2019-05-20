@@ -26,39 +26,40 @@ export type Text = string;
 /** DateTime represented in string, e.g. 2017-01-04T17:10:00-05:00. */
 export type Time = string;
 
-type DistanceBase = QuantityBase & {
+type DistanceBase = QuantityBase;
+export type Distance = ({
     "@type": "Distance";
-};
-export type Distance = string | DistanceBase;
+} & DistanceBase) | string;
 
-type DurationBase = QuantityBase & {
+type DurationBase = QuantityBase;
+export type Duration = ({
     "@type": "Duration";
-};
-export type Duration = string | DurationBase;
+} & DurationBase) | string;
 
-type EnergyBase = QuantityBase & {
+type EnergyBase = QuantityBase;
+export type Energy = ({
     "@type": "Energy";
-};
-export type Energy = string | EnergyBase;
+} & EnergyBase) | string;
 
 type IntangibleBase = ThingBase;
 export type Intangible = ({
     "@type": "Intangible";
 } & IntangibleBase) | Quantity;
 
-type MassBase = QuantityBase & {
+type MassBase = QuantityBase;
+export type Mass = ({
     "@type": "Mass";
-};
-export type Mass = string | MassBase;
+} & MassBase) | string;
 
-type QuantityBase = ThingBase & {};
+type QuantityBase = IntangibleBase;
 export type Quantity = ({
-    "@type": "Quantity"
-} & QuantityBase) | Distance | Duration | Mass | Energy;
+    "@type": "Quantity";
+} & QuantityBase) | (Distance | Duration | Energy | Mass | string);
 
 type ThingBase = {
     "name"?: Text | Text[];
 };
 export type Thing = ({
     "@type": "Thing";
-} & ThingBase) | Quantity;
+} & ThingBase) | Intangible;
+
