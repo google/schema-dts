@@ -27,8 +27,9 @@ export type Text = string;
 export type Time = string;
 
 type ThingBase = {
-    "@type": "Thing";
     "a"?: (Boolean | Date | DateTime | Number | Text | Time) | (Boolean | Date | DateTime | Number | Text | Time)[];
 };
-export type Thing = ThingBase;
+export type Thing = {
+    "@type": "Thing";
+} & ThingBase;
 

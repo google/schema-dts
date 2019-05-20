@@ -32,8 +32,8 @@ export enum ThingEnum {
     c = "http://schema.org/c",
     d = "http://schema.org/d"
 }
-type ThingBase = {
+type ThingBase = {};
+export type Thing = ThingEnum | ({
     "@type": "Thing";
-};
-export type Thing = ThingEnum | (ThingBase);
+} & ThingBase);
 

@@ -27,10 +27,11 @@ export type Text = string;
 export type Time = string;
 
 type PersonBase = ThingBase & {
-    "@type": "Person";
     "height"?: Number | Number[];
 };
-export type Person = PersonBase;
+export type Person = {
+    "@type": "Person";
+} & PersonBase;
 
 type ThingBase = {
     "name"?: Text | Text[];
