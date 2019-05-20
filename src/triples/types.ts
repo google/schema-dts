@@ -77,6 +77,10 @@ export class UrlNode {
         this.context.search === context.search;
   }
 
+  equals(other: UrlNode): boolean {
+    return this.href === other.href;
+  }
+
   static Parse(urlString: string): UrlNode {
     const url = new URL(urlString);
 

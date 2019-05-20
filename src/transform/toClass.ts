@@ -16,6 +16,7 @@
 
 import {Log} from '../logging';
 import {ObjectPredicate, Topic, TypedTopic} from '../triples/triple';
+import {UrlNode} from '../triples/types';
 import {IsClass} from '../triples/wellKnown';
 import {BooleanEnum, Builtin, Class, ClassMap} from '../ts/class';
 
@@ -54,6 +55,12 @@ const wellKnownTypes = [
       'https://schema.org/False', 'Boolean: True or False.'),
 ];
 
+// Should we allow 'string' to be a valid type for all values of this type?
+const wellKnownStrings = [
+  UrlNode.Parse('http://schema.org/Quantity'),
+  UrlNode.Parse('https://schema.org/Quantity'),
+];
+
 function ForwardDeclareClasses(topics: ReadonlyArray<TypedTopic>): ClassMap {
   const classes = new Map<string, Class>();
   for (const wk of wellKnownTypes) {
@@ -61,7 +68,10 @@ function ForwardDeclareClasses(topics: ReadonlyArray<TypedTopic>): ClassMap {
   }
   for (const topic of topics) {
     if (!IsClass(topic)) continue;
-    classes.set(topic.Subject.toString(), new Class(topic.Subject));
+
+    const allowString = wellKnownStrings.some(wks => wks.equals(topic.Subject));
+    classes.set(
+        topic.Subject.toString(), new Class(topic.Subject, allowString));
   }
 
   if (classes.size === 0) {
