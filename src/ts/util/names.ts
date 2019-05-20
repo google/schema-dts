@@ -15,8 +15,23 @@
  */
 import {TObject, TSubject} from '../../triples/triple';
 
+function decodeOr(component: string) {
+  try {
+    return decodeURIComponent(component);
+  } catch {
+    return component;
+  }
+}
+
 export function toClassName(subject: TSubject): string {
-  return subject.name;
+  let sanitizedName = decodeOr(subject.name).replace(/[^A-Za-z0-9_]/g, '_');
+
+  // No leading numbers.
+  if (/^[0-9]/g.test(sanitizedName)) {
+    sanitizedName = `_${sanitizedName}`;
+  }
+
+  return sanitizedName;
 }
 
 export function toTypeName(object: TObject): string {
