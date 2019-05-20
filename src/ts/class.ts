@@ -74,6 +74,11 @@ export class Class {
     return this._props;
   }
 
+  private get allowString(): boolean {
+    return this._allowStringType ||
+        this.parents.some(parent => parent.allowString);
+  }
+
   protected baseName() {
     return toClassName(this.subject) + 'Base';
   }
@@ -84,7 +89,8 @@ export class Class {
     return toClassName(this.subject);
   }
 
-  constructor(readonly subject: TSubject) {}
+  constructor(
+      readonly subject: TSubject, private readonly _allowStringType: boolean) {}
   add(value: {Predicate: TPredicate; Object: TObject},
       classMap: ClassMap): boolean {
     const c = GetComment(value);
@@ -172,6 +178,11 @@ export class Class {
         child =>
             createTypeReferenceNode(child.className(), /*typeArguments=*/[]));
 
+    // 'String' is a valid Type sometimes, add that as a Child if so.
+    if (this.allowString) {
+      children.push(createTypeReferenceNode('string', /*typeArguments=*/[]));
+    }
+
     const childrenNode = children.length === 0 ?
         null :
         children.length === 1 ?
@@ -239,7 +250,7 @@ export class Builtin extends Class {
   constructor(
       url: string, private readonly equivTo: string,
       protected readonly doc: string) {
-    super(UrlNode.Parse(url));
+    super(UrlNode.Parse(url), false);
   }
 
   toNode(): DeclarationStatement[] {
