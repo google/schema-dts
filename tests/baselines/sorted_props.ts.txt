@@ -27,11 +27,12 @@ export type Text = string;
 export type Time = string;
 
 type ThingBase = {
-    "@type": "Thing";
     "a"?: Text | Text[];
     "b"?: Text | Text[];
     "c"?: Text | Text[];
     "d"?: Text | Text[];
 };
-export type Thing = ThingBase;
+export type Thing = {
+    "@type": "Thing";
+} & ThingBase;
 

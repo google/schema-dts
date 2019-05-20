@@ -27,7 +27,6 @@ export type Text = string;
 export type Time = string;
 
 type ThingBase = {
-    "@type": "Thing";
     /** Names are great! {@link X Y} */
     "name"?: Text | Text[];
 };
@@ -38,5 +37,7 @@ type ThingBase = {
  * - Bar
  * - _Baz_, and __Bat__
  */
-export type Thing = ThingBase;
+export type Thing = {
+    "@type": "Thing";
+} & ThingBase;
 

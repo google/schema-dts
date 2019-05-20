@@ -27,10 +27,11 @@ export type Text = string;
 export type Time = string;
 
 type PersonBase = ThingBase & {
-    "@type": "Person";
     "height"?: Number | Number[];
 };
-export type Person = PersonBase;
+export type Person = {
+    "@type": "Person";
+} & PersonBase;
 
 type ThingBase = {
     "name"?: Text | Text[];
@@ -40,8 +41,9 @@ export type Thing = ({
 } & ThingBase) | (Person | Vehicle);
 
 type VehicleBase = ThingBase & {
-    "@type": "Vehicle";
     "doors"?: Number | Number[];
 };
-export type Vehicle = VehicleBase;
+export type Vehicle = {
+    "@type": "Vehicle";
+} & VehicleBase;
 

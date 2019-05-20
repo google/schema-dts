@@ -69,14 +69,9 @@ export class Class {
     return this._comment ? `${this._comment}\n${deprecated}` : deprecated;
   }
 
-  private get isLeaf(): boolean {
-    return this.children.length === 0 && !this.aliasesBuiltin();
-  }
-
   private properties() {
     this._props.sort((a, b) => CompareKeys(a.key, b.key));
-    return this.isLeaf ? [new TypeProperty(this.subject), ...this._props] :
-                         this._props;
+    return this._props;
   }
 
   protected baseName() {
@@ -158,7 +153,7 @@ export class Class {
     } else if (propLiteral.members.length > 0) {
       return propLiteral;
     } else {
-      return createKeywordTypeNode(SyntaxKind.NeverKeyword);
+      return createTypeLiteralNode([]);
     }
   }
 
@@ -183,17 +178,15 @@ export class Class {
         children[0] :
         createParenthesizedType(createUnionTypeNode(children));
 
+    const thisType = createIntersectionTypeNode([
+      createTypeLiteralNode([new TypeProperty(this.subject).toNode(context)]),
+      createTypeReferenceNode(this.baseName(), /*typeArguments=*/[])
+    ]);
+
     if (childrenNode) {
-      return createUnionTypeNode([
-        createIntersectionTypeNode([
-          createTypeLiteralNode(
-              [new TypeProperty(this.subject).toNode(context)]),
-          createTypeReferenceNode(this.baseName(), /*typeArguments=*/[])
-        ]),
-        childrenNode
-      ]);
+      return createUnionTypeNode([thisType, childrenNode]);
     } else {
-      return createTypeReferenceNode(this.baseName(), /*typeArguments=*/[]);
+      return thisType;
     }
   }
 
