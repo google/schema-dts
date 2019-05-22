@@ -19,9 +19,13 @@
 import 'jasmine';
 import {diffLines} from 'diff';
 
+function withoutCrLf(input: string): string {
+  return input.replace(/\r\n/g, '\n');
+}
+
 function handleDiff(
     actual: string, expected: string): jasmine.CustomMatcherResult {
-  const diff = diffLines(actual, expected);
+  const diff = diffLines(withoutCrLf(actual), withoutCrLf(expected));
   const results = diff.filter(line => line.added || line.removed);
 
   if (results.length === 0) return {pass: true};
