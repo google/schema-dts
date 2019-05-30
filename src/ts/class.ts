@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {createEnumDeclaration, createEnumMember, createIntersectionTypeNode, createKeywordTypeNode, createModifiersFromModifierFlags, createParenthesizedType, createStringLiteral, createTypeAliasDeclaration, createTypeLiteralNode, createTypeReferenceNode, createUnionTypeNode, DeclarationStatement, EnumDeclaration, ModifierFlags, Statement, SyntaxKind, TypeAliasDeclaration, TypeNode} from 'typescript';
+import {createEnumDeclaration, createEnumMember, createIntersectionTypeNode, createModifiersFromModifierFlags, createParenthesizedType, createStringLiteral, createTypeAliasDeclaration, createTypeLiteralNode, createTypeReferenceNode, createUnionTypeNode, DeclarationStatement, EnumDeclaration, ModifierFlags, Statement, TypeAliasDeclaration, TypeNode} from 'typescript';
 
 import {Log} from '../logging';
 import {TObject, TPredicate, TSubject} from '../triples/triple';
@@ -49,9 +49,9 @@ export class Class {
   private readonly _enums: EnumValue[] = [];
   private readonly _supersededBy: Class[] = [];
 
-  private aliasesBuiltin(): boolean {
+  private inheritsDataType(): boolean {
     for (const parent of this.parents) {
-      if (parent instanceof Builtin || parent.aliasesBuiltin()) {
+      if (parent instanceof Builtin || parent.inheritsDataType()) {
         return true;
       }
     }
@@ -189,10 +189,18 @@ export class Class {
         children[0] :
         createParenthesizedType(createUnionTypeNode(children));
 
-    const thisType = createIntersectionTypeNode([
-      createTypeLiteralNode([new TypeProperty(this.subject).toNode(context)]),
-      createTypeReferenceNode(this.baseName(), /*typeArguments=*/[])
-    ]);
+    const baseTypeReference =
+        createTypeReferenceNode(this.baseName(), /*typeArguments=*/[]);
+
+    // If we inherit from a DataType (~= a Built In), then the type is _not_
+    // represented as a node. Skip the leaf type.
+    const thisType = this.inheritsDataType() ?
+        baseTypeReference :
+        createIntersectionTypeNode([
+          createTypeLiteralNode(
+              [new TypeProperty(this.subject).toNode(context)]),
+          baseTypeReference
+        ]);
 
     if (childrenNode) {
       return createUnionTypeNode([thisType, childrenNode]);
