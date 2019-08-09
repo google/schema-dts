@@ -298,21 +298,44 @@ export class BooleanEnum extends Builtin {
   }
 }
 
+export class DataTypeUnion extends Builtin {
+  constructor(url: string, private readonly wk: Builtin[], doc: string) {
+    super(url, '', doc);
+  }
+
+  toNode(): DeclarationStatement[] {
+    return [withComments(
+        this.doc,
+        createTypeAliasDeclaration(
+            /*decorators=*/[],
+            createModifiersFromModifierFlags(ModifierFlags.Export),
+            this.subject.name, /*typeParameters=*/[],
+            createUnionTypeNode(this.wk.map(
+                wk => createTypeReferenceNode(
+                    wk.subject.name, /*typeArguments=*/[])))))];
+  }
+}
+
 /**
  * Defines a Sort order between Class declarations.
  *
- * DataTypes come first, followed by all regular classes. Within each group,
- * class names are ordered alphabetically in UTF-16 code units order.
+ * DataTypes come first, by the 'DataType' union itself, followed by all regular
+ * classes. Within each group, class names are ordered alphabetically in UTF-16
+ * code units order.
  */
 export function Sort(a: Class, b: Class): number {
-  if (a instanceof Builtin) {
-    if (b instanceof Builtin) {
+  if (a instanceof Builtin && !(a instanceof DataTypeUnion)) {
+    if (b instanceof Builtin && !(b instanceof DataTypeUnion)) {
       return a.subject.name.localeCompare(b.subject.name);
     } else {
       return -1;
     }
-  } else if (b instanceof Builtin) {
+  } else if (b instanceof Builtin && !(b instanceof DataTypeUnion)) {
     return +1;
+  } else if (a instanceof DataTypeUnion) {
+    return b instanceof DataTypeUnion ? 0 : -1;
+  } else if (b instanceof DataTypeUnion) {
+    return a instanceof DataTypeUnion ? 0 : +1;
   } else {
     return CompareKeys(a.subject, b.subject);
   }
