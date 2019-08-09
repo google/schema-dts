@@ -18,7 +18,7 @@ import {Log} from '../logging';
 import {ObjectPredicate, Topic, TypedTopic} from '../triples/triple';
 import {UrlNode} from '../triples/types';
 import {IsClass} from '../triples/wellKnown';
-import {BooleanEnum, Builtin, Class, ClassMap} from '../ts/class';
+import {BooleanEnum, Builtin, Class, ClassMap, DataTypeUnion} from '../ts/class';
 
 function toClass(cls: Class, topic: Topic, map: ClassMap): Class {
   const rest: ObjectPredicate[] = [];
@@ -61,11 +61,16 @@ const wellKnownStrings = [
   UrlNode.Parse('https://schema.org/Quantity'),
 ];
 
+const dataType = new DataTypeUnion(
+    'http://schema.org/DataType', wellKnownTypes,
+    'The basic data types such as Integers, Strings, etc.');
+
 function ForwardDeclareClasses(topics: ReadonlyArray<TypedTopic>): ClassMap {
   const classes = new Map<string, Class>();
   for (const wk of wellKnownTypes) {
     classes.set(wk.subject.toString(), wk);
   }
+  classes.set(dataType.subject.toString(), dataType);
   for (const topic of topics) {
     if (!IsClass(topic)) continue;
 
