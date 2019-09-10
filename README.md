@@ -15,12 +15,12 @@ completions and stricter validation.
 
 This repository contains two NPM packages:
 
-*   **[schema-dts-gen](https://www.npmjs.com/package/schema-dts-gen)** Providing
-    a command-line tool to generate TypeScript files based on a specific Schema
-    version and layer.
-*   **[schema-dts](https://www.npmjs.com/package/schema-dts)** Pre-packaged
-    TypeScript typings of latest Schema.org schema, without
-    [pending](https://pending.schema.org/) and other non-core layers.
+- **[schema-dts-gen](https://www.npmjs.com/package/schema-dts-gen)** Providing
+  a command-line tool to generate TypeScript files based on a specific Schema
+  version and layer.
+- **[schema-dts](https://www.npmjs.com/package/schema-dts)** Pre-packaged
+  TypeScript typings of latest Schema.org schema, without
+  [pending](https://pending.schema.org/) and other non-core layers.
 
 Note: This is not an officially supported Google product.
 
@@ -33,6 +33,24 @@ project:
     npm install schema-dts
 
 Then you can use it by importing `"schema-dts"`.
+
+### Root context
+
+You will usually want your top-level item to include a `@context`, like `https://schema.org`. In order for your object type to accept this property, you can augment it with `WithContext`, e.g.:
+
+```ts
+import { Person, WithContext } from "schema-dts";
+
+const p: WithContext<Person> = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Eve",
+  affiliation: {
+    "@type": "School",
+    name: "Nice School"
+  }
+};
+```
 
 # Schema Typings Generator
 
