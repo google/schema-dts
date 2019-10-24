@@ -30,6 +30,8 @@ export type Time = string;
 export type DataType = Text | Number | Time | Date | DateTime | Boolean;
 
 type ThingBase = {
+    /** IRI identifying the canonical address of this object. */
+    "@id"?: string;
     "a"?: (Boolean | Date | DateTime | Number | Text | Time) | (Boolean | Date | DateTime | Number | Text | Time)[];
 };
 export type Thing = {
