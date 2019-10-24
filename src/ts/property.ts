@@ -129,14 +129,15 @@ export class TypeProperty {
 
   toNode(context: Context) {
     return createPropertySignature(
-        /* modifiers= */[], createStringLiteral('@type'),
+        /* modifiers= */[],
+        createStringLiteral('@type'),
         /* questionToken= */ undefined,
         /* typeNode= */
         createTypeReferenceNode(
             `"${context.getScopedName(this.className)}"`,
-            /*typeArguments=*/undefined,
-            ),
-        /* initializer= */ undefined);
+            /*typeArguments=*/undefined),
+        /* initializer= */ undefined,
+    );
   }
 
   readonly deprecated = false;
