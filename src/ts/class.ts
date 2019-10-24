@@ -22,7 +22,7 @@ import {GetComment, GetSubClassOf, IsSupersededBy} from '../triples/wellKnown';
 
 import {Context} from './context';
 import {EnumValue} from './enum';
-import {Property, TypeProperty} from './property';
+import {IdPropertyNode, Property, TypeProperty} from './property';
 import {arrayOf} from './util/arrayof';
 import {withComments} from './util/comments';
 import {toClassName} from './util/names';
@@ -137,13 +137,6 @@ export class Class {
 
   private baseNode(skipDeprecatedProperties: boolean, context: Context):
       TypeNode {
-    // Properties part.
-    const propLiteral = createTypeLiteralNode(
-        this.properties()
-            .filter(
-                property => !property.deprecated || !skipDeprecatedProperties)
-            .map(prop => prop.toNode(context)));
-
     const parentTypes = this.parents.map(
         parent => createTypeReferenceNode(parent.baseName(), []));
     const parentNode = parentTypes.length === 0 ?
@@ -151,6 +144,18 @@ export class Class {
         parentTypes.length === 1 ?
         parentTypes[0] :
         createParenthesizedType(createIntersectionTypeNode(parentTypes));
+
+    const isRoot = parentNode === null;
+
+    // Properties part.
+    const propLiteral = createTypeLiteralNode([
+      // Add an '@id' property for the root.
+      ...(isRoot ? [IdPropertyNode()] : []),
+      // ... then everything else.
+      ...this.properties()
+          .filter(property => !property.deprecated || !skipDeprecatedProperties)
+          .map(prop => prop.toNode(context))
+    ]);
 
     if (parentNode && propLiteral.members.length > 0) {
       return createIntersectionTypeNode([parentNode, propLiteral]);

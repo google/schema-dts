@@ -142,3 +142,18 @@ export class TypeProperty {
 
   readonly deprecated = false;
 }
+
+export function IdPropertyNode() {
+  return withComments(
+      'IRI identifying the canonical address of this object.',
+      createPropertySignature(
+          /* modifiers= */[],
+          createStringLiteral('@id'),
+          createToken(SyntaxKind.QuestionToken),
+          /* typeNode= */
+          createTypeReferenceNode(
+              'string',
+              /*typeArguments=*/undefined),
+          /* initializer= */ undefined,
+          ));
+}
