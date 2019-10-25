@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {createEnumDeclaration, createEnumMember, createIntersectionTypeNode, createModifiersFromModifierFlags, createParenthesizedType, createStringLiteral, createTypeAliasDeclaration, createTypeLiteralNode, createTypeReferenceNode, createUnionTypeNode, DeclarationStatement, EnumDeclaration, ModifierFlags, Statement, TypeAliasDeclaration, TypeNode} from 'typescript';
+import {createAsExpression, createEnumDeclaration, createIntersectionTypeNode, createLiteralTypeNode, createModifiersFromModifierFlags, createObjectLiteral, createParenthesizedType, createPropertyAssignment, createStringLiteral, createTypeAliasDeclaration, createTypeLiteralNode, createTypeReferenceNode, createUnionTypeNode, createVariableDeclaration, createVariableDeclarationList, createVariableStatement, DeclarationStatement, EnumDeclaration, ModifierFlags, NodeFlags, Statement, TypeAliasDeclaration, TypeNode} from 'typescript';
 
 import {Log} from '../logging';
 import {TObject, TPredicate, TSubject} from '../triples/triple';
@@ -232,7 +232,8 @@ export class Class {
         this._enums.map(e => e.toNode()));
   }
 
-  toNode(context: Context, skipDeprecatedProperties: boolean) {
+  toNode(context: Context, skipDeprecatedProperties: boolean):
+      readonly Statement[] {
     const typeValue: TypeNode = this.totalType(context);
     const declaration = withComments(
         this.comment,
@@ -261,7 +262,7 @@ export class Builtin extends Class {
     super(UrlNode.Parse(url), false);
   }
 
-  toNode(): DeclarationStatement[] {
+  toNode(): readonly Statement[] {
     return [
       withComments(
           this.doc,
@@ -285,16 +286,45 @@ export class BooleanEnum extends Builtin {
     super(url, '', doc);
   }
 
-  toNode(): DeclarationStatement[] {
-    return [withComments(
-        this.doc,
-        createEnumDeclaration(
-            /*decotrators=*/[],
-            createModifiersFromModifierFlags(ModifierFlags.Export),
-            this.subject.name, [
-              createEnumMember('True', createStringLiteral(this.trueUrl)),
-              createEnumMember('False', createStringLiteral(this.falseUrl)),
-            ]))];
+  toNode(): readonly Statement[] {
+    return [
+      withComments(
+          this.doc,
+          createTypeAliasDeclaration(
+              /*decotrators=*/[],
+              createModifiersFromModifierFlags(ModifierFlags.Export),
+              this.subject.name,
+              /*typeParameters=*/[],
+              createUnionTypeNode([
+                createTypeReferenceNode('true', /*typeArgs=*/[]),
+                createTypeReferenceNode('false', /*typeArgs=*/[]),
+                createLiteralTypeNode(createStringLiteral(this.trueUrl)),
+                createLiteralTypeNode(createStringLiteral(this.falseUrl)),
+              ]),
+              )),
+      createVariableStatement(
+          createModifiersFromModifierFlags(ModifierFlags.Export),
+          createVariableDeclarationList(
+              [createVariableDeclaration(
+                  this.subject.name,
+                  /*type=*/undefined,
+                  createObjectLiteral(
+                      [
+                        createPropertyAssignment(
+                            'True',
+                            createAsExpression(
+                                createStringLiteral(this.trueUrl),
+                                createTypeReferenceNode('const', undefined))),
+                        createPropertyAssignment(
+                            'False',
+                            createAsExpression(
+                                createStringLiteral(this.falseUrl),
+                                createTypeReferenceNode('const', undefined))),
+                      ],
+                      true),
+                  )],
+              NodeFlags.Const))
+    ];
   }
 }
 
