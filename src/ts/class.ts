@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {createAsExpression, createEnumDeclaration, createIntersectionTypeNode, createLiteralTypeNode, createModifiersFromModifierFlags, createObjectLiteral, createParenthesizedType, createPropertyAssignment, createStringLiteral, createTypeAliasDeclaration, createTypeLiteralNode, createTypeReferenceNode, createUnionTypeNode, createVariableDeclaration, createVariableDeclarationList, createVariableStatement, DeclarationStatement, EnumDeclaration, ModifierFlags, NodeFlags, Statement, TypeAliasDeclaration, TypeNode} from 'typescript';
+import {createAsExpression, createEnumDeclaration, createIdentifier, createIntersectionTypeNode, createLiteralTypeNode, createModifiersFromModifierFlags, createObjectLiteral, createParenthesizedType, createPropertyAssignment, createStringLiteral, createTypeAliasDeclaration, createTypeLiteralNode, createTypeReferenceNode, createUnionTypeNode, createVariableDeclaration, createVariableDeclarationList, createVariableStatement, DeclarationStatement, EnumDeclaration, ModifierFlags, NodeFlags, Statement, TypeAliasDeclaration, TypeNode, VariableStatement} from 'typescript';
 
 import {Log} from '../logging';
 import {TObject, TPredicate, TSubject} from '../triples/triple';
@@ -45,9 +45,9 @@ export class Class {
   private _comment?: string;
   private readonly children: Class[] = [];
   private readonly parents: Class[] = [];
-  private readonly _props: Property[] = [];
-  private readonly _enums: EnumValue[] = [];
-  private readonly _supersededBy: Class[] = [];
+  private readonly _props: Set<Property> = new Set();
+  private readonly _enums: Set<EnumValue> = new Set();
+  private readonly _supersededBy: Set<Class> = new Set();
 
   private inheritsDataType(): boolean {
     for (const parent of this.parents) {
@@ -59,19 +59,29 @@ export class Class {
   }
 
   get deprecated() {
-    return this._supersededBy.length > 0;
+    return this._supersededBy.size > 0;
   }
 
   private get comment() {
     if (!this.deprecated) return this._comment;
     const deprecated = `@deprecated Use ${
-        this._supersededBy.map(c => c.className()).join(' or ')} instead.`;
+        this.supersededBy().map(c => c.className()).join(' or ')} instead.`;
     return this._comment ? `${this._comment}\n${deprecated}` : deprecated;
   }
 
   private properties() {
-    this._props.sort((a, b) => CompareKeys(a.key, b.key));
-    return this._props;
+    return Array.from(this._props.values())
+        .sort((a, b) => CompareKeys(a.key, b.key));
+  }
+
+  private supersededBy() {
+    return Array.from(this._supersededBy)
+        .sort((a, b) => CompareKeys(a.subject, b.subject));
+  }
+
+  private enums() {
+    return Array.from(this._enums)
+        .sort((a, b) => CompareKeys(a.value, b.value));
   }
 
   private get allowString(): boolean {
@@ -122,17 +132,17 @@ export class Class {
             value.Object.toString()}, which supersedes class ${
             this.subject.name}`);
       }
-      this._supersededBy.push(supersededBy);
+      this._supersededBy.add(supersededBy);
       return true;
     }
 
     return false;
   }
   addProp(p: Property) {
-    this._props.push(p);
+    this._props.add(p);
   }
   addEnum(e: EnumValue) {
-    this._enums.push(e);
+    this._enums.add(e);
   }
 
   private baseNode(skipDeprecatedProperties: boolean, context: Context):
@@ -215,11 +225,11 @@ export class Class {
   }
 
   private totalType(context: Context): TypeNode {
-    const isEnum = this._enums.length > 0;
+    const isEnum = this._enums.size > 0;
 
     if (isEnum) {
       return createUnionTypeNode([
-        createTypeReferenceNode(this.enumName(), []),
+        ...this.enums().map(e => e.toTypeLiteral()),
         createParenthesizedType(this.nonEnumType(context)),
       ]);
     } else {
@@ -227,14 +237,41 @@ export class Class {
     }
   }
 
-  private enumDecl(): EnumDeclaration|undefined {
-    if (this._enums.length === 0) return undefined;
-    this._enums.sort((a, b) => CompareKeys(a.value, b.value));
+  private enumDecl(): VariableStatement|undefined {
+    if (this._enums.size === 0) return undefined;
+    const enums = this.enums();
 
-    return createEnumDeclaration(
-        /* decorators= */[],
-        createModifiersFromModifierFlags(ModifierFlags.Export), this.enumName(),
-        this._enums.map(e => e.toNode()));
+    return createVariableStatement(
+        createModifiersFromModifierFlags(ModifierFlags.Export),
+        createVariableDeclarationList(
+            [createVariableDeclaration(
+                this.className(),
+                /*type=*/undefined,
+                createObjectLiteral(
+                    enums.map(e => e.toNode()), /*multiLine=*/true))],
+            NodeFlags.Const));
+  }
+
+  private deprecatedEnumDecl(): Statement[] {
+    if (this._enums.size === 0) return [];
+    return [
+      withComments(
+          `@deprecated Use ${this.className()} as a variable instead.`,
+          createVariableStatement(
+              createModifiersFromModifierFlags(ModifierFlags.Export),
+              createVariableDeclarationList(
+                  [createVariableDeclaration(
+                      this.enumName(),
+                      /*type=*/undefined, createIdentifier(this.className()))],
+                  NodeFlags.Const))),
+      withComments(
+          `@deprecated Use ${this.className()} as a type instead.`,
+          createTypeAliasDeclaration(
+              /* decorators = */[],
+              createModifiersFromModifierFlags(ModifierFlags.Export),
+              this.enumName(), /*typeParameters=*/[],
+              createTypeReferenceNode(this.className(), /*typeArgs=*/[])))
+    ];
   }
 
   toNode(context: Context, skipDeprecatedProperties: boolean):
@@ -250,9 +287,31 @@ export class Class {
             typeValue,
             ));
 
+    // Guide to Code Generated:
+    // // Base: Always There -----------------------//
+    // type XyzBase = (Parents) & {
+    //   ... props;
+    // };
+    // // Complete Type ----------------------------//
+    // export type Xyz = "Enum1"|"Enum2"|...        // Enum Piece: Optional.
+    //                  |XyzBase&{'@type': 'Xyz'}   // 'Leaf' Piece.
+    //                  |Child1|Child2|...          // Child Piece: Optional.
+    // // Enum Values: Optional --------------------//
+    // export const Xyz = {
+    //   Enum1 = "Enum1" as const,
+    //   Enum2 = "Enum2" as const,
+    //   ...
+    // }
+    // // Deprecated: Old Enum Style Declarations --//
+    // export const XyzEnum = Xyz;
+    // export type XyzEnum = Xyz;
+    // //-------------------------------------------//
     return arrayOf<Statement>(
-        this.enumDecl(), this.baseDecl(skipDeprecatedProperties, context),
-        declaration);
+        this.baseDecl(skipDeprecatedProperties, context),
+        declaration,
+        this.enumDecl(),
+        ...this.deprecatedEnumDecl(),
+    );
   }
 }
 

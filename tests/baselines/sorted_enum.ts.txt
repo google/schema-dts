@@ -1,14 +1,18 @@
-export enum ThingEnum {
-    a = "http://schema.org/a",
-    b = "http://schema.org/b",
-    c = "http://schema.org/c",
-    d = "http://schema.org/d"
-}
 type ThingBase = {
     /** IRI identifying the canonical address of this object. */
     "@id"?: string;
 };
-export type Thing = ThingEnum | ({
+export type Thing = "http://schema.org/a" | "http://schema.org/b" | "http://schema.org/c" | "http://schema.org/d" | ({
     "@type": "Thing";
 } & ThingBase);
+export const Thing = {
+    a: ("http://schema.org/a" as const),
+    b: ("http://schema.org/b" as const),
+    c: ("http://schema.org/c" as const),
+    d: ("http://schema.org/d" as const)
+};
+/** @deprecated Use Thing as a variable instead. */
+export const ThingEnum = Thing;
+/** @deprecated Use Thing as a type instead. */
+export type ThingEnum = Thing;
 
