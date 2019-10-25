@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {createEnumMember, createStringLiteral} from 'typescript';
+import {createAsExpression, createLiteralTypeNode, createPropertyAssignment, createStringLiteral, createTypeReferenceNode} from 'typescript';
 
 import {ObjectPredicate, TSubject, TTypeName} from '../triples/triple';
 import {GetComment, IsClassType, IsDataType} from '../triples/wellKnown';
@@ -73,8 +73,14 @@ export class EnumValue {
   toNode() {
     return withComments(
         this.comment,
-        createEnumMember(
+        createPropertyAssignment(
             toEnumName(this.value),
-            createStringLiteral(this.value.toString())));
+            createAsExpression(
+                createStringLiteral(this.value.toString()),
+                createTypeReferenceNode('const', undefined))));
+  }
+
+  toTypeLiteral() {
+    return createLiteralTypeNode(createStringLiteral(this.value.toString()));
   }
 }
