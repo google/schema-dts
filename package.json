@@ -39,7 +39,7 @@
     "rxjs": "^6.5.3"
   },
   "peerDependencies": {
-    "typescript": "^3.6.4"
+    "typescript": "^3.4.0"
   },
   "keywords": [
     "typescript",
