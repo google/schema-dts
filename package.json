@@ -18,9 +18,9 @@
   "devDependencies": {
     "@types/argparse": "^1.0.36",
     "@types/diff": "^3.5.2",
-    "@types/htmlparser2": "^3.10.0",
-    "@types/jasmine": "^3.3.12",
-    "@types/node": "^10.14.6",
+    "@types/htmlparser2": "^3.10.1",
+    "@types/jasmine": "^3.4.4",
+    "@types/node": "^10.17.0",
     "child_process": "^1.0.2",
     "clang-format": "^1.2.4",
     "del": "^3.0.0",
@@ -28,18 +28,18 @@
     "gulp": "^4.0.2",
     "gulp-file": "^0.4.0",
     "gulp-typescript": "^5.0.1",
-    "jasmine": "^3.4.0",
+    "jasmine": "^3.5.0",
     "through2": "^3.0.1",
-    "tslint": "^5.16.0",
-    "typescript": "^3.4.5"
+    "tslint": "^5.20.0",
+    "typescript": "^3.5.3"
   },
   "dependencies": {
     "argparse": "^1.0.10",
     "htmlparser2": "^3.10.1",
-    "rxjs": "^6.5.1"
+    "rxjs": "^6.5.3"
   },
   "peerDependencies": {
-    "typescript": "^3.1.6"
+    "typescript": "^3.4.0"
   },
   "keywords": [
     "typescript",
