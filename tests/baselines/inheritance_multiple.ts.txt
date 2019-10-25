@@ -37,6 +37,8 @@ export type Person = {
 } & PersonBase;
 
 type ThingBase = {
+    /** IRI identifying the canonical address of this object. */
+    "@id"?: string;
     "name"?: Text | Text[];
 };
 export type Thing = ({

@@ -129,15 +129,31 @@ export class TypeProperty {
 
   toNode(context: Context) {
     return createPropertySignature(
-        /* modifiers= */[], createStringLiteral('@type'),
+        /* modifiers= */[],
+        createStringLiteral('@type'),
         /* questionToken= */ undefined,
         /* typeNode= */
         createTypeReferenceNode(
             `"${context.getScopedName(this.className)}"`,
-            /*typeArguments=*/undefined,
-            ),
-        /* initializer= */ undefined);
+            /*typeArguments=*/undefined),
+        /* initializer= */ undefined,
+    );
   }
 
   readonly deprecated = false;
+}
+
+export function IdPropertyNode() {
+  return withComments(
+      'IRI identifying the canonical address of this object.',
+      createPropertySignature(
+          /* modifiers= */[],
+          createStringLiteral('@id'),
+          createToken(SyntaxKind.QuestionToken),
+          /* typeNode= */
+          createTypeReferenceNode(
+              'string',
+              /*typeArguments=*/undefined),
+          /* initializer= */ undefined,
+          ));
 }

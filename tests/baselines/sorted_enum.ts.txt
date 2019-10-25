@@ -35,7 +35,10 @@ export enum ThingEnum {
     c = "http://schema.org/c",
     d = "http://schema.org/d"
 }
-type ThingBase = {};
+type ThingBase = {
+    /** IRI identifying the canonical address of this object. */
+    "@id"?: string;
+};
 export type Thing = ThingEnum | ({
     "@type": "Thing";
 } & ThingBase);
