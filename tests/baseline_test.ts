@@ -82,12 +82,14 @@ describe('Baseline', () => {
   beforeEach(() => {
     addMatchers();
   });
+  const header =
+      readFileSync(`tests/baselines/common/header.ts.txt`).toString('utf-8');
 
   for (const {input, spec, name} of getInputFiles()) {
     it(name, async () => {
       const triples = getTriples(input);
       const result = await getResult(triples);
-      const specValue = readFileSync(spec).toString('utf-8');
+      const specValue = header + '\n' + readFileSync(spec).toString('utf-8');
       expect(result).toDiffCleanlyWith(specValue);
     });
   }
