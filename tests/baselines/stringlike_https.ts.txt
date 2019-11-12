@@ -1,0 +1,41 @@
+type EntryPointBase = ThingBase;
+export type EntryPoint = ({
+    "@type": "EntryPoint";
+} & EntryPointBase) | string;
+
+type OrganizationBase = ThingBase & {
+    "locatedIn"?: Place | Place[];
+    "owner"?: Person | Person[];
+    "urlTemplate"?: URL | URL[];
+};
+export type Organization = ({
+    "@type": "Organization";
+} & OrganizationBase) | string;
+
+type PersonBase = ThingBase & {
+    "height"?: Quantity | Quantity[];
+    "locatedIn"?: Place | Place[];
+};
+export type Person = ({
+    "@type": "Person";
+} & PersonBase) | string;
+
+type PlaceBase = ThingBase;
+export type Place = ({
+    "@type": "Place";
+} & PlaceBase) | string;
+
+type QuantityBase = ThingBase;
+export type Quantity = ({
+    "@type": "Quantity";
+} & QuantityBase) | string;
+
+type ThingBase = {
+    /** IRI identifying the canonical address of this object. */
+    "@id"?: string;
+    "name"?: Text | Text[];
+};
+export type Thing = ({
+    "@type": "Thing";
+} & ThingBase) | (EntryPoint | Organization | Person | Place | Quantity);
+
