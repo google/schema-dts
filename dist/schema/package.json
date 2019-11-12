@@ -1,6 +1,6 @@
 {
   "name": "schema-dts",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "displayName": "schema-dts: Strongly-typed Schema.org vocabulary declarations",
   "description": "A TypeScript package with latest Schema.org Schema Typings",
   "authors": [
@@ -29,7 +29,9 @@
     "Linked Data",
     "linked-data",
     "jsonld",
-    "JSON-LD"
+    "JSON-LD",
+    "structured data",
+    "structured-data"
   ],
   "homepage": "https://github.com/google/schema-dts#readme",
   "bugs": "https://github.com/google/schema-dts/issues",
