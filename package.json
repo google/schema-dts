@@ -1,6 +1,6 @@
 {
   "name": "schema-dts-gen",
-  "version": "0.4.3",
+  "version": "0.4.5",
   "displayName": "schema-dts Generator",
   "description": "Generate TypeScript Definitions for Schema.org Schema",
   "authors": [
@@ -51,7 +51,9 @@
     "Linked Data",
     "linked-data",
     "jsonld",
-    "JSON-LD"
+    "JSON-LD",
+    "structured data",
+    "structured-data"
   ],
   "homepage": "https://github.com/google/schema-dts#readme",
   "bugs": "https://github.com/google/schema-dts/issues",
