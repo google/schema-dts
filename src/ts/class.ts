@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {createAsExpression, createEnumDeclaration, createIdentifier, createIntersectionTypeNode, createLiteralTypeNode, createModifiersFromModifierFlags, createObjectLiteral, createParenthesizedType, createPropertyAssignment, createStringLiteral, createTypeAliasDeclaration, createTypeLiteralNode, createTypeReferenceNode, createUnionTypeNode, createVariableDeclaration, createVariableDeclarationList, createVariableStatement, DeclarationStatement, EnumDeclaration, ModifierFlags, NodeFlags, Statement, TypeAliasDeclaration, TypeNode, VariableStatement} from 'typescript';
+import {createAsExpression, createIdentifier, createIntersectionTypeNode, createLiteralTypeNode, createModifiersFromModifierFlags, createObjectLiteral, createParenthesizedType, createPropertyAssignment, createStringLiteral, createTypeAliasDeclaration, createTypeLiteralNode, createTypeReferenceNode, createUnionTypeNode, createVariableDeclaration, createVariableDeclarationList, createVariableStatement, DeclarationStatement, ModifierFlags, NodeFlags, Statement, TypeAliasDeclaration, TypeNode, VariableStatement} from 'typescript';
 
 import {Log} from '../logging';
 import {TObject, TPredicate, TSubject} from '../triples/triple';

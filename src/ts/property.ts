@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {createArrayTypeNode, createKeywordTypeNode, createPropertySignature, createStringLiteral, createToken, createTypeReferenceNode, createUnionTypeNode, HighlightSpanKind, PropertySignature, SyntaxKind, TypeNode} from 'typescript';
+import {createArrayTypeNode, createKeywordTypeNode, createPropertySignature, createStringLiteral, createToken, createTypeReferenceNode, createUnionTypeNode, PropertySignature, SyntaxKind} from 'typescript';
 
 import {Log} from '../logging';
 import {Format, ObjectPredicate, TObject, TSubject} from '../triples/triple';
