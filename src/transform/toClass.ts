@@ -58,7 +58,9 @@ const wellKnownTypes = [
 // Should we allow 'string' to be a valid type for all values of this type?
 const wellKnownStrings = [
   UrlNode.Parse('http://schema.org/Quantity'),
+  UrlNode.Parse('http://schema.org/EntryPoint'),
   UrlNode.Parse('https://schema.org/Quantity'),
+  UrlNode.Parse('https://schema.org/EntryPoint'),
 ];
 
 const dataType = new DataTypeUnion(
