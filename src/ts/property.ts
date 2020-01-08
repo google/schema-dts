@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {createArrayTypeNode, createKeywordTypeNode, createPropertySignature, createStringLiteral, createToken, createTypeReferenceNode, createUnionTypeNode, PropertySignature, SyntaxKind} from 'typescript';
+import {createArrayTypeNode, createKeywordTypeNode, createPropertySignature, createStringLiteral, createToken, createTypeOperatorNode, createTypeReferenceNode, createUnionTypeNode, PropertySignature, SyntaxKind} from 'typescript';
 
 import {Log} from '../logging';
 import {Format, ObjectPredicate, TObject, TSubject} from '../triples/triple';
@@ -108,7 +108,11 @@ export class Property {
 
   private typeNode() {
     const node = this.type.scalarTypeNode();
-    return createUnionTypeNode([node, createArrayTypeNode(node)]);
+    return createUnionTypeNode([
+      node,
+      createTypeOperatorNode(
+          SyntaxKind.ReadonlyKeyword, createArrayTypeNode(node))
+    ]);
   }
 
   toNode(context: Context): PropertySignature {
