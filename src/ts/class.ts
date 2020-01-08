@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {createAsExpression, createIdentifier, createIntersectionTypeNode, createLiteralTypeNode, createModifiersFromModifierFlags, createObjectLiteral, createParenthesizedType, createPropertyAssignment, createStringLiteral, createTypeAliasDeclaration, createTypeLiteralNode, createTypeReferenceNode, createUnionTypeNode, createVariableDeclaration, createVariableDeclarationList, createVariableStatement, DeclarationStatement, ModifierFlags, NodeFlags, Statement, TypeAliasDeclaration, TypeNode, VariableStatement} from 'typescript';
+import {createAsExpression, createIntersectionTypeNode, createLiteralTypeNode, createModifiersFromModifierFlags, createObjectLiteral, createParenthesizedType, createPropertyAssignment, createStringLiteral, createTypeAliasDeclaration, createTypeLiteralNode, createTypeReferenceNode, createUnionTypeNode, createVariableDeclaration, createVariableDeclarationList, createVariableStatement, DeclarationStatement, ModifierFlags, NodeFlags, Statement, TypeAliasDeclaration, TypeNode, VariableStatement} from 'typescript';
 
 import {Log} from '../logging';
 import {TObject, TPredicate, TSubject} from '../triples/triple';
@@ -91,9 +91,6 @@ export class Class {
 
   protected baseName() {
     return toClassName(this.subject) + 'Base';
-  }
-  private enumName() {
-    return toClassName(this.subject) + 'Enum';
   }
   private className() {
     return toClassName(this.subject);
@@ -252,28 +249,6 @@ export class Class {
             NodeFlags.Const));
   }
 
-  private deprecatedEnumDecl(): Statement[] {
-    if (this._enums.size === 0) return [];
-    return [
-      withComments(
-          `@deprecated Use ${this.className()} as a variable instead.`,
-          createVariableStatement(
-              createModifiersFromModifierFlags(ModifierFlags.Export),
-              createVariableDeclarationList(
-                  [createVariableDeclaration(
-                      this.enumName(),
-                      /*type=*/undefined, createIdentifier(this.className()))],
-                  NodeFlags.Const))),
-      withComments(
-          `@deprecated Use ${this.className()} as a type instead.`,
-          createTypeAliasDeclaration(
-              /* decorators = */[],
-              createModifiersFromModifierFlags(ModifierFlags.Export),
-              this.enumName(), /*typeParameters=*/[],
-              createTypeReferenceNode(this.className(), /*typeArgs=*/[])))
-    ];
-  }
-
   toNode(context: Context, skipDeprecatedProperties: boolean):
       readonly Statement[] {
     const typeValue: TypeNode = this.totalType(context);
@@ -302,15 +277,11 @@ export class Class {
     //   Enum2 = "Enum2" as const,
     //   ...
     // }
-    // // Deprecated: Old Enum Style Declarations --//
-    // export const XyzEnum = Xyz;
-    // export type XyzEnum = Xyz;
     // //-------------------------------------------//
     return arrayOf<Statement>(
         this.baseDecl(skipDeprecatedProperties, context),
         declaration,
         this.enumDecl(),
-        ...this.deprecatedEnumDecl(),
     );
   }
 }
