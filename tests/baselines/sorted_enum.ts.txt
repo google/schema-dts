@@ -11,8 +11,4 @@ export const Thing = {
     c: ("http://schema.org/c" as const),
     d: ("http://schema.org/d" as const)
 };
-/** @deprecated Use Thing as a variable instead. */
-export const ThingEnum = Thing;
-/** @deprecated Use Thing as a type instead. */
-export type ThingEnum = Thing;
 
