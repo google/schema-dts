@@ -2,7 +2,7 @@ type ThingBase = {
     /** IRI identifying the canonical address of this object. */
     "@id"?: string;
     /** Names are great! {@link X Y} */
-    "name"?: Text | Text[];
+    "name"?: Text | readonly Text[];
 };
 /**
  * Things are amazing!

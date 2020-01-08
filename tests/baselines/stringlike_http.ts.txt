@@ -4,17 +4,17 @@ export type EntryPoint = ({
 } & EntryPointBase) | string;
 
 type OrganizationBase = ThingBase & {
-    "locatedIn"?: Place | Place[];
-    "owner"?: Person | Person[];
-    "urlTemplate"?: URL | URL[];
+    "locatedIn"?: Place | readonly Place[];
+    "owner"?: Person | readonly Person[];
+    "urlTemplate"?: URL | readonly URL[];
 };
 export type Organization = ({
     "@type": "Organization";
 } & OrganizationBase) | string;
 
 type PersonBase = ThingBase & {
-    "height"?: Quantity | Quantity[];
-    "locatedIn"?: Place | Place[];
+    "height"?: Quantity | readonly Quantity[];
+    "locatedIn"?: Place | readonly Place[];
 };
 export type Person = ({
     "@type": "Person";
@@ -33,7 +33,7 @@ export type Quantity = ({
 type ThingBase = {
     /** IRI identifying the canonical address of this object. */
     "@id"?: string;
-    "name"?: Text | Text[];
+    "name"?: Text | readonly Text[];
 };
 export type Thing = ({
     "@type": "Thing";

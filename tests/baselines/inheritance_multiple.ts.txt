@@ -1,5 +1,5 @@
 type PersonLikeBase = ThingBase & {
-    "height"?: Number | Number[];
+    "height"?: Number | readonly Number[];
 };
 export type PersonLike = {
     "@type": "PersonLike";
@@ -8,14 +8,14 @@ export type PersonLike = {
 type ThingBase = {
     /** IRI identifying the canonical address of this object. */
     "@id"?: string;
-    "name"?: Text | Text[];
+    "name"?: Text | readonly Text[];
 };
 export type Thing = ({
     "@type": "Thing";
 } & ThingBase) | (PersonLike | Vehicle);
 
 type VehicleBase = ThingBase & {
-    "doors"?: Number | Number[];
+    "doors"?: Number | readonly Number[];
 };
 export type Vehicle = {
     "@type": "Vehicle";
