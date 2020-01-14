@@ -22,29 +22,29 @@ describe('UrlNode', () => {
     const node =
         UrlNode.Parse('http://www.w3.org/1999/02/22-rdf-syntax-ns#type');
 
-    expect(node.name).to.be('type');
+    expect(node.name).to.equal('type');
     expect(node.context.href)
-        .to.be('http://www.w3.org/1999/02/22-rdf-syntax-ns');
-    expect(node.context.hostname).to.be('www.w3.org');
-    expect(node.context.path).to.equal(['1999', '02', '22-rdf-syntax-ns']);
+        .to.equal('http://www.w3.org/1999/02/22-rdf-syntax-ns');
+    expect(node.context.hostname).to.equal('www.w3.org');
+    expect(node.context.path).to.deep.equal(['1999', '02', '22-rdf-syntax-ns']);
   });
 
   it('parses rdf-schema', () => {
     const node = UrlNode.Parse('http://www.w3.org/2000/01/rdf-schema#Class');
 
-    expect(node.name).to.be('Class');
-    expect(node.context.href).to.be('http://www.w3.org/2000/01/rdf-schema');
-    expect(node.context.hostname).to.be('www.w3.org');
-    expect(node.context.path).to.equal(['2000', '01', 'rdf-schema']);
+    expect(node.name).to.equal('Class');
+    expect(node.context.href).to.equal('http://www.w3.org/2000/01/rdf-schema');
+    expect(node.context.hostname).to.equal('www.w3.org');
+    expect(node.context.path).to.deep.equal(['2000', '01', 'rdf-schema']);
   });
 
   it('parses schema.org concepts', () => {
     const node = UrlNode.Parse('http://schema.org/domainIncludes');
 
-    expect(node.name).to.be('domainIncludes');
-    expect(node.context.href).to.be('http://schema.org/');
-    expect(node.context.hostname).to.be('schema.org');
-    expect(node.context.path).to.equal(['']);
+    expect(node.name).to.equal('domainIncludes');
+    expect(node.context.href).to.equal('http://schema.org/');
+    expect(node.context.hostname).to.equal('schema.org');
+    expect(node.context.path).to.deep.equal(['']);
   });
 });
 

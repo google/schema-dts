@@ -21,29 +21,29 @@ import {toClassName} from '../../src/ts/util/names';
 describe('toClassName', () => {
   it('operates normally, with typical inputs', () => {
     expect(toClassName(UrlNode.Parse('https://schema.org/Person')))
-        .to.be('Person');
+        .to.equal('Person');
     expect(toClassName(UrlNode.Parse('https://schema.org/Person3')))
-        .to.be('Person3');
+        .to.equal('Person3');
     expect(toClassName(UrlNode.Parse('http://schema.org/Person')))
-        .to.be('Person');
+        .to.equal('Person');
     expect(toClassName(
                UrlNode.Parse('http://schema.org/Organization4Organization')))
-        .to.be('Organization4Organization');
+        .to.equal('Organization4Organization');
   });
 
   it('handles illegal TypeScript identifier characters', () => {
     expect(toClassName(UrlNode.Parse('https://schema.org/Person-4')))
-        .to.be('Person_4');
+        .to.equal('Person_4');
     expect(toClassName(UrlNode.Parse('https://schema.org/Person%4')))
-        .to.be('Person_4');
+        .to.equal('Person_4');
     expect(toClassName(UrlNode.Parse('https://schema.org/Person%204')))
-        .to.be('Person_4');
+        .to.equal('Person_4');
     expect(toClassName(UrlNode.Parse('https://schema.org/Person, 4')))
-        .to.be('Person__4');
+        .to.equal('Person__4');
 
     expect(toClassName(UrlNode.Parse('https://schema.org/3DModel')))
-        .to.be('_3DModel');
+        .to.equal('_3DModel');
     expect(toClassName(UrlNode.Parse('https://schema.org/3DModel-5')))
-        .to.be('_3DModel_5');
+        .to.equal('_3DModel_5');
   });
 });
