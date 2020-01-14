@@ -25,6 +25,7 @@
     "chai": "^4.2.0",
     "child_process": "^1.0.2",
     "clang-format": "^1.2.4",
+    "coveralls": "^3.0.9",
     "del": "^3.0.0",
     "diff": "^3.5.0",
     "gulp": "^4.0.2",
@@ -82,6 +83,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "build-gen": "tsc -p src",
-    "test": "mocha"
+    "test": "nyc mocha",
+    "coverage_on_travis": "nyc report --reporter=text-lcov | coveralls"
   }
 }
