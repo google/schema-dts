@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import 'jasmine';
+import {expect} from 'chai';
 
 import {UrlNode} from '../../src/triples/types';
 import {toClassName} from '../../src/ts/util/names';
@@ -21,29 +21,29 @@ import {toClassName} from '../../src/ts/util/names';
 describe('toClassName', () => {
   it('operates normally, with typical inputs', () => {
     expect(toClassName(UrlNode.Parse('https://schema.org/Person')))
-        .toBe('Person');
+        .to.be('Person');
     expect(toClassName(UrlNode.Parse('https://schema.org/Person3')))
-        .toBe('Person3');
+        .to.be('Person3');
     expect(toClassName(UrlNode.Parse('http://schema.org/Person')))
-        .toBe('Person');
+        .to.be('Person');
     expect(toClassName(
                UrlNode.Parse('http://schema.org/Organization4Organization')))
-        .toBe('Organization4Organization');
+        .to.be('Organization4Organization');
   });
 
   it('handles illegal TypeScript identifier characters', () => {
     expect(toClassName(UrlNode.Parse('https://schema.org/Person-4')))
-        .toBe('Person_4');
+        .to.be('Person_4');
     expect(toClassName(UrlNode.Parse('https://schema.org/Person%4')))
-        .toBe('Person_4');
+        .to.be('Person_4');
     expect(toClassName(UrlNode.Parse('https://schema.org/Person%204')))
-        .toBe('Person_4');
+        .to.be('Person_4');
     expect(toClassName(UrlNode.Parse('https://schema.org/Person, 4')))
-        .toBe('Person__4');
+        .to.be('Person__4');
 
     expect(toClassName(UrlNode.Parse('https://schema.org/3DModel')))
-        .toBe('_3DModel');
+        .to.be('_3DModel');
     expect(toClassName(UrlNode.Parse('https://schema.org/3DModel-5')))
-        .toBe('_3DModel_5');
+        .to.be('_3DModel_5');
   });
 });

@@ -17,10 +17,12 @@
   "bin": "./dist/gen/cli/cli.js",
   "devDependencies": {
     "@types/argparse": "^1.0.36",
+    "@types/chai": "^4.2.7",
     "@types/diff": "^3.5.2",
     "@types/htmlparser2": "^3.10.1",
     "@types/mocha": "^5.2.7",
     "@types/node": "^10.17.0",
+    "chai": "^4.2.0",
     "child_process": "^1.0.2",
     "clang-format": "^1.2.4",
     "del": "^3.0.0",
