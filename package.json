@@ -64,6 +64,6 @@
   "license": "Apache-2.0",
   "scripts": {
     "build-gen": "tsc -p src",
-    "test": "tsc -p src && tsc -p test/ && jasmine --config=test/support/jasmine.json"
+    "test": "mocha"
   }
 }
