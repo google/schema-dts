@@ -55,7 +55,7 @@
     "structured data",
     "structured-data"
   ],
-  "homepage": "https://github.com/google/schema-dts#readme",
+  "homepage": "https://opensource.google/projects/schema-dts",
   "bugs": "https://github.com/google/schema-dts/issues",
   "repository": "github:google/schema-dts",
   "license": "Apache-2.0",
