@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import 'jasmine';
+
+import {expect} from 'chai';
 
 import {createPrinter, createSourceFile, EmitHint, NewLineKind, Node, ScriptKind, ScriptTarget} from 'typescript';
 
@@ -34,7 +35,7 @@ describe('WithContext generation', () => {
     ctx.setUrlContext('https://foo.com');
 
     expect(asString(ctx.toNode()))
-        .toEqual(
+        .to.equal(
             `/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
 export type WithContext<T extends Thing> = T & {
     "@context": "https://foo.com";
@@ -47,7 +48,7 @@ export type WithContext<T extends Thing> = T & {
     ctx.addNamedContext('b', 'https://bar.com');
 
     expect(asString(ctx.toNode()))
-        .toEqual(
+        .to.equal(
             `/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
 export type WithContext<T extends Thing> = T & {
     "@context": {
@@ -63,7 +64,7 @@ describe('Context.validate', () => {
     expect(() => {
       const ctx = new Context();
       ctx.validate();
-    }).toThrowError('Invalid empty context.');
+    }).to.throw('Invalid empty context.');
   });
 
   it('duplicate throws', () => {
@@ -72,7 +73,7 @@ describe('Context.validate', () => {
       ctx.addNamedContext('a', 'foo.com');
       ctx.addNamedContext('a', 'bar.com');
       ctx.validate();
-    }).toThrowError('Named context a found twice in context.');
+    }).to.throw('Named context a found twice in context.');
   });
 
   it('empty name throws', () => {
@@ -81,9 +82,7 @@ describe('Context.validate', () => {
       ctx.addNamedContext('a', 'foo.com');
       ctx.addNamedContext('', 'bar.com');
       ctx.validate();
-    })
-        .toThrowError(
-            'Context with multipled named contexts includes unnamed URL.');
+    }).to.throw('Context with multipled named contexts includes unnamed URL.');
   });
 });
 
@@ -93,13 +92,13 @@ describe('Context.getScopedName', () => {
     ctx.setUrlContext('https://schema.org');
 
     expect(ctx.getScopedName(UrlNode.Parse('https://schema.org/Thing')))
-        .toEqual('Thing');
+        .to.equal('Thing');
     expect(ctx.getScopedName(UrlNode.Parse('https://schema.org/rangeIncludes')))
-        .toEqual('rangeIncludes');
+        .to.equal('rangeIncludes');
     expect(ctx.getScopedName(UrlNode.Parse('http://schema.org/Door')))
-        .toEqual('Door');
+        .to.equal('Door');
     expect(ctx.getScopedName(UrlNode.Parse('https://foo.org/Door')))
-        .toEqual('https://foo.org/Door');
+        .to.equal('https://foo.org/Door');
   });
 
   it('with single domain URL (http)', () => {
@@ -107,13 +106,13 @@ describe('Context.getScopedName', () => {
     ctx.setUrlContext('http://schema.org');
 
     expect(ctx.getScopedName(UrlNode.Parse('http://schema.org/Thing')))
-        .toEqual('Thing');
+        .to.equal('Thing');
     expect(ctx.getScopedName(UrlNode.Parse('http://schema.org/rangeIncludes')))
-        .toEqual('rangeIncludes');
+        .to.equal('rangeIncludes');
     expect(ctx.getScopedName(UrlNode.Parse('https://schema.org/Door')))
-        .toEqual('https://schema.org/Door');
+        .to.equal('https://schema.org/Door');
     expect(ctx.getScopedName(UrlNode.Parse('http://foo.org/Door')))
-        .toEqual('http://foo.org/Door');
+        .to.equal('http://foo.org/Door');
   });
 
   it('with multiple URLs', () => {
@@ -123,14 +122,14 @@ describe('Context.getScopedName', () => {
     ctx.addNamedContext('schema', 'http://schema.org/');
 
     expect(ctx.getScopedName(UrlNode.Parse('http://schema.org/Thing')))
-        .toEqual('schema:Thing');
+        .to.equal('schema:Thing');
     expect(ctx.getScopedName(UrlNode.Parse(
                'http://www.w3.org/1999/02/22-rdf-syntax-ns#type')))
-        .toEqual('rdf:type');
+        .to.equal('rdf:type');
     expect(ctx.getScopedName(UrlNode.Parse(
                'http://www.w3.org/2000/01/rdf-schema#subClassOf')))
-        .toEqual('rdfs:subClassOf');
+        .to.equal('rdfs:subClassOf');
     expect(ctx.getScopedName(UrlNode.Parse('http://foo.org/Door')))
-        .toEqual('http://foo.org/Door');
+        .to.equal('http://foo.org/Door');
   });
 });

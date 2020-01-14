@@ -18,8 +18,6 @@
  * Triples representing an entire ontology.
  */
 
-import 'jasmine';
-
 import {readdirSync, readFile, readFileSync} from 'fs';
 import {parse} from 'path';
 import {from, Observable} from 'rxjs';
@@ -30,20 +28,20 @@ import {process, toTripleStrings} from '../src/triples/reader';
 import {Triple} from '../src/triples/triple';
 import {Context} from '../src/ts/context';
 
-import {addMatchers} from './helpers/baseline';
+import {expectNoDiff} from './helpers/baseline';
 
 function* getInputFiles(): IterableIterator<{
   input: string,
   spec: string,
   name: string,
 }> {
-  const files = readdirSync('tests/baselines');
+  const files = readdirSync('test/baselines');
   for (const file of files) {
     const {ext, name, dir} = parse(file);
     if (ext === '.nt') {
       yield {
-        input: `tests/baselines${dir}/${file}`,
-        spec: `tests/baselines${dir}/${name}.ts.txt`,
+        input: `test/baselines${dir}/${file}`,
+        spec: `test/baselines${dir}/${name}.ts.txt`,
         name
       };
     }
@@ -79,18 +77,15 @@ async function getResult(triples: Observable<Triple>) {
 }
 
 describe('Baseline', () => {
-  beforeEach(() => {
-    addMatchers();
-  });
   const header =
-      readFileSync(`tests/baselines/common/header.ts.txt`).toString('utf-8');
+      readFileSync(`test/baselines/common/header.ts.txt`).toString('utf-8');
 
   for (const {input, spec, name} of getInputFiles()) {
     it(name, async () => {
       const triples = getTriples(input);
       const result = await getResult(triples);
       const specValue = header + '\n' + readFileSync(spec).toString('utf-8');
-      expect(result).toDiffCleanlyWith(specValue);
+      expectNoDiff(result, specValue);
     });
   }
 });

@@ -13,22 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// tslint:disable-next-line no-reference
-/// <reference path="./baseline.d.ts" />
-
-import 'jasmine';
+import {AssertionError} from 'assert';
 import {diffLines} from 'diff';
 
 function withoutCrLf(input: string): string {
   return input.replace(/\r\n/g, '\n');
 }
 
-function handleDiff(
-    actual: string, expected: string): jasmine.CustomMatcherResult {
+export function expectNoDiff(actual: string, expected: string): void {
   const diff = diffLines(withoutCrLf(actual), withoutCrLf(expected));
   const results = diff.filter(line => line.added || line.removed);
 
-  if (results.length === 0) return {pass: true};
+  if (results.length === 0) return;
 
   const lines: string[] = [];
   for (const result of results) {
@@ -38,18 +34,5 @@ function handleDiff(
     lines.push(...prepended);
   }
   const reason = lines.join('\n');
-  return {pass: false, message: `Mismatch detected:\n${reason}`};
-}
-
-export function addMatchers() {
-  jasmine.addMatchers({
-    'toDiffCleanlyWith': (util, testers) => {
-      return {
-        compare: handleDiff,
-        negativeCompare: () => {
-          throw new Error('Not implemented');
-        }
-      };
-    }
-  });
+  throw new AssertionError({message: `Mismatch detected:\n${reason}`});
 }
