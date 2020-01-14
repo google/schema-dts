@@ -37,13 +37,13 @@ function* getInputFiles(): IterableIterator<{
   spec: string,
   name: string,
 }> {
-  const files = readdirSync('tests/baselines');
+  const files = readdirSync('test/baselines');
   for (const file of files) {
     const {ext, name, dir} = parse(file);
     if (ext === '.nt') {
       yield {
-        input: `tests/baselines${dir}/${file}`,
-        spec: `tests/baselines${dir}/${name}.ts.txt`,
+        input: `test/baselines${dir}/${file}`,
+        spec: `test/baselines${dir}/${name}.ts.txt`,
         name
       };
     }
@@ -83,7 +83,7 @@ describe('Baseline', () => {
     addMatchers();
   });
   const header =
-      readFileSync(`tests/baselines/common/header.ts.txt`).toString('utf-8');
+      readFileSync(`test/baselines/common/header.ts.txt`).toString('utf-8');
 
   for (const {input, spec, name} of getInputFiles()) {
     it(name, async () => {
