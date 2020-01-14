@@ -56,7 +56,8 @@
       "**/*.d.ts",
       "dist/**/*",
       "gulpfile.js",
-      "coverage/**/*"
+      "coverage/**/*",
+      "test/**/*"
     ],
     "reporter": [
       "html"
