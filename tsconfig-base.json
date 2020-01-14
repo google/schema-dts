@@ -9,13 +9,5 @@
     "declarationMap": true,
     "sourceMap": true,
     "composite": true
-  },
-  "references": [
-    {
-      "path": "./src"
-    },
-    {
-      "path": "./tests"
-    }
-  ]
+  }
 }
