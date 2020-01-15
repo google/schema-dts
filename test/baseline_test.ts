@@ -18,11 +18,12 @@
  * Triples representing an entire ontology.
  */
 
-import {readdirSync, readFile, readFileSync} from 'fs';
+import {existsSync, readdirSync, readFile, readFileSync} from 'fs';
 import {parse} from 'path';
 import {from, Observable} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 
+import {SetOptions} from '../src/logging';
 import {WriteDeclarations} from '../src/transform/transform';
 import {process, toTripleStrings} from '../src/triples/reader';
 import {Triple} from '../src/triples/triple';
@@ -33,6 +34,7 @@ import {expectNoDiff} from './helpers/baseline';
 function* getInputFiles(): IterableIterator<{
   input: string,
   spec: string,
+  optLog: string,
   name: string,
 }> {
   const files = readdirSync('test/baselines');
@@ -42,6 +44,7 @@ function* getInputFiles(): IterableIterator<{
       yield {
         input: `test/baselines${dir}/${file}`,
         spec: `test/baselines${dir}/${name}.ts.txt`,
+        optLog: `test/baselines${dir}/${name}.log`,
         name
       };
     }
@@ -77,15 +80,35 @@ async function getActual(
 }
 
 describe('Baseline', () => {
+  const realErr = console.error;
   const header =
       readFileSync(`test/baselines/common/header.ts.txt`).toString('utf-8');
+  let logs: string[];
 
-  for (const {input, spec, name} of getInputFiles()) {
+  beforeEach(() => {
+    // Save log output.
+    logs = [];
+    console.error = (msg: string) => void logs.push(msg);
+  });
+
+  afterEach(() => {
+    console.error = realErr;
+  });
+
+  for (const {input, spec, name, optLog} of getInputFiles()) {
     it(name, async () => {
+      const shouldLog = existsSync(optLog);
+      SetOptions({verbose: shouldLog});
+
       const triples = getTriples(input);
       const actual = await getActual(triples, ShouldIncludeDeprecated(name));
       const specValue = header + '\n' + readFileSync(spec).toString('utf-8');
       expectNoDiff(actual, specValue);
+
+      if (shouldLog) {
+        expectNoDiff(
+            logs.join('\n') + '\n', readFileSync(optLog).toString('utf-8'));
+      }
     });
   }
 });
