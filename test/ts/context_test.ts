@@ -24,7 +24,7 @@ import {Context} from '../../src/ts/context';
 function asString(node: Node): string {
   const printer = createPrinter({newLine: NewLineKind.LineFeed});
   const source = createSourceFile(
-      'test.ts', '', ScriptTarget.Latest, /*setParentNodes=*/false,
+      'test.ts', '', ScriptTarget.Latest, /*setParentNodes=*/ false,
       ScriptKind.TS);
   return printer.printNode(EmitHint.Unspecified, node, source);
 }
@@ -82,7 +82,46 @@ describe('Context.validate', () => {
       ctx.addNamedContext('a', 'foo.com');
       ctx.addNamedContext('', 'bar.com');
       ctx.validate();
-    }).to.throw('Context with multipled named contexts includes unnamed URL.');
+    }).to.throw('Context with multiple named contexts includes unnamed URL.');
+  });
+
+  it('named + default throws', () => {
+    expect(() => {
+      const ctx = new Context();
+      ctx.setUrlContext('https://schema.org');
+      ctx.addNamedContext('eys', 'https://eyas.sh/foo');
+      ctx.validate();
+    }).to.throw('Context with multiple named contexts includes unnamed URL.');
+  });
+
+  it('default + name throws', () => {
+    const ctx = new Context();
+    ctx.addNamedContext('eys', 'https://eyas.sh/foo');
+    expect(() => ctx.setUrlContext('https://schema.org'))
+        .to.throw('Attempting to set a default URL context');
+  });
+
+  it('singular works', () => {
+    expect(() => {
+      const ctx = new Context();
+      ctx.setUrlContext('https://schema.org');
+      ctx.validate();
+    }).not.to.throw();
+
+    expect(() => {
+      const ctx = new Context();
+      ctx.addNamedContext('sdo', 'https://schema.org');
+      ctx.validate();
+    }).not.to.throw();
+  });
+
+  it('multiple can work', () => {
+    expect(() => {
+      const ctx = new Context();
+      ctx.addNamedContext('sdo', 'https://schema.org');
+      ctx.addNamedContext('eys', 'https://eyas.sh/foo');
+      ctx.validate();
+    }).not.to.throw();
   });
 });
 
