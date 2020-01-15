@@ -46,7 +46,7 @@ export class Context {
       }
       if (name === '') {
         throw new Error(
-            'Context with multipled named contexts includes unnamed URL.');
+            'Context with multiple named contexts includes unnamed URL.');
       }
       seen.add(name);
     }
@@ -70,13 +70,13 @@ export class Context {
 
     // or "@context" is a literal object type of key-values of URLs:
     return createTypeLiteralNode(
-        /*members=*/this.context.map(
+        /*members=*/ this.context.map(
             ([name, url]) => createPropertySignature(
                 /*modifiers=*/[],
                 createStringLiteral(name),
-                /*questionToken=*/undefined,
+                /*questionToken=*/ undefined,
                 createLiteralTypeNode(createStringLiteral(url)),
-                /*initializer=*/undefined,
+                /*initializer=*/ undefined,
                 )));
   }
 
@@ -94,16 +94,16 @@ export class Context {
               createTypeParameterDeclaration(
                   'T', /*constraint=*/
                   createTypeReferenceNode(
-                      'Thing', /*typeArguments=*/undefined)),
+                      'Thing', /*typeArguments=*/ undefined)),
             ],
             createIntersectionTypeNode([
-              createTypeReferenceNode('T', /*typeArguments=*/undefined),
+              createTypeReferenceNode('T', /*typeArguments=*/ undefined),
               createTypeLiteralNode([createPropertySignature(
                   /*modifiers=*/[],
                   createStringLiteral('@context'),
-                  /*questionToken=*/undefined,
+                  /*questionToken=*/ undefined,
                   this.typeNode(),
-                  /*initializer=*/undefined,
+                  /*initializer=*/ undefined,
                   )]),
             ])),
     );
