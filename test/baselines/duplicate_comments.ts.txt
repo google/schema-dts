@@ -1,0 +1,22 @@
+type ThingBase = {
+    /** IRI identifying the canonical address of this object. */
+    "@id"?: string;
+    /** Names are great! {@link X Y} */
+    "name"?: Text | readonly Text[];
+};
+/**
+ * Things are amazing!
+ *
+ * - Foo
+ * - Bar
+ * - _Baz_, and __Bat__
+ */
+export type Thing = "http://schema.org/Gadget" | "http://schema.org/Widget" | ({
+    "@type": "Thing";
+} & ThingBase);
+export const Thing = {
+    /** Complex! */
+    Gadget: ("http://schema.org/Gadget" as const),
+    Widget: ("http://schema.org/Widget" as const)
+};
+
