@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {DomHandler, Parser} from 'htmlparser2';
+import {Parser} from 'htmlparser2';
 import {Node, setSyntheticLeadingComments, SyntaxKind} from 'typescript';
 
 const replacer: Array<[RegExp, string]> = [
@@ -31,72 +31,67 @@ function replace(str: string): string {
 }
 function parseComment(comment: string): string {
   const result: string[] = [];
-  const parser = new Parser(
-      // FIXME: htmlparser2 domhandler typings seem wrong: (1) not a Partial
-      // anymore, (2) onclosetag has no tagname. The JS source code seems to
-      // tell a different story.
-      // https://github.com/fb55/htmlparser2/blob/master/lib/Parser.js
-      {
-        ontext: (text: string) => result.push(replace(text)),
-        onopentag: (tag: string, attrs: {[key: string]: string}) => {
-          switch (tag) {
-            case 'a':
-              result.push(`{@link ${attrs['href']} `);
-              break;
-            case 'em':
-            case 'i':
-              result.push('_');
-              break;
-            case 'strong':
-            case 'b':
-              result.push('__');
-              break;
-            case 'br':
-              result.push('\n');
-              break;
-            case 'li':
-              result.push('- ');
-              break;
-            case 'code':
-            case 'pre':
-              result.push('`');
-              break;
-            case 'ul':
-              // Ignore
-              break;
-            default:
-              throw new Error(`Unknown tag "${tag}".`);
-          }
-        },
-        onclosetag: (tag: string) => {
-          switch (tag) {
-            case 'a':
-              result.push('}');
-              break;
-            case 'em':
-            case 'i':
-              result.push('_');
-              break;
-            case 'strong':
-            case 'b':
-              result.push('__');
-              break;
-            case 'li':
-              result.push('\n');
-              break;
-            case 'code':
-            case 'pre':
-              result.push('`');
-              break;
-            case 'ul':
-            case 'br':
-              // Ignore
-              break;
-            default:
-              throw new Error(`Unknown tag "${tag}".`);
-          }
-        }
-      } as unknown as DomHandler);
+  const parser = new Parser({
+    ontext: (text: string) => result.push(replace(text)),
+    onopentag: (tag: string, attrs: {[key: string]: string}) => {
+      switch (tag) {
+        case 'a':
+          result.push(`{@link ${attrs['href']} `);
+          break;
+        case 'em':
+        case 'i':
+          result.push('_');
+          break;
+        case 'strong':
+        case 'b':
+          result.push('__');
+          break;
+        case 'br':
+          result.push('\n');
+          break;
+        case 'li':
+          result.push('- ');
+          break;
+        case 'code':
+        case 'pre':
+          result.push('`');
+          break;
+        case 'ul':
+          // Ignore
+          break;
+        default:
+          throw new Error(`Unknown tag "${tag}".`);
+      }
+    },
+    onclosetag: (tag: string) => {
+      switch (tag) {
+        case 'a':
+          result.push('}');
+          break;
+        case 'em':
+        case 'i':
+          result.push('_');
+          break;
+        case 'strong':
+        case 'b':
+          result.push('__');
+          break;
+        case 'li':
+          result.push('\n');
+          break;
+        case 'code':
+        case 'pre':
+          result.push('`');
+          break;
+        case 'ul':
+        case 'br':
+          // Ignore
+          break;
+        default:
+          throw new Error(`Unknown tag "${tag}".`);
+      }
+    }
+  });
   parser.write(comment);
   parser.end();
 

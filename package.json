@@ -16,37 +16,32 @@
   "main": "./dist/gen/index.js",
   "bin": "./dist/gen/cli/cli.js",
   "devDependencies": {
-    "@types/argparse": "^1.0.36",
+    "@types/argparse": "^1.0.38",
     "@types/chai": "^4.2.7",
     "@types/chai-as-promised": "^7.1.2",
-    "@types/diff": "^3.5.2",
-    "@types/htmlparser2": "^3.10.1",
+    "@types/diff": "^4.0.2",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^10.17.0",
+    "@types/node": "^13.1.7",
     "@types/sinon": "^7.5.1",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "child_process": "^1.0.2",
-    "clang-format": "^1.2.4",
+    "clang-format": "^1.3.0",
     "coveralls": "^3.0.9",
-    "del": "^3.0.0",
-    "diff": "^3.5.0",
+    "del": "^5.1.0",
+    "diff": "^4.0.2",
     "gulp": "^4.0.2",
-    "gulp-file": "^0.4.0",
-    "gulp-typescript": "^5.0.1",
     "mocha": "^7.0.0",
     "nyc": "^15.0.0",
     "sinon": "^8.0.4",
     "source-map-support": "^0.5.16",
-    "through2": "^3.0.1",
     "ts-node": "^8.6.2",
-    "tslint": "^5.20.0",
-    "typescript": "^3.5.3"
+    "tslint": "^5.20.1",
+    "typescript": "^3.7.4"
   },
   "dependencies": {
     "argparse": "^1.0.10",
-    "htmlparser2": "^3.10.1",
-    "rxjs": "^6.5.3"
+    "htmlparser2": "^4.0.0",
+    "rxjs": "^6.5.4"
   },
   "peerDependencies": {
     "typescript": "^3.4.0"
@@ -87,8 +82,13 @@
   "repository": "github:google/schema-dts",
   "license": "Apache-2.0",
   "scripts": {
-    "build-gen": "tsc -p src",
     "test": "nyc mocha",
-    "coverage_on_travis": "nyc report --reporter=text-lcov | coveralls"
+    "coverage_on_travis": "nyc report --reporter=text-lcov | coveralls",
+    "build": "tsc -b",
+    "build-gen": "tsc -p src",
+    "build-schema": "mkdir -p built/ts-schema && node built/src/cli/cli.js > built/ts-schema/schema.ts",
+    "pkg-gen": "cp -R built/src/ dist/gen",
+    "pkg-schema": "cp LICENSE dist/schema/ && tsc built/ts-schema/*.ts --declaration --noImplicitAny --outDir dist/schema/",
+    "pkg": "gulp clean && npm run build-gen && npm run build-schema && npm run pkg-gen && npm run pkg-schema"
   }
 }

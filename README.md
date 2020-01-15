@@ -63,11 +63,23 @@ The Schema Typings Generator is available in the
 
 Command line usage:
 
-- **`schema`** and **`layer`**: Used to load the actual Schema definition:
+- **Specify your ontology**
+  - (*Default*) From Schema.org: Specify **`--schema`** and **`--layer`**:
+    Your schema definition will be imported from.
 
-      https://schema.org/version/${schema}/${layer}.nt
+        https://schema.org/version/${schema}/${layer}.nt
 
-- **`context`**: Defaults to `https://schema.org`, the value or values to be
+    This will be used by default, with `--schema=latest` and
+    `--layer=all-layers`, which includes pending, life sciences, and other
+    schemas.
+
+  - From a custom URL: Specify **`--ontology`**: An HTTPs URL to an .nt NTriple
+    file declaring your ontology.
+
+    Must be compatible with Schema.org, including the Schema.org `DataType`s and
+    specifying a top-level `Thign` type.
+
+- **`--context`**: Defaults to `https://schema.org`, the value or values to be
   used with the `"@context"` property.
 
   Can be either a single URL, or a comma separated list of two or more name:URL
@@ -76,9 +88,11 @@ Command line usage:
   The context affects names of string properties in types, as well as the values
   of an object's `"@type"`.
 
-- **`deprecated`**/**`nodeprecated`**: Whether or not to include deprecated
+- **`--deprecated`**/**`--nodeprecated`**: Whether or not to include deprecated
   Schema.org types and properties. When included, these types will still be
   marked with `@deprecated` JSDOC tags.
+
+- **`--verbose`**: Outputs additional logs and debugging notes to stderr.
 
 ## Developers
 
@@ -86,12 +100,15 @@ Use NPM to install dependencies:
 
     npm install
 
-Use Gulp to build the package:
+We have wrappers around `tsc` and `tsc --build` to build our generator other
+.d.ts files.
 
-    gulp generate-ts
+To generate TypeScript from the latest Schema.org Schema:
+
+    npm run build-gen && npm run build-schema
 
 or simply build the schema-dts generator:
 
-    gulp build-generator
+    npm run build-gen
 
 To contribute changes, see [the CONTRIBUTING.md file](./CONTRIBUTING.md).
