@@ -46,6 +46,110 @@ describe('UrlNode', () => {
     expect(node.context.hostname).to.equal('schema.org');
     expect(node.context.path).to.deep.equal(['']);
   });
+
+  it('rejects search strings', () => {
+    expect(() => UrlNode.Parse('http://schema.org/Person?q=true&a'))
+        .to.throw('Search string');
+
+    expect(() => UrlNode.Parse('http://schema.org/Person?q&a'))
+        .to.throw('Search string');
+
+    expect(() => UrlNode.Parse('http://schema.org/Person?q'))
+        .to.throw('Search string');
+
+    expect(() => UrlNode.Parse('http://schema.org/abc?q#foo')).not.to.throw();
+    expect(() => UrlNode.Parse('http://schema.org/abc#?q')).not.to.throw();
+  });
+
+  it('top-level domain', () => {
+    expect(() => UrlNode.Parse('http://schema.org/'))
+        .to.throw('no room for \'name\'');
+
+    expect(() => UrlNode.Parse('http://schema.org'))
+        .to.throw('no room for \'name\'');
+
+    expect(() => UrlNode.Parse('http://schema.org/#foo')).not.to.throw();
+  });
+
+  describe('matches context', () => {
+    it('matches exact urls', () => {
+      expect(UrlNode.Parse('http://schema.org/Person')
+                 .matchesContext('http://schema.org/'))
+          .to.be.true;
+
+      expect(UrlNode.Parse('http://schema.org/Person')
+                 .matchesContext('http://schema.org'))
+          .to.be.true;
+
+      expect(UrlNode.Parse('https://schema.org/Person')
+                 .matchesContext('https://schema.org'))
+          .to.be.true;
+
+      expect(UrlNode.Parse('https://schema.org/Person')
+                 .matchesContext('https://schema.org/'))
+          .to.be.true;
+    });
+
+    it('http matches https', () => {
+      expect(UrlNode.Parse('http://schema.org/Person')
+                 .matchesContext('https://schema.org/'))
+          .to.be.true;
+    });
+
+    it('https does not matche http (security)', () => {
+      expect(UrlNode.Parse('https://schema.org/Person')
+                 .matchesContext('http://schema.org/'))
+          .to.be.false;
+    });
+
+    it('matches exact path', () => {
+      expect(UrlNode.Parse('https://webschema.com/5.0/Person')
+                 .matchesContext('https://webschema.com/5.0'))
+          .to.be.true;
+
+      expect(UrlNode.Parse('https://webschema.com/5.0#Person')
+                 .matchesContext('https://webschema.com/5.0'))
+          .to.be.true;
+    });
+
+    it('different URLs', () => {
+      expect(UrlNode.Parse('https://webschema.com/5.0/Person')
+                 .matchesContext('https://foo.com/5.0'))
+          .to.be.false;
+
+      expect(UrlNode.Parse('https://webschema.com/5.0#Person')
+                 .matchesContext('https://foo.com/5.0'))
+          .to.be.false;
+    });
+
+    it('different path lengths', () => {
+      expect(UrlNode.Parse('https://webschema.com/5.0/g/Person')
+                 .matchesContext('https://webschema.com/5.0'))
+          .to.be.false;
+
+      expect(UrlNode.Parse('https://webschema.com/5.0/Person')
+                 .matchesContext('https://webschema.com/g/5.0'))
+          .to.be.false;
+
+      expect(UrlNode.Parse('https://webschema.com/5.0/g#Person')
+                 .matchesContext('https://webschema.com/5.0'))
+          .to.be.false;
+
+      expect(UrlNode.Parse('https://webschema.com/5.0#Person')
+                 .matchesContext('https://webschema.com/5.0/g'))
+          .to.be.false;
+    });
+
+    it('different paths same length', () => {
+      expect(UrlNode.Parse('https://webschema.com/6.0/Person')
+                 .matchesContext('https://webschema.com/5.0'))
+          .to.be.false;
+
+      expect(UrlNode.Parse('https://webschema.com/5.0#Person')
+                 .matchesContext('https://webschema.com/6.0'))
+          .to.be.false;
+    });
+  });
 });
 
 describe('SchemaString', () => {
