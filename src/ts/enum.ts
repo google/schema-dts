@@ -15,6 +15,7 @@
  */
 import {createAsExpression, createLiteralTypeNode, createPropertyAssignment, createStringLiteral, createTypeReferenceNode} from 'typescript';
 
+import {Log} from '../logging';
 import {ObjectPredicate, TSubject, TTypeName} from '../triples/triple';
 import {GetComment, IsClassType, IsDataType} from '../triples/wellKnown';
 
@@ -60,8 +61,9 @@ export class EnumValue {
     const comment = GetComment(value);
     if (comment) {
       if (this.comment) {
-        throw new Error(`Attempt to add comment on ${
-            this.value.toString()} enum but one already exists.`);
+        Log(`Duplicate comments provided on ${
+            this.value
+                .toString()} enum but one already exists. It will be overwritten.`);
       }
       this.comment = comment.comment;
       return true;
