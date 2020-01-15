@@ -2,12 +2,14 @@ type ThingBase = {
     /** IRI identifying the canonical address of this object. */
     "@id"?: string;
 };
+/** A Thing! */
 export type Thing = "http://schema.org/a" | "http://schema.org/b" | "http://schema.org/c" | "http://schema.org/d" | ({
     "@type": "Thing";
 } & ThingBase);
 export const Thing = {
     a: ("http://schema.org/a" as const),
     b: ("http://schema.org/b" as const),
+    /** A letter! */
     c: ("http://schema.org/c" as const),
     d: ("http://schema.org/d" as const)
 };
