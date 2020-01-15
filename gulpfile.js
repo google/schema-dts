@@ -44,7 +44,7 @@ function spawn(command, args = [], options = {}) {
 
 gulp.task('clean', () => del([
                      'built',
-                     'dist/src',
+                     'dist/gen',
                      'dist/schema/**/*',
                      '!dist/schema/package.json',
                      '!dist/schema/README.md',
