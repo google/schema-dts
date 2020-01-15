@@ -18,18 +18,19 @@ import {createArrayTypeNode, createKeywordTypeNode, createPropertySignature, cre
 
 import {Log} from '../logging';
 import {Format, ObjectPredicate, TObject, TSubject} from '../triples/triple';
-import {GetComment, IsDomainIncludes, IsRangeIncludes, IsSupersededBy} from '../triples/wellKnown';
+import {UrlNode} from '../triples/types';
+import {GetComment, IsDomainIncludes, IsRangeIncludes, IsSupersededBy, IsTypeName} from '../triples/wellKnown';
 
 import {ClassMap} from './class';
 import {Context} from './context';
 import {withComments} from './util/comments';
-import {toTypeName} from './util/names';
+import {toClassName} from './util/names';
 
 /**
  * A "class" of properties, not associated with any particuar object.
  */
 export class PropertyType {
-  private readonly types: TObject[] = [];
+  private readonly types: UrlNode[] = [];
   private _comment?: string;
   private readonly _supersededBy: TObject[] = [];
 
@@ -59,6 +60,9 @@ export class PropertyType {
     }
 
     if (IsRangeIncludes(value.Predicate)) {
+      if (!IsTypeName(value.Object))
+        throw new Error(`Type expected to be a UrlNode always. When adding ${
+            Format(value)} to ${this.subject.toString()}.`);
       this.types.push(value.Object);
       return true;
     }
@@ -83,8 +87,8 @@ export class PropertyType {
 
   scalarTypeNode() {
     const typeNodes =
-        this.types.sort((a, b) => toTypeName(a).localeCompare(toTypeName(b)))
-            .map(type => createTypeReferenceNode(toTypeName(type), []));
+        this.types.sort((a, b) => toClassName(a).localeCompare(toClassName(b)))
+            .map(type => createTypeReferenceNode(toClassName(type), []));
     switch (typeNodes.length) {
       case 0:
         return createKeywordTypeNode(SyntaxKind.NeverKeyword);
@@ -122,8 +126,8 @@ export class Property {
             /* modifiers= */[],
             createStringLiteral(context.getScopedName(this.key)),
             createToken(SyntaxKind.QuestionToken),
-            /*typeNode=*/this.typeNode(),
-            /*initializer=*/undefined,
+            /*typeNode=*/ this.typeNode(),
+            /*initializer=*/ undefined,
             ));
   }
 }
@@ -139,7 +143,7 @@ export class TypeProperty {
         /* typeNode= */
         createTypeReferenceNode(
             `"${context.getScopedName(this.className)}"`,
-            /*typeArguments=*/undefined),
+            /*typeArguments=*/ undefined),
         /* initializer= */ undefined,
     );
   }
@@ -157,7 +161,7 @@ export function IdPropertyNode() {
           /* typeNode= */
           createTypeReferenceNode(
               'string',
-              /*typeArguments=*/undefined),
+              /*typeArguments=*/ undefined),
           /* initializer= */ undefined,
           ));
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {ObjectPredicate, TPredicate, TSubject, TTypeName, TypedTopic} from './triple';
+import {ObjectPredicate, TObject, TPredicate, TSubject, TTypeName, TypedTopic} from './triple';
 import {UrlNode} from './types';
 
 /** Whether the context corresponds to rdf-schema. */
@@ -108,13 +108,18 @@ export function IsType(predicate: TPredicate): boolean {
   return IsRdfSyntax(predicate) && predicate.name === 'type';
 }
 
+/** Returns iff an Object can be described as a Type Name. */
+export function IsTypeName(value: TObject): value is TTypeName {
+  return value.type === 'UrlNode';
+}
+
 /**
  * If an ObjectPredicate corresponds to a
  * http://www.w3.org/1999/02/22-rdf-syntax-ns#type, returns a Type it describes.
  */
 export function GetType(value: ObjectPredicate): TTypeName|null {
   if (IsType(value.Predicate)) {
-    if (value.Object.type === 'Rdfs' || value.Object.type === 'SchemaString') {
+    if (!IsTypeName(value.Object)) {
       throw new Error(`Unexpected type ${value.Object}`);
     }
     return value.Object;
