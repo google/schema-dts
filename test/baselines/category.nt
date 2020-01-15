@@ -1,0 +1,10 @@
+<http://schema.org/name> <http://schema.org/rangeIncludes> <http://schema.org/Text> .
+<http://schema.org/name> <http://schema.org/domainIncludes> <http://schema.org/Thing> .
+<http://schema.org/name> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
+<http://schema.org/Thing> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
+<http://schema.org/Distillery> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
+<http://schema.org/Distillery> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://schema.org/Thing> .
+<http://schema.org/Distillery> <http://purl.org/dc/terms/source> <https://github.com/schemaorg/schemaorg/issues/743> .
+<http://schema.org/Distillery> <http://schema.org/category> "issue-743" .
+<http://schema.org/Distillery> <http://www.w3.org/2000/01/rdf-schema#label> "Distillery" .
+<http://schema.org/Distillery> <http://www.w3.org/2000/01/rdf-schema#comment> "A distillery." .
