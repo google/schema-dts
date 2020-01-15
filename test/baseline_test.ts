@@ -65,14 +65,14 @@ function getTriples(file: string): Observable<Triple> {
       }));
 }
 
-async function getResult(triples: Observable<Triple>) {
+async function getResult(
+    triples: Observable<Triple>, includeDeprecated: boolean) {
   const result: string[] = [];
   const context = new Context();
   context.setUrlContext('https://schema.org');
-  await WriteDeclarations(
-      triples, /*includeDeprecated=*/true, context, content => {
-        result.push(content);
-      });
+  await WriteDeclarations(triples, includeDeprecated, context, content => {
+    result.push(content);
+  });
   return result.join('');
 }
 
@@ -83,9 +83,13 @@ describe('Baseline', () => {
   for (const {input, spec, name} of getInputFiles()) {
     it(name, async () => {
       const triples = getTriples(input);
-      const result = await getResult(triples);
+      const result = await getResult(triples, ShouldIncludeDeprecated(name));
       const specValue = header + '\n' + readFileSync(spec).toString('utf-8');
       expectNoDiff(result, specValue);
     });
   }
 });
+
+function ShouldIncludeDeprecated(name: string) {
+  return !name.startsWith('nodeprecated_');
+}

@@ -184,11 +184,13 @@ export class Class {
         /*typeParameters=*/[], baseNode);
   }
 
-  private nonEnumType(context: Context): TypeNode {
+  private nonEnumType(context: Context, skipDeprecated: boolean): TypeNode {
     this.children.sort((a, b) => CompareKeys(a.subject, b.subject));
-    const children = this.children.map(
-        child =>
-            createTypeReferenceNode(child.className(), /*typeArguments=*/[]));
+    const children =
+        this.children.filter(child => !(child.deprecated && skipDeprecated))
+            .map(
+                child => createTypeReferenceNode(
+                    child.className(), /*typeArguments=*/[]));
 
     // 'String' is a valid Type sometimes, add that as a Child if so.
     if (this.allowString) {
@@ -221,16 +223,16 @@ export class Class {
     }
   }
 
-  private totalType(context: Context): TypeNode {
+  private totalType(context: Context, skipDeprecated: boolean): TypeNode {
     const isEnum = this._enums.size > 0;
 
     if (isEnum) {
       return createUnionTypeNode([
         ...this.enums().map(e => e.toTypeLiteral()),
-        createParenthesizedType(this.nonEnumType(context)),
+        createParenthesizedType(this.nonEnumType(context, skipDeprecated)),
       ]);
     } else {
-      return this.nonEnumType(context);
+      return this.nonEnumType(context, skipDeprecated);
     }
   }
 
@@ -249,9 +251,8 @@ export class Class {
             NodeFlags.Const));
   }
 
-  toNode(context: Context, skipDeprecatedProperties: boolean):
-      readonly Statement[] {
-    const typeValue: TypeNode = this.totalType(context);
+  toNode(context: Context, skipDeprecated: boolean): readonly Statement[] {
+    const typeValue: TypeNode = this.totalType(context, skipDeprecated);
     const declaration = withComments(
         this.comment,
         createTypeAliasDeclaration(
@@ -279,7 +280,7 @@ export class Class {
     // }
     // //-------------------------------------------//
     return arrayOf<Statement>(
-        this.baseDecl(skipDeprecatedProperties, context),
+        this.baseDecl(skipDeprecated, context),
         declaration,
         this.enumDecl(),
     );
