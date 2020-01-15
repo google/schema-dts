@@ -13,27 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {TSubject, TTypeName} from '../../triples/triple';
+import {UrlNode} from '../../src/triples/types';
+import {Class, ClassMap} from '../../src/ts/class';
 
-function decodeOr(component: string) {
-  try {
-    return decodeURIComponent(component);
-  } catch {
-    return component;
-  }
+export function makeClass(url: string, allowString: boolean = false): Class {
+  return new Class(UrlNode.Parse(url), allowString);
 }
 
-export function toClassName(subject: TTypeName): string {
-  let sanitizedName = decodeOr(subject.name).replace(/[^A-Za-z0-9_]/g, '_');
-
-  // No leading numbers.
-  if (/^[0-9]/g.test(sanitizedName)) {
-    sanitizedName = `_${sanitizedName}`;
-  }
-
-  return sanitizedName;
-}
-
-export function toEnumName(subject: TSubject): string {
-  return (subject.name).replace(/[^A-Za-z0-9_]/g, '_');
+export function makeClassMap(...classes: Class[]): ClassMap {
+  return new Map(classes.map(cls => [cls.subject.href, cls]));
 }
