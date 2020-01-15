@@ -65,7 +65,7 @@ function getTriples(file: string): Observable<Triple> {
       }));
 }
 
-async function getResult(
+async function getActual(
     triples: Observable<Triple>, includeDeprecated: boolean) {
   const result: string[] = [];
   const context = new Context();
@@ -83,9 +83,9 @@ describe('Baseline', () => {
   for (const {input, spec, name} of getInputFiles()) {
     it(name, async () => {
       const triples = getTriples(input);
-      const result = await getResult(triples, ShouldIncludeDeprecated(name));
+      const actual = await getActual(triples, ShouldIncludeDeprecated(name));
       const specValue = header + '\n' + readFileSync(spec).toString('utf-8');
-      expectNoDiff(result, specValue);
+      expectNoDiff(actual, specValue);
     });
   }
 });
