@@ -1,0 +1,80 @@
+type DiagnosticProcedureBase = MedicalProcedureBase;
+export type DiagnosticProcedure = {
+    "@type": "DiagnosticProcedure";
+} & DiagnosticProcedureBase;
+
+type EnumerationBase = IntangibleBase;
+export type Enumeration = ({
+    "@type": "Enumeration";
+} & EnumerationBase) | MedicalEnumeration;
+
+type IntangibleBase = ThingBase;
+export type Intangible = ({
+    "@type": "Intangible";
+} & IntangibleBase) | Enumeration;
+
+type MedicalEntityBase = ThingBase;
+export type MedicalEntity = ({
+    "@type": "MedicalEntity";
+} & MedicalEntityBase) | MedicalProcedure;
+
+type MedicalEnumerationBase = EnumerationBase;
+export type MedicalEnumeration = ({
+    "@type": "MedicalEnumeration";
+} & MedicalEnumerationBase) | (MedicalProcedureType | PhysicalExam);
+
+type MedicalProcedureBase = MedicalEntityBase;
+/** A process of care used in either a diagnostic, therapeutic, preventive or palliative capacity that relies on invasive (surgical), non-invasive, or other techniques. */
+export type MedicalProcedure = ({
+    "@type": "MedicalProcedure";
+} & MedicalProcedureBase) | (DiagnosticProcedure | PalliativeProcedure | PhysicalExam | SurgicalProcedure | TherapeuticProcedure);
+
+type MedicalProcedureTypeBase = MedicalEnumerationBase;
+/** An enumeration that describes different types of medical procedures. */
+export type MedicalProcedureType = "http://schema.org/NoninvasiveProcedure" | "http://schema.org/PercutaneousProcedure" | ({
+    "@type": "MedicalProcedureType";
+} & MedicalProcedureTypeBase);
+export const MedicalProcedureType = {
+    NoninvasiveProcedure: ("http://schema.org/NoninvasiveProcedure" as const),
+    PercutaneousProcedure: ("http://schema.org/PercutaneousProcedure" as const)
+};
+
+type MedicalTherapyBase = TherapeuticProcedureBase;
+export type MedicalTherapy = ({
+    "@type": "MedicalTherapy";
+} & MedicalTherapyBase) | PalliativeProcedure;
+
+type PalliativeProcedureBase = (MedicalProcedureBase & MedicalTherapyBase);
+export type PalliativeProcedure = {
+    "@type": "PalliativeProcedure";
+} & PalliativeProcedureBase;
+
+type PhysicalExamBase = (MedicalProcedureBase & MedicalEnumerationBase);
+export type PhysicalExam = "http://schema.org/Head" | "http://schema.org/Neuro" | ({
+    "@type": "PhysicalExam";
+} & PhysicalExamBase);
+export const PhysicalExam = {
+    Head: ("http://schema.org/Head" as const),
+    Neuro: ("http://schema.org/Neuro" as const)
+};
+
+type SurgicalProcedureBase = MedicalProcedureBase;
+/** A medical procedure involving an incision with instruments; performed for diagnose, or therapeutic purposes. */
+export type SurgicalProcedure = {
+    "@type": "SurgicalProcedure";
+} & SurgicalProcedureBase;
+
+type TherapeuticProcedureBase = MedicalProcedureBase;
+export type TherapeuticProcedure = ({
+    "@type": "TherapeuticProcedure";
+} & TherapeuticProcedureBase) | MedicalTherapy;
+
+type ThingBase = {
+    /** IRI identifying the canonical address of this object. */
+    "@id"?: string;
+    "procedureType"?: MedicalProcedureType | readonly MedicalProcedureType[];
+};
+export type Thing = ({
+    "@type": "Thing";
+} & ThingBase) | (Intangible | MedicalEntity);
+
