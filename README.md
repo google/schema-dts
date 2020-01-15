@@ -86,12 +86,15 @@ Use NPM to install dependencies:
 
     npm install
 
-Use Gulp to build the package:
+We have wrappers around `tsc` and `tsc --build` to build our generator other
+.d.ts files.
 
-    gulp generate-ts
+To generate TypeScript from the latest Schema.org Schema:
+
+    npm run build-gen && npm run build-schema
 
 or simply build the schema-dts generator:
 
-    gulp build-generator
+    npm run build-gen
 
 To contribute changes, see [the CONTRIBUTING.md file](./CONTRIBUTING.md).
