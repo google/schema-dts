@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
+import {ok} from 'assert';
+
 import {Log} from '../logging';
 import {ObjectPredicate, Topic, TypedTopic} from '../triples/triple';
 import {UrlNode} from '../triples/types';
 import {IsClass} from '../triples/wellKnown';
 import {BooleanEnum, Builtin, Class, ClassMap, DataTypeUnion} from '../ts/class';
+
+const assert: <T>(item: T|undefined) => asserts item is T = ok;
 
 function toClass(cls: Class, topic: Topic, map: ClassMap): Class {
   const rest: ObjectPredicate[] = [];
@@ -87,10 +91,6 @@ function ForwardDeclareClasses(topics: ReadonlyArray<TypedTopic>): ClassMap {
         topic.Subject.toString(), new Class(topic.Subject, allowString));
   }
 
-  if (classes.size === 0) {
-    throw new Error('Expected Class topics to exist.');
-  }
-
   return classes;
 }
 
@@ -99,10 +99,7 @@ function BuildClasses(topics: ReadonlyArray<TypedTopic>, classes: ClassMap) {
     if (!IsClass(topic)) continue;
 
     const cls = classes.get(topic.Subject.toString());
-    if (!cls) {
-      throw new Error(`Class ${
-          topic.Subject.toString()} should have been forward declared.`);
-    }
+    assert(cls);
     toClass(cls, topic, classes);
   }
 }
