@@ -172,6 +172,28 @@ describe('Class', () => {
               '    "@type": "Person";\n' +
               '} & PersonBase;');
     });
+
+    it('complains about bad comment markup', () => {
+      const ctx = new Context();
+      ctx.setUrlContext('https://schema.org/');
+      addParent(cls, 'https://schema.org/Thing');
+
+      expect(cls.add(
+                 {
+                   Predicate: comment(),
+                   Object: new SchemaString(
+                       'Hello World. ' +
+                           '<table>' +
+                           '<tr><td>XYZ</td><td>ABC</td></tr>' +
+                           '<tr><td>123</td><td>234</td></tr>' +
+                           '</table>',
+                       undefined)
+                 },
+                 new Map))
+          .to.be.true;
+
+      expect(() => cls.toNode(ctx, true)).to.throw('Unknown tag');
+    });
   });
 });
 
