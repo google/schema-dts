@@ -137,6 +137,12 @@ export function* process(triples: string[][]): Iterable<Triple> {
       // certain layer overlays.
       continue;
     }
+
+    // Schema.org 3.4 all-layers used to contain a test comment:
+    // (Subject:    <http://meta.schema.org/>
+    //  Predicate:  <http://www.w3.org/2000/01/rdf-schema#comment>
+    //  Object:     "A test comment.")
+    // We skip it manually.
     if (match[0] === 'http://meta.schema.org/') {
       continue;
     }

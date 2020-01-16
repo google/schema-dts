@@ -18,7 +18,6 @@ import {expect, use} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {ClientRequest, IncomingMessage} from 'http';
 import https from 'https';
-import {Observable} from 'rxjs';
 import {toArray} from 'rxjs/operators';
 import {SinonStub, stub} from 'sinon';
 import {PassThrough, Writable} from 'stream';
@@ -122,6 +121,30 @@ describe('load', () => {
       const control = fakeResponse(200, 'Ok');
       control.data(
           `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`);
+      control.data(
+          `<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`);
+      control.end();
+
+      await expect(triples).to.eventually.deep.equal([
+        {
+          Subject: UrlNode.Parse('https://schema.org/Person'),
+          Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
+          Object: SchemaString.Parse('"math"')!,
+        },
+        {
+          Subject: UrlNode.Parse('https://schema.org/Person'),
+          Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
+          Object: SchemaString.Parse('"science"')!,
+        }
+      ]);
+    });
+
+    it('Multiple (skip test comment)', async () => {
+      const control = fakeResponse(200, 'Ok');
+      control.data(
+          `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`);
+      control.data(
+          `<http://meta.schema.org/> <http://www.w3.org/2000/01/rdf-schema#comment> "A test comment." .\n`);
       control.data(
           `<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`);
       control.end();
