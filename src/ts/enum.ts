@@ -34,20 +34,31 @@ export class EnumValue {
       readonly value: TSubject, types: ReadonlyArray<TTypeName>,
       map: ClassMap) {
     for (const type of types) {
-      // "Type" containment.
-      // A Topic can have multiple types. So the triple we're adding now could
-      // either be:
-      // 1. An already processed well-known type (e.g. the Topic is also a
-      // Class,
-      //    as well as being an enum).
-      // 2. The Type of the Enum.
+      // If a Subject has a "Type", then it either means:
+      // 1- Type is Class - This topic represents an object that can be
+      //    represented as a class (usually, a node/object).
+      // 2- Type is DataType - This topic represents an object that can
+      //    represented as a raw value.
+      // 3- Type is Neither - This topic's IRI can be used in the place of that
+      //    type to describe its value.
       //
-      // e.g.: SurgicalProcedure (schema.org/SurgicalProcedure) is both a class
-      //       having the "Class" type, and also an instance of the
-      //       MedicalProcedureType (schema.org/MedicalProcedureType) enum.
-      //       Therefore, an Enum will contain two TTypeName ObjectPredicates:
-      //       one of Type=Class, and another of Type=MedicalProcedureType.
-      if (IsClassType(type) || IsDataType(type)) return;
+      // For example,
+      // - Thing is a Class only.
+      // - Text is a Class and a DataType.
+      // - DataType is a Class.
+      // - Wednesday is a DayOfWeek only.
+      //
+      // In Schema.org 3.4, some enumerations were both a Class and an Enum.
+      //
+      // For example, SurgicalProcedure was both an enum value for
+      // MedicalProcedureType and a class that can be described in its own
+      // right. It had type Class and MedicalProcedureType.
+      //
+      // For those cases, we make sure:
+      // (a) We add an EnumValue for all types that are not Class/DataType.
+      // (b) An EnumValue being a Class/DataType should not disqualify it from
+      //     being an enum value for some other type (if it has one).
+      if (IsClassType(type) || IsDataType(type)) continue;
 
       const enumObject = map.get(type.toString());
       if (!enumObject) {
