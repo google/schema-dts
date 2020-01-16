@@ -168,10 +168,8 @@ export class Class {
       return createIntersectionTypeNode([parentNode, propLiteral]);
     } else if (parentNode) {
       return parentNode;
-    } else if (propLiteral.members.length > 0) {
-      return propLiteral;
     } else {
-      return createTypeLiteralNode([]);
+      return propLiteral;
     }
   }
 
@@ -245,9 +243,9 @@ export class Class {
         createVariableDeclarationList(
             [createVariableDeclaration(
                 this.className(),
-                /*type=*/undefined,
+                /*type=*/ undefined,
                 createObjectLiteral(
-                    enums.map(e => e.toNode()), /*multiLine=*/true))],
+                    enums.map(e => e.toNode()), /*multiLine=*/ true))],
             NodeFlags.Const));
   }
 
@@ -343,7 +341,7 @@ export class BooleanEnum extends Builtin {
           createVariableDeclarationList(
               [createVariableDeclaration(
                   this.subject.name,
-                  /*type=*/undefined,
+                  /*type=*/ undefined,
                   createObjectLiteral(
                       [
                         createPropertyAssignment(
@@ -385,14 +383,14 @@ export class DataTypeUnion extends Builtin {
 /**
  * Defines a Sort order between Class declarations.
  *
- * DataTypes come first, by the 'DataType' union itself, followed by all regular
- * classes. Within each group, class names are ordered alphabetically in UTF-16
- * code units order.
+ * DataTypes come first, next the 'DataType' union itself, followed by all
+ * regular classes. Within each group, class names are ordered alphabetically in
+ * UTF-16 code units order.
  */
 export function Sort(a: Class, b: Class): number {
   if (a instanceof Builtin && !(a instanceof DataTypeUnion)) {
     if (b instanceof Builtin && !(b instanceof DataTypeUnion)) {
-      return a.subject.name.localeCompare(b.subject.name);
+      return CompareKeys(a.subject, b.subject);
     } else {
       return -1;
     }
@@ -401,7 +399,8 @@ export function Sort(a: Class, b: Class): number {
   } else if (a instanceof DataTypeUnion) {
     return b instanceof DataTypeUnion ? 0 : -1;
   } else if (b instanceof DataTypeUnion) {
-    return a instanceof DataTypeUnion ? 0 : +1;
+    // If we are here, a is never a DataTypeUnion.
+    return +1;
   } else {
     return CompareKeys(a.subject, b.subject);
   }
