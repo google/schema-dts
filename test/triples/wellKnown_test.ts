@@ -1,7 +1,7 @@
 import {expect} from 'chai';
 
 import {Rdfs, SchemaString, UrlNode} from '../../src/triples/types';
-import {GetComment, GetSubClassOf, GetType, GetTypes} from '../../src/triples/wellKnown';
+import {GetComment, GetSubClassOf, GetType, GetTypes, IsClass} from '../../src/triples/wellKnown';
 
 describe('wellKnown', () => {
   describe('GetComment', () => {
@@ -200,6 +200,54 @@ describe('wellKnown', () => {
                 }
               ]))
           .to.throw('No type found');
+    });
+  });
+
+  describe('IsClass', () => {
+    const cls = UrlNode.Parse('http://www.w3.org/2000/01/rdf-schema#Class');
+    const dataType = UrlNode.Parse('http://schema.org/DataType');
+    const bool = UrlNode.Parse('http://schema.org/Boolean');
+
+    it('a data type is not a class', () => {
+      expect(IsClass({
+        Subject: UrlNode.Parse('https://schema.org/Text'),
+        types: [cls, dataType],
+        values: []
+      })).to.be.false;
+
+      expect(IsClass({
+        Subject: UrlNode.Parse('https://schema.org/Text'),
+        types: [dataType, cls],
+        values: []
+      })).to.be.false;
+    });
+
+    it('an only-enum is not a class', () => {
+      expect(IsClass({
+        Subject: UrlNode.Parse('https://schema.org/True'),
+        types: [bool],
+        values: []
+      })).to.be.false;
+    });
+
+    it('an enum can still be a class', () => {
+      expect(IsClass({
+        Subject: UrlNode.Parse('https://schema.org/ItsComplicated'),
+        types: [bool, cls],
+        values: []
+      })).to.be.true;
+    });
+
+    it('the DataType union is not a class', () => {
+      expect(IsClass({
+        Subject: UrlNode.Parse('https://schema.org/DataType'),
+        types: [cls],
+        values: [{
+          Predicate:
+              UrlNode.Parse('http://www.w3.org/2000/01/rdf-schema#subClassOf'),
+          Object: UrlNode.Parse('http://www.w3.org/2000/01/rdf-schema#Class')
+        }]
+      })).to.be.false;
     });
   });
 });
