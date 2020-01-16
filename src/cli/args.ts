@@ -51,7 +51,7 @@ export function IsCustom(options: StandardOntology|
   return typeof (options as Partial<CustomOntology>).ontology === 'string';
 }
 
-export function ParseFlags(): Options|undefined {
+export function ParseFlags(args?: string[]): Options|undefined {
   const parser = new ArgumentParser(
       {version: '0.0.1', addHelp: true, description: 'schema-dts generator'});
 
@@ -97,7 +97,7 @@ export function ParseFlags(): Options|undefined {
 
   const deprecated = parser.addMutuallyExclusiveGroup({required: false});
   deprecated.addArgument('--deprecated', {
-    defaultValue: {defaultValue: true},
+    defaultValue: true,
     help: 'Include deprecated Classes and Properties.',
     action: 'storeTrue',
     dest: 'deprecated'
@@ -107,5 +107,5 @@ export function ParseFlags(): Options|undefined {
     action: 'storeFalse',
     dest: 'deprecated'
   });
-  return parser.parseArgs();
+  return parser.parseArgs(args);
 }
