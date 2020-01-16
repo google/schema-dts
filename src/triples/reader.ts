@@ -137,6 +137,12 @@ export function* process(triples: string[][]): Iterable<Triple> {
       // certain layer overlays.
       continue;
     }
+
+    // Schema.org 3.4 all-layers used to contain a test comment:
+    // (Subject:    <http://meta.schema.org/>
+    //  Predicate:  <http://www.w3.org/2000/01/rdf-schema#comment>
+    //  Object:     "A test comment.")
+    // We skip it manually.
     if (match[0] === 'http://meta.schema.org/') {
       continue;
     }
@@ -166,9 +172,9 @@ export function* process(triples: string[][]): Iterable<Triple> {
         Object: object(match[2])
       };
     } catch (parseError) {
-      throw new Error(`${
-          parseError.stack ||
-          String(parseError)} while parsing line ${match}.`);
+      const e = parseError as Error;
+      throw new Error(`ParseError: ${e.name}: ${e.message} while parsing line ${
+          match}.\nOriginal Stack:\n${e.stack}\nRethrown from:`);
     }
   }
 }
