@@ -163,6 +163,42 @@ describe('load', () => {
       ]);
     });
 
+    it('Multiple (throws from bad URL: Subject)', async () => {
+      const control = fakeResponse(200, 'Ok');
+      control.data(
+          `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`);
+      control.data(
+          `<http://schema.org/> <http://www.w3.org/2000/01/rdf-schema#comment> "A test comment." .\n`);
+      control.end();
+
+      await expect(triples).to.eventually.rejectedWith(
+          'ParseError: Error: Unexpected URL');
+    });
+
+    it('Multiple (throws from bad URL: Predicate)', async () => {
+      const control = fakeResponse(200, 'Ok');
+      control.data(
+          `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`);
+      control.data(
+          `<http://schema.org/A> <https://schema.org> "A test comment." .\n`);
+      control.end();
+
+      await expect(triples).to.eventually.rejectedWith(
+          'ParseError: Error: Unexpected URL');
+    });
+
+    it('Multiple (throws from bad URL: Object)', async () => {
+      const control = fakeResponse(200, 'Ok');
+      control.data(
+          `<https://schema.org/Person> <https://schema.org/knowsAbout> <https://schema.org/> .\n`);
+      control.data(
+          `<http://schema.org/A> <http://www.w3.org/2000/01/rdf-schema#comment> "A test comment." .\n`);
+      control.end();
+
+      await expect(triples).to.eventually.rejectedWith(
+          'ParseError: Error: Unexpected URL');
+    });
+
     it('Multiple (dirty broken)', async () => {
       const control = fakeResponse(200, 'Ok');
       control.data(`<https://schema.org/Person> <https://sc`);

@@ -172,9 +172,9 @@ export function* process(triples: string[][]): Iterable<Triple> {
         Object: object(match[2])
       };
     } catch (parseError) {
-      throw new Error(`${
-          parseError.stack ||
-          String(parseError)} while parsing line ${match}.`);
+      const e = parseError as Error;
+      throw new Error(`ParseError: ${e.name}: ${e.message} while parsing line ${
+          match}.\nOriginal Stack:\n${e.stack}\nRethrown from:`);
     }
   }
 }
