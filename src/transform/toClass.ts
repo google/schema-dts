@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-import {ok} from 'assert';
-
 import {Log} from '../logging';
 import {ObjectPredicate, Topic, TypedTopic} from '../triples/triple';
 import {UrlNode} from '../triples/types';
 import {IsClass} from '../triples/wellKnown';
 import {BooleanEnum, Builtin, Class, ClassMap, DataTypeUnion} from '../ts/class';
-
-const assert: <T>(item: T|undefined) => asserts item is T = ok;
+import {assert} from '../util/assert';
 
 function toClass(cls: Class, topic: Topic, map: ClassMap): Class {
   const rest: ObjectPredicate[] = [];

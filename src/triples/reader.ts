@@ -17,18 +17,11 @@ import https from 'https';
 import {Observable, Subscriber, TeardownLogic} from 'rxjs';
 
 import {Log} from '../logging';
+import {assert} from '../util/assert';
 
-import {TObject, Triple} from './triple';
+import {Triple} from './triple';
 import {Rdfs, SchemaString, UrlNode} from './types';
 
-function verify<T>(
-    content: string, ...rest: Array<(content: string) => T | null>): T {
-  for (const item of rest) {
-    const attempt = item(content);
-    if (attempt) return attempt;
-  }
-  throw new Error(`Unexpected ${content}`);
-}
 function unWrap<T>(maker: (content: string) => T | null): (content: string) =>
     T | null {
   return (content: string) => {
@@ -47,9 +40,13 @@ function predicate(content: string) {
 }
 
 function object(content: string) {
-  return verify<TObject>(
-      content, unWrap(Rdfs.Parse), unWrap(UrlNode.Parse), SchemaString.Parse);
+  const o = unWrap(Rdfs.Parse)(content) || unWrap(UrlNode.Parse)(content) ||
+      SchemaString.Parse(content);
+
+  assert(o, `Unexpected: ${content}.`);
+  return o;
 }
+
 const totalRegex =
     /\s*<([^<>]+)>\s*<([^<>]+)>\s*((?:<[^<>"]+>)|(?:"(?:[^"]|(?:\\"))+(?:[^\"]|\\")"(?:@[a-zA-Z]+)?))\s*\./;
 export function toTripleStrings(data: string[]) {
