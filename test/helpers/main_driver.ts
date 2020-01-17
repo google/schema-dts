@@ -26,10 +26,7 @@ import {main} from '../../src/cli/internal/main';
 
 import {flush} from './async';
 
-export async function cliOnFile(
-    file: string,
-    options:
-        {includeDeprecated: boolean, shouldLog: boolean, contextFlag?: string}):
+export async function cliOnFile(file: string, args: string[]):
     Promise<{actual: string, actualLogs: string}> {
   // Restorables
   const realWrite = process.stdout.write;
@@ -74,11 +71,6 @@ export async function cliOnFile(
   const logs: string[] = [];
 
   try {
-    const args = ['--ontology', `https://fake.com/${file}`];
-    if (!options.includeDeprecated) args.push('--nodeprecated');
-    if (options.shouldLog) args.push('--verbose');
-    if (options.contextFlag) args.push('--context', options.contextFlag);
-
     const wholeProgram = main(args);
     await flush();
 

@@ -52,8 +52,11 @@ describe('Baseline', () => {
     it(name, async () => {
       const shouldLog = existsSync(optLog);
 
-      const {actual, actualLogs} = await cliOnFile(
-          input, {includeDeprecated: ShouldIncludeDeprecated(name), shouldLog});
+      const args = ['--ontology', `https://fake.com/${input}`];
+      if (!ShouldIncludeDeprecated(name)) args.push('--nodeprecated');
+      if (shouldLog) args.push('--verbose');
+
+      const {actual, actualLogs} = await cliOnFile(input, args);
       const specValue = header + '\n' + readFileSync(spec).toString('utf-8');
       expectNoDiff(actual, specValue);
 
