@@ -23,24 +23,6 @@ import {Context} from '../ts/context';
 
 import {IsCustom, ParseFlags} from './args';
 
-function parseContext(flag: string) {
-  const keyVals = flag.split(',');
-  const context = new Context();
-  if (keyVals.length === 1) {
-    context.setUrlContext(flag);
-  } else {
-    for (const keyVal of keyVals) {
-      const match = /^([^:]+):(.+)$/g.exec(keyVal);
-      if (!match || match[1] === undefined || match[2] === undefined) {
-        throw new Error(`Unknown value ${keyVal} in --context flag.`);
-      }
-      context.addNamedContext(match[1], match[2]);
-    }
-  }
-  context.validate();
-  return context;
-}
-
 async function main() {
   const options = ParseFlags();
   if (!options) return;
@@ -52,7 +34,7 @@ async function main() {
   Log(`Loading Ontology from URL: ${ontologyUrl}`);
 
   const result = load(ontologyUrl);
-  const context = parseContext(options.context);
+  const context = Context.Parse(options.context);
   await WriteDeclarations(result, options.deprecated, context, write);
 }
 
