@@ -15,32 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import {Log, SetOptions} from '../logging';
-import {WriteDeclarations} from '../transform/transform';
-import {load} from '../triples/reader';
-import {Context} from '../ts/context';
-
-import {IsCustom, ParseFlags} from './args';
-
-async function main() {
-  const options = ParseFlags();
-  if (!options) return;
-  SetOptions(options);
-
-  const ontologyUrl = IsCustom(options) ?
-      options.ontology :
-      `https://schema.org/version/${options.schema}/${options.layer}.nt`;
-  Log(`Loading Ontology from URL: ${ontologyUrl}`);
-
-  const result = load(ontologyUrl);
-  const context = Context.Parse(options.context);
-  await WriteDeclarations(result, options.deprecated, context, write);
-}
-
-function write(content: string) {
-  process.stdout.write(content, 'utf-8');
-}
+import {main} from './internal/main';
 
 main()
     .then(() => {
