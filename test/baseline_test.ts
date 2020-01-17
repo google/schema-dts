@@ -18,18 +18,11 @@
  * Triples representing an entire ontology.
  */
 
-import {existsSync, readdirSync, readFile, readFileSync} from 'fs';
+import {existsSync, readdirSync, readFileSync} from 'fs';
 import {parse} from 'path';
-import {from, Observable} from 'rxjs';
-import {switchMap} from 'rxjs/operators';
-
-import {SetOptions} from '../src/logging';
-import {WriteDeclarations} from '../src/transform/transform';
-import {process, toTripleStrings} from '../src/triples/reader';
-import {Triple} from '../src/triples/triple';
-import {Context} from '../src/ts/context';
 
 import {expectNoDiff} from './helpers/baseline';
+import {cliOnFile} from './helpers/main_driver';
 
 function* getInputFiles(): IterableIterator<{
   input: string,
@@ -51,63 +44,21 @@ function* getInputFiles(): IterableIterator<{
   }
 }
 
-function getTriples(file: string): Observable<Triple> {
-  return new Observable<string>(subscriber => {
-           readFile(file, {encoding: 'utf-8'}, (err, data) => {
-             if (err) {
-               subscriber.error(err);
-             } else {
-               subscriber.next(data);
-               subscriber.complete();
-             }
-           });
-         })
-      .pipe(switchMap(contents => {
-        const triples = toTripleStrings([contents]);
-        return from(process(triples));
-      }));
-}
-
-async function getActual(
-    triples: Observable<Triple>, includeDeprecated: boolean) {
-  const result: string[] = [];
-  const context = new Context();
-  context.setUrlContext('https://schema.org');
-  await WriteDeclarations(triples, includeDeprecated, context, content => {
-    result.push(content);
-  });
-  return result.join('');
-}
-
 describe('Baseline', () => {
-  const realErr = console.error;
   const header =
       readFileSync(`test/baselines/common/header.ts.txt`).toString('utf-8');
-  let logs: string[];
-
-  beforeEach(() => {
-    // Save log output.
-    logs = [];
-    console.error = (msg: string) => void logs.push(msg);
-  });
-
-  afterEach(() => {
-    console.error = realErr;
-  });
 
   for (const {input, spec, name, optLog} of getInputFiles()) {
     it(name, async () => {
       const shouldLog = existsSync(optLog);
-      SetOptions({verbose: shouldLog});
 
-      const triples = getTriples(input);
-      const actual = await getActual(triples, ShouldIncludeDeprecated(name));
+      const {actual, actualLogs} = await cliOnFile(
+          input, {includeDeprecated: ShouldIncludeDeprecated(name), shouldLog});
       const specValue = header + '\n' + readFileSync(spec).toString('utf-8');
       expectNoDiff(actual, specValue);
 
       if (shouldLog) {
-        expectNoDiff(
-            logs.join('\n') + '\n', readFileSync(optLog).toString('utf-8'));
+        expectNoDiff(actualLogs, readFileSync(optLog).toString('utf-8'));
       }
     });
   }
