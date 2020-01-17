@@ -172,3 +172,77 @@ describe('Context.getScopedName', () => {
         .to.equal('http://foo.org/Door');
   });
 });
+
+describe('Context.Parse', () => {
+  it('one default', () => {
+    expect(Context.Parse('https://myschema.org/'))
+        .to.deep.equal(ctx(c => c.setUrlContext('https://myschema.org/')));
+  });
+
+  it('one default -- leading comma', () => {
+    expect(Context.Parse(',https://myschema.org/'))
+        .to.deep.equal(ctx(c => c.setUrlContext('https://myschema.org/')));
+  });
+
+  it('one default -- trailing comma', () => {
+    expect(Context.Parse('https://myschema.org/,'))
+        .to.deep.equal(ctx(c => c.setUrlContext('https://myschema.org/')));
+  });
+
+  it('one default -- whitespace', () => {
+    expect(Context.Parse('  https://myschema.org/\t'))
+        .to.deep.equal(ctx(c => c.setUrlContext('https://myschema.org/')));
+  });
+
+  it('one default -- commas andwhitespace', () => {
+    expect(Context.Parse(' , https://myschema.org/,\t'))
+        .to.deep.equal(ctx(c => c.setUrlContext('https://myschema.org/')));
+  });
+
+  // One named is not supported.
+
+  it('two named', () => {
+    expect(Context.Parse('a:https://schema.org/A,b:https://schema.org/B'))
+        .to.deep.equal(ctx(c => {
+          c.addNamedContext('a', 'https://schema.org/A');
+          c.addNamedContext('b', 'https://schema.org/B');
+        }));
+  });
+
+  it('two named, whitespace', () => {
+    expect(Context.Parse('a:https://schema.org/A ,\tb:https://schema.org/B'))
+        .to.deep.equal(ctx(c => {
+          c.addNamedContext('a', 'https://schema.org/A');
+          c.addNamedContext('b', 'https://schema.org/B');
+        }));
+  });
+
+  it('two named, extra commas', () => {
+    expect(
+        Context.Parse(',a:https://schema.org/A ,, ,\tb:https://schema.org/B,,'))
+        .to.deep.equal(ctx(c => {
+          c.addNamedContext('a', 'https://schema.org/A');
+          c.addNamedContext('b', 'https://schema.org/B');
+        }));
+  });
+
+  it('unexpected lone URL', () => {
+    expect(
+        () => Context.Parse(
+            'a:https://schema.org/A,http://www.com,b:https://schema.org/B'))
+        .to.throw();
+  });
+
+  it('unexpected totally off', () => {
+    expect(
+        () =>
+            Context.Parse('a:https://schema.org/A,a=b,b:https://schema.org/B'))
+        .to.throw();
+  });
+});
+
+function ctx(mutator: (context: Context) => void): Context {
+  const context = new Context();
+  mutator(context);
+  return context;
+}

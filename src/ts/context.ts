@@ -21,7 +21,7 @@ import {TSubject} from '../triples/triple';
 import {withComments} from './util/comments';
 
 export class Context {
-  private readonly context: Array<[string, string]> = [];
+  private readonly context: Array<readonly[string, string]> = [];
 
   setUrlContext(ctx: string) {
     if (this.context.length > 0) {
@@ -107,5 +107,26 @@ export class Context {
                   )]),
             ])),
     );
+  }
+
+  static Parse(contextSpec: string): Context {
+    const keyVals = contextSpec.split(',').map(s => s.trim()).filter(s => !!s);
+    const context = new Context();
+
+    if (keyVals.length === 1) {
+      context.setUrlContext(keyVals[0]);
+
+    } else {
+      for (const keyVal of keyVals) {
+        const match = /^([^:]+):((http|https):.+)$/g.exec(keyVal);
+        if (!match || match[1] === undefined || match[2] === undefined) {
+          throw new Error(`Unknown value ${keyVal} in --context flag.`);
+        }
+        context.addNamedContext(match[1], match[2]);
+      }
+    }
+
+    context.validate();
+    return context;
   }
 }
