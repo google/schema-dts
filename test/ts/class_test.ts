@@ -15,7 +15,7 @@
  */
 
 import {expect} from 'chai';
-import {createExpressionWithTypeArguments, createPrinter, createSourceFile, EmitHint, NewLineKind, ScriptKind, ScriptTarget} from 'typescript';
+import {createPrinter, createSourceFile, EmitHint, NewLineKind, ScriptKind, ScriptTarget} from 'typescript';
 
 import {SchemaString, UrlNode} from '../../src/triples/types';
 import {BooleanEnum, Builtin, Class, DataTypeUnion, Sort} from '../../src/ts/class';
