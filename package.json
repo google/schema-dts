@@ -57,7 +57,7 @@
       "gulpfile.js",
       "coverage/**/*",
       "test/**/*",
-      "src/cli/cli.js"
+      "src/cli/cli.ts"
     ],
     "reporter": [
       "html"
