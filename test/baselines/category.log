@@ -1,1 +1,3 @@
+Loading Ontology from URL: https://fake.com/test/baselines/category.nt
+Got Response 200: Ok.
 Class Distillery: Did not add [(category "issue-743")]

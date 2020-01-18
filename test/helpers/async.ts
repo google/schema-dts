@@ -1,5 +1,3 @@
-#! /usr/bin/env node
-
 /**
  * Copyright 2020 Google LLC
  *
@@ -14,14 +12,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
-import {main} from './internal/main';
 
-main()
-    .then(() => {
-      process.exit();
-    })
-    .catch(e => {
-      console.error(e);
-      process.abort();
-    });
+export function flush(): Promise<void> {
+  return new Promise(resolve => {
+    setTimeout(resolve, 1);
+  });
+}

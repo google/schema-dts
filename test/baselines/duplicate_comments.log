@@ -1,3 +1,5 @@
+Loading Ontology from URL: https://fake.com/test/baselines/duplicate_comments.nt
+Got Response 200: Ok.
 Duplicate comments provided on class http://schema.org/Thing. It will be overwritten.
 Duplicate comments provided on property http://schema.org/name. It will be overwritten.
 Duplicate comments provided on http://schema.org/Gadget enum but one already exists. It will be overwritten.

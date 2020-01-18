@@ -25,6 +25,7 @@ import {PassThrough, Writable} from 'stream';
 import {load} from '../../src/triples/reader';
 import {Triple} from '../../src/triples/triple';
 import {SchemaString, UrlNode} from '../../src/triples/types';
+import {flush} from '../helpers/async';
 
 use(chaiAsPromised);
 
@@ -42,7 +43,7 @@ describe('load', () => {
   it('is lazy', () => {
     load('https://schema.org');
     expect(get.called).to.be.false;
-  })
+  });
 
   it('total fail', async () => {
     const triples$ = load('https://schema.org/');
@@ -405,12 +406,6 @@ describe('load', () => {
 
 function passThrough(): ClientRequest {
   return new PassThrough() as Writable as ClientRequest;
-}
-
-function flush(): Promise<void> {
-  return new Promise(resolve => {
-    setTimeout(resolve, 1);
-  });
 }
 
 interface Control {
