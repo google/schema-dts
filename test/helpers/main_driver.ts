@@ -17,7 +17,6 @@
  * function, for testing.
  */
 
-import {fail} from 'assert';
 import {readFile} from 'fs';
 import {ClientRequest, IncomingMessage} from 'http';
 import https from 'https';
@@ -33,50 +32,52 @@ export async function cliOnFile(file: string, args: string[]):
   const realErr = console.error;
   const realGet = https.get;
 
-  // Controllers
-  let innerOnData: (chunk: Buffer) => void;
-  let innerOnEnd: () => void;
-
-  // Mockables
-  process.stdout.write =
-      ((...params: Parameters<typeof process.stdout.write>): boolean => {
-        const str = params[0];
-        if (typeof str === 'string') {
-          writes.push(str);
-          return true;
-        } else {
-          return realWrite(...params);
-        }
-      }) as typeof process.stdout.write;
-  console.error = (msg: string) => void logs.push(msg);
-
-  // TODO(eyas): A lot of the mocking here is due to the fact that https.get
-  // cannot read local file:/// paths. If it were possible, the get mocking
-  // would go away, making a lot of this much simpler.
-  https.get =
-      ((_: string, callback: (inc: IncomingMessage) => void): ClientRequest => {
-        callback({
-          statusCode: 200,
-          statusMessage: 'Ok',
-          on: (event: string, listener: (arg?: unknown) => void) => {
-            if (event === 'data') innerOnData = listener;
-            if (event === 'end') innerOnEnd = listener;
-          }
-        } as IncomingMessage);
-        return {on: () => {}} as {} as ClientRequest;
-      }) as typeof https.get;
-
-  // Outputs
-  const writes: string[] = [];
-  const logs: string[] = [];
-
   try {
+    // Controllers
+    let innerOnData: (chunk: Buffer) => void;
+    let innerOnEnd: () => void;
+
+    // Mockables
+    process.stdout.write =
+        ((...params: Parameters<typeof process.stdout.write>): boolean => {
+          const str = params[0];
+          if (typeof str === 'string') {
+            writes.push(str);
+            return true;
+          } else {
+            return realWrite(...params);
+          }
+        }) as typeof process.stdout.write;
+
+    console.error = (msg: string) => void logs.push(msg);
+
+    // TODO(eyas): A lot of the mocking here is due to the fact that https.get
+    // cannot read local file:/// paths. If it were possible, the get mocking
+    // would go away, making a lot of this much simpler.
+    https.get = ((_: string,
+                  callback: (inc: IncomingMessage) => void): ClientRequest => {
+                  callback({
+                    statusCode: 200,
+                    statusMessage: 'Ok',
+                    on: (event: string, listener: (arg?: unknown) => void) => {
+                      if (event === 'data') innerOnData = listener;
+                      if (event === 'end') innerOnEnd = listener;
+                    }
+                  } as IncomingMessage);
+                  return {on: () => {}} as {} as ClientRequest;
+                }) as typeof https.get;
+
+    // Outputs
+    const writes: string[] = [];
+    const logs: string[] = [];
+
     const wholeProgram = main(args);
     await flush();
 
     readFile(file, (err, data) => {
       if (err) {
-        fail(err);
+        realErr(err.stack);
+        throw err;
       } else {
         innerOnData(data);
         innerOnEnd();
@@ -89,7 +90,9 @@ export async function cliOnFile(file: string, args: string[]):
       actual: writes.join(''),
       actualLogs: logs.join('\n') + '\n',
     };
-
+  } catch (e) {
+    realErr((e as Error).stack);
+    throw e;
   } finally {
     process.stdout.write = realWrite;
     console.error = realErr;
