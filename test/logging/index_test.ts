@@ -17,18 +17,19 @@
 import {expect} from 'chai';
 import {SinonStub, stub} from 'sinon';
 
-import {Log, SetOptions} from '../../src/logging';
+import {Log, SetLogger, SetOptions} from '../../src/logging';
 
 describe('Log', () => {
   let logErr:
       SinonStub<Parameters<Console['error']>, ReturnType<Console['error']>>;
 
   beforeEach(() => {
-    logErr = stub(console, 'error');
+    logErr = stub();
+    SetLogger(logErr);
   });
 
   afterEach(() => {
-    logErr.restore();
+    SetLogger(console.error);
   });
 
   it('doesn\'t log by default', () => {
