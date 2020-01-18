@@ -51,7 +51,7 @@ export function IsCustom(options: StandardOntology|
   return typeof (options as Partial<CustomOntology>).ontology === 'string';
 }
 
-export function ParseFlags(args?: string[]): Options|undefined {
+export function ParseFlags(args?: string[]): Options {
   const parser = new ArgumentParser(
       {version: '0.0.1', addHelp: true, description: 'schema-dts generator'});
 

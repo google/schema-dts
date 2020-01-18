@@ -23,7 +23,6 @@ import {IsCustom, ParseFlags} from '../args';
 
 export async function main(args?: string[]) {
   const options = ParseFlags(args);
-  if (!options) return;
   SetOptions(options);
 
   const ontologyUrl = IsCustom(options) ?
