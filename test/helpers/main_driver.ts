@@ -22,6 +22,7 @@ import {ClientRequest, IncomingMessage} from 'http';
 import https from 'https';
 
 import {main} from '../../src/cli/internal/main';
+import {SetOptions} from '../../src/logging';
 
 import {flush} from './async';
 
@@ -97,5 +98,8 @@ export async function cliOnFile(file: string, args: string[]):
     process.stdout.write = realWrite;
     console.error = realErr;
     https.get = realGet;
+
+    // Always reset verbosity settings.
+    SetOptions({verbose: false});
   }
 }
