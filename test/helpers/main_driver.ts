@@ -22,7 +22,7 @@ import {ClientRequest, IncomingMessage} from 'http';
 import https from 'https';
 
 import {main} from '../../src/cli/internal/main';
-import {SetOptions} from '../../src/logging';
+import {SetLogger, SetOptions} from '../../src/logging';
 
 import {flush} from './async';
 
@@ -30,7 +30,6 @@ export async function cliOnFile(file: string, args: string[]):
     Promise<{actual: string, actualLogs: string}> {
   // Restorables
   const realWrite = process.stdout.write;
-  const realErr = console.error;
   const realGet = https.get;
 
   try {
@@ -50,7 +49,7 @@ export async function cliOnFile(file: string, args: string[]):
           }
         }) as typeof process.stdout.write;
 
-    console.error = (msg: string) => void logs.push(msg);
+    SetLogger((msg: string) => void logs.push(msg));
 
     // TODO(eyas): A lot of the mocking here is due to the fact that https.get
     // cannot read local file:/// paths. If it were possible, the get mocking
@@ -77,7 +76,6 @@ export async function cliOnFile(file: string, args: string[]):
 
     readFile(file, (err, data) => {
       if (err) {
-        realErr(err.stack);
         throw err;
       } else {
         innerOnData(data);
@@ -91,15 +89,12 @@ export async function cliOnFile(file: string, args: string[]):
       actual: writes.join(''),
       actualLogs: logs.join('\n') + '\n',
     };
-  } catch (e) {
-    realErr((e as Error).stack);
-    throw e;
   } finally {
     process.stdout.write = realWrite;
-    console.error = realErr;
     https.get = realGet;
 
     // Always reset verbosity settings.
     SetOptions({verbose: false});
+    SetLogger(console.error);
   }
 }

@@ -15,6 +15,7 @@
  */
 
 let verbose = false;
+let logger = console.error;
 
 export function SetOptions(options: {verbose: boolean}): void {
   verbose = options.verbose;
@@ -22,6 +23,10 @@ export function SetOptions(options: {verbose: boolean}): void {
 
 export function Log(message: string): void {
   if (verbose) {
-    console.error(message);
+    logger(message);
   }
+}
+
+export function SetLogger(newLogger: (msg: string) => void) {
+  logger = newLogger;
 }
