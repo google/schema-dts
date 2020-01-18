@@ -65,6 +65,23 @@ describe('Baseline', () => {
       }
     });
   }
+
+  describe('manual', () => {
+    it('default ontology', async () => {
+      const {actual, actualLogs} = await cliOnFile(
+          'test/baselines/manual/default_ontology.nt', ['--verbose']);
+
+      const expected = header + '\n' +
+          readFileSync(`test/baselines/manual/default_ontology.ts.txt`)
+              .toString('utf-8');
+      const expectedLogs =
+          readFileSync(`test/baselines/manual/default_ontology.log`)
+              .toString('utf-8');
+
+      expectNoDiff(actual, expected);
+      expectNoDiff(actualLogs, expectedLogs);
+    });
+  });
 });
 
 function ShouldIncludeDeprecated(name: string) {

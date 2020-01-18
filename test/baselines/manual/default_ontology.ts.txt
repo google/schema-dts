@@ -1,0 +1,8 @@
+type ThingBase = {
+    /** IRI identifying the canonical address of this object. */
+    "@id"?: string;
+};
+export type Thing = {
+    "@type": "Thing";
+} & ThingBase;
+
