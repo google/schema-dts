@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-import {expect} from 'chai';
-
-import {Format, ObjectPredicate, Triple} from '../../src/triples/triple';
+import { Format, ObjectPredicate, Triple } from '../../src/triples/triple';
 import {Rdfs, SchemaString, UrlNode} from '../../src/triples/types';
 
 describe('Format(Triple)', () => {
@@ -27,7 +25,7 @@ describe('Format(Triple)', () => {
       Object: SchemaString.Parse('"food"')!
     };
 
-    expect(Format(triple)).to.equal('(Person, knowsAbout, "food")');
+    expect(Format(triple)).toBe('(Person, knowsAbout, "food")');
   });
 
   it('smoke test 2', () => {
@@ -37,7 +35,7 @@ describe('Format(Triple)', () => {
       Object: Rdfs.Parse('rdfs:Class')!
     };
 
-    expect(Format(triple)).to.equal('(Organization, knowsAbout, rdfs:Class)');
+    expect(Format(triple)).toBe('(Organization, knowsAbout, rdfs:Class)');
   });
 });
 
@@ -48,7 +46,7 @@ describe('Format(ObjectPredicate)', () => {
       Object: SchemaString.Parse('"food"')!
     };
 
-    expect(Format(triple)).to.equal('(knowsAbout, "food")');
+    expect(Format(triple)).toBe('(knowsAbout, "food")');
   });
 
   it('smoke test 2', () => {
@@ -57,6 +55,6 @@ describe('Format(ObjectPredicate)', () => {
       Object: Rdfs.Parse('rdfs:Class')!
     };
 
-    expect(Format(triple)).to.equal('(knowsAbout, rdfs:Class)');
+    expect(Format(triple)).toBe('(knowsAbout, rdfs:Class)');
   });
 });

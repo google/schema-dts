@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import {expect} from 'chai';
-import {stub} from 'sinon';
 import {UrlNode} from '../../src/triples/types';
 import {EnumValue} from '../../src/ts/enum';
 import {makeClass, makeClassMap} from '../helpers/make_class';
@@ -31,12 +29,14 @@ describe('EnumValue', () => {
           () => new EnumValue(
               UrlNode.Parse('https://schema.org/Wednesday'),
               [UrlNode.Parse('https://schema.org/DayOfWeek')], map))
-          .to.throw('Couldn\'t find');
+          .toThrowError('Couldn\'t find');
     });
 
     it('Works fine when called for plain enum', () => {
       const dayOfWeek = makeClass('https://schema.org/DayOfWeek');
-      const addEnum = stub(dayOfWeek, 'addEnum');
+      const addEnum = jest.fn();
+      dayOfWeek.addEnum = addEnum;
+
       const map = makeClassMap(
           makeClass('https://schema.org/Foo'),
           makeClass('https://schema.org/Bar'), dayOfWeek);
@@ -45,14 +45,14 @@ describe('EnumValue', () => {
           UrlNode.Parse('https://schema.org/Wednesday'),
           [UrlNode.Parse('https://schema.org/DayOfWeek')], map);
 
-      expect(addEnum.calledWith(myEnum)).to.be.true;
-      addEnum.restore();
+      expect(addEnum).toBeCalledWith(myEnum);
     });
 
     it('Works fine when called for an enum/class', () => {
       const medicalProcedureType =
           makeClass('https://schema.org/MedicalProcedureType');
-      const addEnum = stub(medicalProcedureType, 'addEnum');
+      const addEnum = jest.fn();
+      medicalProcedureType.addEnum = addEnum;
 
       const map = makeClassMap(
           makeClass('https://schema.org/Foo'),
@@ -66,8 +66,7 @@ describe('EnumValue', () => {
           ],
           map);
 
-      expect(addEnum.calledWith(myEnum)).to.be.true;
-      addEnum.restore();
+      expect(addEnum).toBeCalledWith(myEnum);
     });
   });
 });

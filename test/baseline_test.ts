@@ -21,7 +21,6 @@
 import {existsSync, readdirSync, readFileSync} from 'fs';
 import {parse} from 'path';
 
-import {expectNoDiff} from './helpers/baseline';
 import {cliOnFile} from './helpers/main_driver';
 
 function* getInputFiles(): IterableIterator<{
@@ -58,10 +57,11 @@ describe('Baseline', () => {
 
       const {actual, actualLogs} = await cliOnFile(input, args);
       const specValue = header + '\n' + readFileSync(spec).toString('utf-8');
-      expectNoDiff(actual, specValue);
+      expect(crlf2lf(actual)).toEqual(crlf2lf(specValue));
 
       if (shouldLog) {
-        expectNoDiff(actualLogs, readFileSync(optLog).toString('utf-8'));
+        expect(crlf2lf(actualLogs))
+            .toEqual(crlf2lf(readFileSync(optLog).toString('utf-8')));
       }
     });
   }
@@ -78,12 +78,16 @@ describe('Baseline', () => {
           readFileSync(`test/baselines/manual/default_ontology.log`)
               .toString('utf-8');
 
-      expectNoDiff(actual, expected);
-      expectNoDiff(actualLogs, expectedLogs);
+      expect(crlf2lf(actual)).toEqual(crlf2lf(expected));
+      expect(crlf2lf(actualLogs)).toEqual(crlf2lf(expectedLogs));
     });
   });
 });
 
 function ShouldIncludeDeprecated(name: string) {
   return !name.startsWith('nodeprecated_');
+}
+
+function crlf2lf(input: string): string {
+  return input.replace(/\r\n/g, '\n');
 }

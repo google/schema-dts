@@ -23,6 +23,7 @@ import https from 'https';
 
 import {main} from '../../src/cli/internal/main';
 import {SetLogger, SetOptions} from '../../src/logging';
+import {assert, assertTypeof} from '../../src/util/assert';
 
 import {flush} from './async';
 
@@ -41,12 +42,9 @@ export async function cliOnFile(file: string, args: string[]):
     process.stdout.write =
         ((...params: Parameters<typeof process.stdout.write>): boolean => {
           const str = params[0];
-          if (typeof str === 'string') {
-            writes.push(str);
-            return true;
-          } else {
-            return realWrite(...params);
-          }
+          assertTypeof(str, 'string');
+          writes.push(str);
+          return true;
         }) as typeof process.stdout.write;
 
     SetLogger((msg: string) => void logs.push(msg));
@@ -75,12 +73,10 @@ export async function cliOnFile(file: string, args: string[]):
     await flush();
 
     readFile(file, (err, data) => {
-      if (err) {
-        throw err;
-      } else {
-        innerOnData(data);
-        innerOnEnd();
-      }
+      assert(!err, err!);
+
+      innerOnData(data);
+      innerOnEnd();
     });
 
     await wholeProgram;

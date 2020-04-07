@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-import {expect, use} from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import {ClientRequest, IncomingMessage} from 'http';
 import https from 'https';
 import {toArray} from 'rxjs/operators';
-import {SinonStub, stub} from 'sinon';
 import {PassThrough, Writable} from 'stream';
 
 import {load} from '../../src/triples/reader';
@@ -27,34 +24,35 @@ import {Triple} from '../../src/triples/triple';
 import {SchemaString, UrlNode} from '../../src/triples/types';
 import {flush} from '../helpers/async';
 
-use(chaiAsPromised);
-
 describe('load', () => {
-  let get: SinonStub<
-      Parameters<typeof https['get']>, ReturnType<typeof https['get']>>;
+  let get: jest
+      .Mock<ReturnType<typeof https['get']>, Parameters<typeof https['get']>>;
+  let ogGet: typeof https['get'];
 
   beforeEach(() => {
-    get = stub(https, 'get');
+    get = jest.fn();
+    ogGet = https.get;
+    https.get = get as typeof https['get'];
   });
   afterEach(() => {
-    get.restore();
+    https.get = ogGet;
   });
 
   it('is lazy', () => {
     load('https://schema.org');
-    expect(get.called).to.be.false;
+    expect(get).not.toBeCalled();
   });
 
   it('total fail', async () => {
     const triples$ = load('https://schema.org/');
 
     const firstReturn = passThrough();
-    get.onFirstCall().returns(firstReturn);
+    get.mockReturnValueOnce(firstReturn);
     firstReturn.destroy(new Error('Bad!!!'));
 
-    await expect(triples$.toPromise()).to.eventually.rejectedWith('Bad!!!');
+    await expect(triples$.toPromise()).rejects.toThrow('Bad!!!');
 
-    expect(get.calledOnce).to.be.true;
+    expect(get).toBeCalledTimes(1);
   });
 
   describe('with one or more message', () => {
@@ -63,7 +61,7 @@ describe('load', () => {
 
     beforeEach(async () => {
       const triples$ = load('https://schema.org/');
-      get.onFirstCall().callsFake((_, cb) => {
+      get.mockImplementationOnce((_, cb) => {
         // Unfortunately, we use another overload that doesn't appear here.
         const callback = cb as {} as (inc: IncomingMessage) => void;
         fakeResponse = makeFakeResponse(callback);
@@ -80,29 +78,29 @@ describe('load', () => {
     it('METATEST', () => {
       // Make sure our test machinery works. If the METATEST fails, then
       // the test code itself broke.
-      expect(get.called).to.be.true;
-      expect(triples).not.to.be.undefined;
-      expect(fakeResponse).to.be.a('function');
+      expect(get).toBeCalled();
+      expect(triples).not.toBeUndefined();
+      expect(fakeResponse).toBeInstanceOf(Function);
     });
 
     it('First response fails at status', async () => {
       fakeResponse(500, 'So Sad!');
 
-      await expect(triples).to.eventually.rejectedWith('So Sad!');
+      await expect(triples).rejects.toMatch('So Sad!');
     });
 
     it('First response fails at error', async () => {
       const control = fakeResponse(200, 'Ok');
       control.error('So BAD!');
 
-      await expect(triples).to.eventually.rejectedWith('So BAD!');
+      await expect(triples).rejects.toThrow('So BAD!');
     });
 
     it('Immediate success (empty)', async () => {
       const control = fakeResponse(200, 'Ok');
       control.end();
 
-      await expect(triples).to.eventually.deep.equal([]);
+      await expect(triples).resolves.toEqual([]);
     });
 
     it('Oneshot', async () => {
@@ -111,7 +109,7 @@ describe('load', () => {
           `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`);
       control.end();
 
-      await expect(triples).to.eventually.deep.equal([{
+      await expect(triples).resolves.toEqual([{
         Subject: UrlNode.Parse('https://schema.org/Person'),
         Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
         Object: SchemaString.Parse('"math"')!,
@@ -126,7 +124,7 @@ describe('load', () => {
           `<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`);
       control.end();
 
-      await expect(triples).to.eventually.deep.equal([
+      await expect(triples).resolves.toEqual([
         {
           Subject: UrlNode.Parse('https://schema.org/Person'),
           Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
@@ -150,7 +148,7 @@ describe('load', () => {
           `<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`);
       control.end();
 
-      await expect(triples).to.eventually.deep.equal([
+      await expect(triples).resolves.toEqual([
         {
           Subject: UrlNode.Parse('https://schema.org/Person'),
           Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
@@ -172,7 +170,7 @@ describe('load', () => {
           `<http://schema.org/> <http://www.w3.org/2000/01/rdf-schema#comment> "A test comment." .\n`);
       control.end();
 
-      await expect(triples).to.eventually.rejectedWith(
+      await expect(triples).rejects.toThrow(
           'ParseError: Error: Unexpected URL');
     });
 
@@ -184,7 +182,7 @@ describe('load', () => {
           `<http://schema.org/A> <https://schema.org> "A test comment." .\n`);
       control.end();
 
-      await expect(triples).to.eventually.rejectedWith(
+      await expect(triples).rejects.toThrow(
           'ParseError: Error: Unexpected URL');
     });
 
@@ -196,7 +194,7 @@ describe('load', () => {
           `<http://schema.org/A> <http://www.w3.org/2000/01/rdf-schema#comment> "A test comment." .\n`);
       control.end();
 
-      await expect(triples).to.eventually.rejectedWith(
+      await expect(triples).rejects.toThrow(
           'ParseError: Error: Unexpected URL');
     });
 
@@ -207,7 +205,7 @@ describe('load', () => {
           `hema.org/knowsAbout> "math" .\n<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`);
       control.end();
 
-      await expect(triples).to.eventually.deep.equal([
+      await expect(triples).resolves.toEqual([
         {
           Subject: UrlNode.Parse('https://schema.org/Person'),
           Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
@@ -228,7 +226,7 @@ describe('load', () => {
           `hema.org/knowsAbout> "math" .\n<file:///usr/Person> <https://schema.org/knowsAbout> "science" .\n`);
       control.end();
 
-      await expect(triples).to.eventually.deep.equal([{
+      await expect(triples).resolves.toEqual([{
         Subject: UrlNode.Parse('https://schema.org/Person'),
         Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
         Object: SchemaString.Parse('"math"')!,
@@ -244,7 +242,7 @@ describe('load', () => {
           `org/knowsAbout> <http://schema.org/isPartOf> <http://pending.schema.org> .\n`);
       control.end();
 
-      await expect(triples).to.eventually.deep.equal([{
+      await expect(triples).resolves.toEqual([{
         Subject: UrlNode.Parse('https://schema.org/knowsAbout'),
         Predicate: UrlNode.Parse('https://schema.org/domainIncludes'),
         Object: UrlNode.Parse('https://schema.org/Thing'),
@@ -256,14 +254,14 @@ describe('load', () => {
         const control = fakeResponse(200, 'Ok');
         control.data(`<https://schema.org/knowsAbout> <https://sc`);
         control.end();
-        await expect(triples).to.eventually.rejectedWith('Unexpected');
+        await expect(triples).rejects.toThrow('Unexpected');
       });
 
       it('only two datums', async () => {
         const control = fakeResponse(200, 'Ok');
         control.data(`<https://schema.org/knowsAbout> <https://sc> .`);
         control.end();
-        await expect(triples).to.eventually.rejectedWith('Unexpected');
+        await expect(triples).rejects.toThrow('Unexpected');
       });
 
       it('missing dot', async () => {
@@ -271,35 +269,35 @@ describe('load', () => {
         control.data(
             `<https://schema.org/knowsAbout> <https://scema.org/domainIncludes> "a"`);
         control.end();
-        await expect(triples).to.eventually.rejectedWith('Unexpected');
+        await expect(triples).rejects.toThrow('Unexpected');
       });
 
       it('Non-IRI Subject', async () => {
         const control = fakeResponse(200, 'Ok');
         control.data(`"knowsAbout" <https://scema.org/domainIncludes> "a" .`);
         control.end();
-        await expect(triples).to.eventually.rejectedWith('Unexpected');
+        await expect(triples).rejects.toThrow('Unexpected');
       });
 
       it('Non-IRI Predicate', async () => {
         const control = fakeResponse(200, 'Ok');
         control.data(`<https://schema.org/knowsAbout> "domainIncludes" "a"`);
         control.end();
-        await expect(triples).to.eventually.rejectedWith('Unexpected');
+        await expect(triples).rejects.toThrow('Unexpected');
       });
 
       it('Invalid object', async () => {
         const control = fakeResponse(200, 'Ok');
         control.data(`<https://schema.org/a> <https://schema.org/b> 'c`);
         control.end();
-        await expect(triples).to.eventually.rejectedWith('Unexpected');
+        await expect(triples).rejects.toThrow('Unexpected');
       });
 
       it('Domain only', async () => {
         const control = fakeResponse(200, 'Ok');
         control.data(`<https://schema.org/> <https://schema.org/b> "c"`);
         control.end();
-        await expect(triples).to.eventually.rejectedWith('Unexpected');
+        await expect(triples).rejects.toThrow('Unexpected');
       });
     });
 
@@ -307,7 +305,8 @@ describe('load', () => {
       let fakeResponse2: FakeResponseFunc;
 
       beforeEach(async () => {
-        get.onSecondCall().callsFake((_, cb) => {
+        // on second call:
+        get.mockImplementationOnce((_, cb) => {
           // Unfortunately, we use another overload that doesn't appear here.
           const callback = cb as {} as (inc: IncomingMessage) => void;
           fakeResponse2 = makeFakeResponse(callback);
@@ -322,27 +321,27 @@ describe('load', () => {
       });
 
       it('METATEST', () => {
-        expect(fakeResponse2).to.be.a('function');
+        expect(fakeResponse2).toBeInstanceOf(Function);
       });
 
       it('Post Redirect response fails at status', async () => {
         fakeResponse2(500, 'So Sad!');
 
-        await expect(triples).to.eventually.rejectedWith('So Sad!');
+        await expect(triples).rejects.toMatch('So Sad!');
       });
 
       it('Post Redirect response fails at error', async () => {
         const control = fakeResponse2(200, 'Ok');
         control.error('So BAD!');
 
-        await expect(triples).to.eventually.rejectedWith('So BAD!');
+        await expect(triples).rejects.toThrow('So BAD!');
       });
 
       it('Post Redirect (empty)', async () => {
         const control = fakeResponse2(200, 'Ok');
         control.end();
 
-        await expect(triples).to.eventually.deep.equal([]);
+        await expect(triples).resolves.toEqual([]);
       });
 
       it('Post Redirect Oneshot', async () => {
@@ -351,7 +350,7 @@ describe('load', () => {
             `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`);
         control.end();
 
-        await expect(triples).to.eventually.deep.equal([{
+        await expect(triples).resolves.toEqual([{
           Subject: UrlNode.Parse('https://schema.org/Person'),
           Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
           Object: SchemaString.Parse('"math"')!,
@@ -366,7 +365,7 @@ describe('load', () => {
             `<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`);
         control.end();
 
-        await expect(triples).to.eventually.deep.equal([
+        await expect(triples).resolves.toEqual([
           {
             Subject: UrlNode.Parse('https://schema.org/Person'),
             Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
@@ -387,7 +386,7 @@ describe('load', () => {
             `hema.org/knowsAbout> "math" .\n<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`);
         control.end();
 
-        await expect(triples).to.eventually.deep.equal([
+        await expect(triples).resolves.toEqual([
           {
             Subject: UrlNode.Parse('https://schema.org/Person'),
             Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
@@ -423,21 +422,21 @@ type FakeResponseFunc =
 function makeFakeResponse(callback: (inc: IncomingMessage) => void):
     FakeResponseFunc {
   return (statusCode: number, statusMessage: string, headers: Headers = {}) => {
-    type CBs = {
-      'data': (b: Buffer) => void,
-      'end': () => void,
-      'error': (error: Error) => void
-    };
+    interface CBs {
+      'data': (b: Buffer) => void;
+      'end': () => void;
+      'error': (error: Error) => void;
+    }
 
     const cbs: CBs = {} as CBs;
     const message = {
       statusCode,
       statusMessage,
       headers,
-      on(event: string, cb: (...args: {}[]) => void): void {
-        if (event == 'data') cbs['data'] = cb;
-        if (event == 'end') cbs['end'] = cb;
-        if (event == 'error') cbs['error'] = cb;
+      on(event: string, cb: (...args: Array<{}>) => void): void {
+        if (event === 'data') cbs['data'] = cb;
+        if (event === 'end') cbs['end'] = cb;
+        if (event === 'error') cbs['error'] = cb;
       }
     } as IncomingMessage;
     callback(message);
