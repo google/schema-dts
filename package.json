@@ -23,15 +23,16 @@
     "clang-format": "^1.4.0",
     "coveralls": "^3.0.9",
     "del": "^5.1.0",
-    "diff": "^4.0.2",
     "gulp": "^4.0.2",
     "jest": "^25.2.7",
+    "mkdirp": "^1.0.4",
     "ts-jest": "^25.3.1",
     "tslint": "^6.1.0",
     "typescript": "^3.8.3"
   },
   "dependencies": {
     "argparse": "^1.0.10",
+    "cpy-cli": "^3.1.0",
     "htmlparser2": "^4.1.0",
     "rxjs": "^6.5.4"
   },
@@ -79,9 +80,9 @@
     "coverage_on_travis": "cat ./coverage/lcov.info | coveralls",
     "build": "tsc -b",
     "build-gen": "tsc -p src",
-    "build-schema": "mkdir -p built/ts-schema && node built/src/cli/cli.js > built/ts-schema/schema.ts",
-    "pkg-gen": "cp -R built/src/ dist/gen",
-    "pkg-schema": "cp LICENSE dist/schema/ && tsc built/ts-schema/*.ts --declaration --noImplicitAny --outDir dist/schema/",
+    "build-schema": "mkdirp built/ts-schema && node built/src/cli/cli.js > built/ts-schema/schema.ts",
+    "pkg-gen": "cpy built/src/ dist/gen",
+    "pkg-schema": "cpy LICENSE dist/schema/ && tsc built/ts-schema/schema.ts --declaration --noImplicitAny --outDir dist/schema/",
     "pkg": "gulp clean && npm run build-gen && npm run build-schema && npm run pkg-gen && npm run pkg-schema"
   }
 }
