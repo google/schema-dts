@@ -14,30 +14,28 @@
  * limitations under the License.
  */
 
-import {expect} from 'chai';
-
 import {CustomOntology, IsCustom, ParseFlags, StandardOntology} from '../../src/cli/args';
 
 describe('ParseFlags', () => {
   it('defaults', () => {
     const options = ParseFlags([])!;
-    expect(options).not.to.be.undefined;
-    expect(options.context).to.equal('https://schema.org');
-    expect(options.deprecated).to.be.true;
-    expect(options.verbose).to.be.false;
-    expect(IsCustom(options)).to.be.false;
+    expect(options).not.toBeUndefined();
+    expect(options.context).toBe('https://schema.org');
+    expect(options.deprecated).toBe(true);
+    expect(options.verbose).toBe(false);
+    expect(IsCustom(options)).toBe(false);
 
     const standard = options as StandardOntology;
-    expect(standard.layer).to.equal('all-layers');
-    expect(standard.schema).to.equal('latest');
+    expect(standard.layer).toBe('all-layers');
+    expect(standard.schema).toBe('latest');
   });
 
   it('custom ontology', () => {
     const options = ParseFlags(['--ontology', 'https://google.com/foo'])!;
-    expect(options).not.to.be.undefined;
-    expect(IsCustom(options)).to.be.true;
+    expect(options).not.toBeUndefined();
+    expect(IsCustom(options)).toBe(true);
 
     const custom = options as CustomOntology;
-    expect(custom.ontology).to.equal('https://google.com/foo');
+    expect(custom.ontology).toBe('https://google.com/foo');
   });
 });

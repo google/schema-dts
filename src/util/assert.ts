@@ -20,3 +20,8 @@ export function assert<T>(
     item: T|null|undefined, message?: string|Error): asserts item is T {
   ok(item, message);
 }
+
+export function assertTypeof(
+    item: unknown, type: 'string'): asserts item is string {
+  ok(typeof item === 'string');
+}

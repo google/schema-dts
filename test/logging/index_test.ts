@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-import {expect} from 'chai';
-import {SinonStub, stub} from 'sinon';
-
 import {Log, SetLogger, SetOptions} from '../../src/logging';
 
 describe('Log', () => {
   let logErr:
-      SinonStub<Parameters<Console['error']>, ReturnType<Console['error']>>;
+      jest.Mock<ReturnType<Console['error']>, Parameters<Console['error']>>;
 
   beforeEach(() => {
-    logErr = stub();
+    logErr = jest.fn();
     SetLogger(logErr);
   });
 
@@ -34,19 +31,19 @@ describe('Log', () => {
 
   it('doesn\'t log by default', () => {
     Log('Foo');
-    expect(logErr.called).to.be.false;
+    expect(logErr).not.toBeCalled();
   });
 
   it('doesn\'t log when verbose=false', () => {
     SetOptions({verbose: false});
     Log('Foo');
-    expect(logErr.called).to.be.false;
+    expect(logErr).not.toBeCalled();
   });
 
   it('logs when verbose=true', () => {
     SetOptions({verbose: true});
     Log('Foo');
-    expect(logErr.calledWith('Foo')).to.be.true;
+    expect(logErr).toBeCalledWith('Foo');
   });
 
   it('stops logging after turned off', () => {
@@ -55,7 +52,7 @@ describe('Log', () => {
     SetOptions({verbose: false});
     Log('Bar');
 
-    expect(logErr.calledWith('Foo')).to.be.true;
-    expect(logErr.calledWith('Bar')).to.be.false;
+    expect(logErr).toBeCalledWith('Foo');
+    expect(logErr).not.toBeCalledWith('Bar');
   });
 });

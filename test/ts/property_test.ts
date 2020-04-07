@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-import {expect} from 'chai';
-
-import {Rdfs, SchemaString, UrlNode} from '../../src/triples/types';
+import { Rdfs, SchemaString, UrlNode } from '../../src/triples/types';
 import {PropertyType} from '../../src/ts/property';
 import {makeClass, makeClassMap} from '../helpers/make_class';
 
@@ -28,8 +26,8 @@ describe('PropertyType', () => {
   });
 
   it('initial properties when empty', () => {
-    expect(prop.comment).to.be.undefined;
-    expect(prop.deprecated).to.be.false;
+    expect(prop.comment).toBeUndefined();
+    expect(prop.deprecated).toBe(false);
   });
 
   describe('add', () => {
@@ -44,13 +42,11 @@ describe('PropertyType', () => {
                   Predicate: rangeIncludes(),
                   Object: new SchemaString('foo', 'en')
                 },
-                new Map))
-            .to.throw('Type expected to be a UrlNode');
+                new Map)).toThrowError('Type expected to be a UrlNode');
 
         expect(
             () => prop.add(
-                {Predicate: rangeIncludes(), Object: new Rdfs('foo')}, new Map))
-            .to.throw('Type expected to be a UrlNode');
+                {Predicate: rangeIncludes(), Object: new Rdfs('foo')}, new Map)).toThrowError('Type expected to be a UrlNode');
       });
 
       it('type rangeIncludes object succeeds', () => {
@@ -59,8 +55,7 @@ describe('PropertyType', () => {
                      Predicate: rangeIncludes(),
                      Object: UrlNode.Parse('https://schema.org/Thing')
                    },
-                   new Map))
-            .to.be.true;
+                   new Map)).toBe(true);
       });
     });
   });
@@ -76,8 +71,7 @@ describe('PropertyType', () => {
                 Predicate: domainIncludes(),
                 Object: UrlNode.Parse('https://schema.org/Thing')
               },
-              classes))
-          .to.throw('Could not find class');
+              classes)).toThrowError('Could not find class');
     });
 
     it('real lookup works', () => {
@@ -87,8 +81,7 @@ describe('PropertyType', () => {
                    Predicate: domainIncludes(),
                    Object: UrlNode.Parse('https://schema.org/Person')
                  },
-                 classes))
-          .to.be.true;
+                 classes)).toBe(true);
     });
   });
 
@@ -99,11 +92,10 @@ describe('PropertyType', () => {
                    Predicate: UrlNode.Parse('https://schema.org/supersededBy'),
                    Object: UrlNode.Parse('https://schema.org/Person')
                  },
-                 new Map))
-          .to.be.true;
+                 new Map)).toBe(true);
 
-      expect(prop.comment).to.match(/@deprecated/g);
-      expect(prop.deprecated).to.be.true;
+      expect(prop.comment).toMatch(/@deprecated/g);
+      expect(prop.deprecated).toBe(true);
     });
   });
 
@@ -114,10 +106,9 @@ describe('PropertyType', () => {
     it('works with string', () => {
       expect(prop.add(
                  {Predicate: comment(), Object: new SchemaString('foo', 'en')},
-                 new Map))
-          .to.be.true;
+                 new Map)).toBe(true);
 
-      expect(prop.comment).to.match(/foo/g);
+      expect(prop.comment).toMatch(/foo/g);
     });
 
     it('only supports strings as comments', () => {
@@ -127,8 +118,7 @@ describe('PropertyType', () => {
                 Predicate: comment(),
                 Object: UrlNode.Parse('http://schema.org/Amazing')
               },
-              new Map))
-          .to.throw('non-string object');
+              new Map)).toThrowError('non-string object');
     });
   });
 });
