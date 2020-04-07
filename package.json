@@ -22,8 +22,6 @@
     "@types/node": "^13.9.1",
     "clang-format": "^1.4.0",
     "coveralls": "^3.0.9",
-    "del": "^5.1.0",
-    "gulp": "^4.0.2",
     "jest": "^25.2.7",
     "mkdirp": "^1.0.4",
     "ts-jest": "^25.3.1",
@@ -33,6 +31,7 @@
   "dependencies": {
     "argparse": "^1.0.10",
     "cpy-cli": "^3.1.0",
+    "del-cli": "^3.0.0",
     "htmlparser2": "^4.1.0",
     "rxjs": "^6.5.4"
   },
@@ -47,7 +46,6 @@
     "exclude": [
       "**/*.d.ts",
       "dist/**/*",
-      "gulpfile.js",
       "coverage/**/*",
       "test/**/*",
       "src/cli/cli.ts"
@@ -76,6 +74,7 @@
   "repository": "github:google/schema-dts",
   "license": "Apache-2.0",
   "scripts": {
+    "clean": "del-cli built dist/gen dist/schema/**/* !dist/schema/package.json !dist/schema/README.md",
     "test": "jest --coverage",
     "coverage_on_travis": "cat ./coverage/lcov.info | coveralls",
     "build": "tsc -b",
@@ -83,6 +82,6 @@
     "build-schema": "mkdirp built/ts-schema && node built/src/cli/cli.js > built/ts-schema/schema.ts",
     "pkg-gen": "cpy built/src/ dist/gen",
     "pkg-schema": "cpy LICENSE dist/schema/ && tsc built/ts-schema/schema.ts --declaration --noImplicitAny --outDir dist/schema/",
-    "pkg": "gulp clean && npm run build-gen && npm run build-schema && npm run pkg-gen && npm run pkg-schema"
+    "pkg": "npm run clean && npm run build-gen && npm run build-schema && npm run pkg-gen && npm run pkg-schema"
   }
 }
