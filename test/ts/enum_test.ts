@@ -22,14 +22,18 @@ describe('EnumValue', () => {
   describe('constructor', () => {
     it('Throws when referencing a non-existent type', () => {
       const map = makeClassMap(
-          makeClass('https://schema.org/Foo'),
-          makeClass('https://schema.org/Bar'),
-          makeClass('https://schema.org/Baz'));
+        makeClass('https://schema.org/Foo'),
+        makeClass('https://schema.org/Bar'),
+        makeClass('https://schema.org/Baz')
+      );
       expect(
-          () => new EnumValue(
-              UrlNode.Parse('https://schema.org/Wednesday'),
-              [UrlNode.Parse('https://schema.org/DayOfWeek')], map))
-          .toThrowError('Couldn\'t find');
+        () =>
+          new EnumValue(
+            UrlNode.Parse('https://schema.org/Wednesday'),
+            [UrlNode.Parse('https://schema.org/DayOfWeek')],
+            map
+          )
+      ).toThrowError("Couldn't find");
     });
 
     it('Works fine when called for plain enum', () => {
@@ -38,33 +42,41 @@ describe('EnumValue', () => {
       dayOfWeek.addEnum = addEnum;
 
       const map = makeClassMap(
-          makeClass('https://schema.org/Foo'),
-          makeClass('https://schema.org/Bar'), dayOfWeek);
+        makeClass('https://schema.org/Foo'),
+        makeClass('https://schema.org/Bar'),
+        dayOfWeek
+      );
 
       const myEnum = new EnumValue(
-          UrlNode.Parse('https://schema.org/Wednesday'),
-          [UrlNode.Parse('https://schema.org/DayOfWeek')], map);
+        UrlNode.Parse('https://schema.org/Wednesday'),
+        [UrlNode.Parse('https://schema.org/DayOfWeek')],
+        map
+      );
 
       expect(addEnum).toBeCalledWith(myEnum);
     });
 
     it('Works fine when called for an enum/class', () => {
-      const medicalProcedureType =
-          makeClass('https://schema.org/MedicalProcedureType');
+      const medicalProcedureType = makeClass(
+        'https://schema.org/MedicalProcedureType'
+      );
       const addEnum = jest.fn();
       medicalProcedureType.addEnum = addEnum;
 
       const map = makeClassMap(
-          makeClass('https://schema.org/Foo'),
-          makeClass('https://schema.org/Bar'), medicalProcedureType);
+        makeClass('https://schema.org/Foo'),
+        makeClass('https://schema.org/Bar'),
+        medicalProcedureType
+      );
 
       const myEnum = new EnumValue(
-          UrlNode.Parse('https://schema.org/SurgicalProcedure'),
-          [
-            UrlNode.Parse('https://schema.org/MedicalProcedureType'),
-            UrlNode.Parse('http://www.w3.org/2000/01/rdf-schema#Class')
-          ],
-          map);
+        UrlNode.Parse('https://schema.org/SurgicalProcedure'),
+        [
+          UrlNode.Parse('https://schema.org/MedicalProcedureType'),
+          UrlNode.Parse('http://www.w3.org/2000/01/rdf-schema#Class'),
+        ],
+        map
+      );
 
       expect(addEnum).toBeCalledWith(myEnum);
     });

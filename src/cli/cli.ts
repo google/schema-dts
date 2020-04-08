@@ -18,10 +18,10 @@
 import {main} from './internal/main';
 
 main()
-    .then(() => {
-      process.exit();
-    })
-    .catch(e => {
-      console.error(e);
-      process.abort();
-    });
+  .then(() => {
+    process.exit();
+  })
+  .catch(e => {
+    console.error(e);
+    process.abort();
+  });

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Format, ObjectPredicate, Triple } from '../../src/triples/triple';
+import {Format, ObjectPredicate, Triple} from '../../src/triples/triple';
 import {Rdfs, SchemaString, UrlNode} from '../../src/triples/types';
 
 describe('Format(Triple)', () => {
@@ -22,7 +22,7 @@ describe('Format(Triple)', () => {
     const triple: Triple = {
       Subject: UrlNode.Parse('https://schema.org/Person'),
       Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-      Object: SchemaString.Parse('"food"')!
+      Object: SchemaString.Parse('"food"')!,
     };
 
     expect(Format(triple)).toBe('(Person, knowsAbout, "food")');
@@ -32,7 +32,7 @@ describe('Format(Triple)', () => {
     const triple: Triple = {
       Subject: UrlNode.Parse('https://schema.org/Organization'),
       Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-      Object: Rdfs.Parse('rdfs:Class')!
+      Object: Rdfs.Parse('rdfs:Class')!,
     };
 
     expect(Format(triple)).toBe('(Organization, knowsAbout, rdfs:Class)');
@@ -43,7 +43,7 @@ describe('Format(ObjectPredicate)', () => {
   it('smoke test 1', () => {
     const triple: ObjectPredicate = {
       Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-      Object: SchemaString.Parse('"food"')!
+      Object: SchemaString.Parse('"food"')!,
     };
 
     expect(Format(triple)).toBe('(knowsAbout, "food")');
@@ -52,7 +52,7 @@ describe('Format(ObjectPredicate)', () => {
   it('smoke test 2', () => {
     const triple: ObjectPredicate = {
       Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-      Object: Rdfs.Parse('rdfs:Class')!
+      Object: Rdfs.Parse('rdfs:Class')!,
     };
 
     expect(Format(triple)).toBe('(knowsAbout, rdfs:Class)');

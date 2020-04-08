@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-export function arrayOf<T>(...args: Array<T|undefined|null>): T[] {
+export function arrayOf<T>(...args: Array<T | undefined | null>): T[] {
   return args.filter(
-      (elem): elem is T => elem !== null && typeof elem !== 'undefined');
+    (elem): elem is T => elem !== null && typeof elem !== 'undefined'
+  );
 }

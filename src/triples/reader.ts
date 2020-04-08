@@ -22,8 +22,9 @@ import {assert} from '../util/assert';
 import {Triple} from './triple';
 import {Rdfs, SchemaString, UrlNode} from './types';
 
-function unWrap<T>(maker: (content: string) => T | null): (content: string) =>
-    T | null {
+function unWrap<T>(
+  maker: (content: string) => T | null
+): (content: string) => T | null {
   return (content: string) => {
     const result = /^<([^<>]+)>$/.exec(content);
     if (result) return maker(result[1]);
@@ -40,20 +41,22 @@ function predicate(content: string) {
 }
 
 function object(content: string) {
-  const o = unWrap(Rdfs.Parse)(content) || unWrap(UrlNode.Parse)(content) ||
-      SchemaString.Parse(content);
+  const o =
+    unWrap(Rdfs.Parse)(content) ||
+    unWrap(UrlNode.Parse)(content) ||
+    SchemaString.Parse(content);
 
   assert(o, `Unexpected: ${content}.`);
   return o;
 }
 
-const totalRegex =
-    /\s*<([^<>]+)>\s*<([^<>]+)>\s*((?:<[^<>"]+>)|(?:"(?:[^"]|(?:\\"))+(?:[^\"]|\\")"(?:@[a-zA-Z]+)?))\s*\./;
+const totalRegex = /\s*<([^<>]+)>\s*<([^<>]+)>\s*((?:<[^<>"]+>)|(?:"(?:[^"]|(?:\\"))+(?:[^\"]|\\")"(?:@[a-zA-Z]+)?))\s*\./;
 export function toTripleStrings(data: string[]) {
-  const linearTriples = data.join('')
-                            .split(totalRegex)
-                            .map(s => s.trim())
-                            .filter(s => s.length > 0);
+  const linearTriples = data
+    .join('')
+    .split(totalRegex)
+    .map(s => s.trim())
+    .filter(s => s.length > 0);
 
   return linearTriples.reduce((result, _, index, array) => {
     if (index % 3 === 0) {
@@ -74,53 +77,51 @@ export function load(url: string): Observable<Triple> {
 
 function handleUrl(url: string, subscriber: Subscriber<Triple>): TeardownLogic {
   https
-      .get(
-          url,
-          response => {
-            Log(`Got Response ${response.statusCode}: ${
-                response.statusMessage}.`);
-            if (response.statusCode !== 200) {
-              const location = response.headers['location'] ||
-                  response.headers['content-location'];
+    .get(url, response => {
+      Log(`Got Response ${response.statusCode}: ${response.statusMessage}.`);
+      if (response.statusCode !== 200) {
+        const location =
+          response.headers['location'] || response.headers['content-location'];
 
-              if (location) {
-                Log(`Handling redirect to ${location}...`);
-                handleUrl(location, subscriber);
-                return;
-              }
+        if (location) {
+          Log(`Handling redirect to ${location}...`);
+          handleUrl(location, subscriber);
+          return;
+        }
 
-              subscriber.error(`Got Errored Response ${response.statusCode}: ${
-                  response.statusMessage}.`);
-              return;
-            }
+        subscriber.error(
+          `Got Errored Response ${response.statusCode}: ${response.statusMessage}.`
+        );
+        return;
+      }
 
-            const data: string[] = [];
+      const data: string[] = [];
 
-            response.on('data', (chunkB: Buffer) => {
-              const chunk = chunkB.toString('utf-8');
-              data.push(chunk);
-            });
+      response.on('data', (chunkB: Buffer) => {
+        const chunk = chunkB.toString('utf-8');
+        data.push(chunk);
+      });
 
-            response.on('end', () => {
-              try {
-                const triples = toTripleStrings(data);
-                for (const triple of process(triples)) {
-                  subscriber.next(triple);
-                }
-              } catch (error) {
-                Log(`Caught Error on end: ${error}`);
-                subscriber.error(error);
-              }
+      response.on('end', () => {
+        try {
+          const triples = toTripleStrings(data);
+          for (const triple of process(triples)) {
+            subscriber.next(triple);
+          }
+        } catch (error) {
+          Log(`Caught Error on end: ${error}`);
+          subscriber.error(error);
+        }
 
-              subscriber.complete();
-            });
+        subscriber.complete();
+      });
 
-            response.on('error', error => {
-              Log(`Saw error: ${error}`);
-              subscriber.error(error);
-            });
-          })
-      .on('error', e => subscriber.error(e));
+      response.on('error', error => {
+        Log(`Saw error: ${error}`);
+        subscriber.error(error);
+      });
+    })
+    .on('error', e => subscriber.error(e));
 }
 
 export function* process(triples: string[][]): Iterable<Triple> {
@@ -144,12 +145,14 @@ export function* process(triples: string[][]): Iterable<Triple> {
       continue;
     }
 
-    if (match[1] === 'http://www.w3.org/2002/07/owl#equivalentClass' ||
-        match[1] === 'http://www.w3.org/2002/07/owl#equivalentProperty' ||
-        match[1] === 'http://purl.org/dc/terms/source' ||
-        match[1] === 'http://www.w3.org/2000/01/rdf-schema#label' ||
-        match[1] === 'http://www.w3.org/2004/02/skos/core#closeMatch' ||
-        match[1] === 'http://www.w3.org/2004/02/skos/core#exactMatch') {
+    if (
+      match[1] === 'http://www.w3.org/2002/07/owl#equivalentClass' ||
+      match[1] === 'http://www.w3.org/2002/07/owl#equivalentProperty' ||
+      match[1] === 'http://purl.org/dc/terms/source' ||
+      match[1] === 'http://www.w3.org/2000/01/rdf-schema#label' ||
+      match[1] === 'http://www.w3.org/2004/02/skos/core#closeMatch' ||
+      match[1] === 'http://www.w3.org/2004/02/skos/core#exactMatch'
+    ) {
       // Skip Equivalent Classes & Properties
       continue;
     }
@@ -166,12 +169,13 @@ export function* process(triples: string[][]): Iterable<Triple> {
       yield {
         Subject: subject(match[0]),
         Predicate: predicate(match[1]),
-        Object: object(match[2])
+        Object: object(match[2]),
       };
     } catch (parseError) {
       const e = parseError as Error;
-      throw new Error(`ParseError: ${e.name}: ${e.message} while parsing line ${
-          match}.\nOriginal Stack:\n${e.stack}\nRethrown from:`);
+      throw new Error(
+        `ParseError: ${e.name}: ${e.message} while parsing line ${match}.\nOriginal Stack:\n${e.stack}\nRethrown from:`
+      );
     }
   }
 }

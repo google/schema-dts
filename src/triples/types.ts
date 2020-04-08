@@ -31,11 +31,13 @@ function fromString(urlString: string): ReadonlyUrl {
     protocol: url.protocol,
     hostname: url.hostname,
     path: url.pathname.slice(1).split('/'),
-    search: url.search
+    search: url.search,
   };
 }
 function pathEqual(
-    first: ReadonlyArray<string>, second: ReadonlyArray<string>) {
+  first: ReadonlyArray<string>,
+  second: ReadonlyArray<string>
+) {
   if (first.length !== second.length) return false;
   for (let i = 0; i < first.length; ++i) {
     if (first[i] !== second[i]) return false;
@@ -50,8 +52,10 @@ function pathEqual(
 export class UrlNode {
   readonly type = 'UrlNode';
   constructor(
-      readonly name: string, readonly context: ReadonlyUrl,
-      readonly href: string) {}
+    readonly name: string,
+    readonly context: ReadonlyUrl,
+    readonly href: string
+  ) {}
 
   toString() {
     return this.href;
@@ -72,9 +76,11 @@ export class UrlNode {
       }
     }
 
-    return this.context.hostname === context.hostname &&
-        pathEqual(this.context.path, context.path) &&
-        this.context.search === context.search;
+    return (
+      this.context.hostname === context.hostname &&
+      pathEqual(this.context.path, context.path) &&
+      this.context.search === context.search
+    );
   }
 
   equals(other: UrlNode): boolean {
@@ -86,14 +92,16 @@ export class UrlNode {
 
     if (url.hash) {
       return new UrlNode(
-          /*name=*/url.hash.slice(1),
-          /*context=*/fromString(url.origin + url.pathname + url.search),
-          /*href=*/url.href);
+        /*name=*/ url.hash.slice(1),
+        /*context=*/ fromString(url.origin + url.pathname + url.search),
+        /*href=*/ url.href
+      );
     }
 
     if (url.search) {
       throw new Error(
-          `Can't handle Search string in ${url.search} in ${url.href}`);
+        `Can't handle Search string in ${url.search} in ${url.href}`
+      );
     }
 
     const split = url.pathname.split('/');
@@ -115,12 +123,13 @@ export class UrlNode {
  */
 export class SchemaString {
   readonly type = 'SchemaString';
-  constructor(readonly value: string, readonly language: string|undefined) {}
+  constructor(readonly value: string, readonly language: string | undefined) {}
   toString() {
-    return this.language ? `"${this.value}@${this.language}` :
-                           `"${this.value}"`;
+    return this.language
+      ? `"${this.value}@${this.language}`
+      : `"${this.value}"`;
   }
-  static Parse(content: string): SchemaString|null {
+  static Parse(content: string): SchemaString | null {
     const result = /^"(([^"]|(\\"))+)"(?:@([a-zA-Z]+))?$/.exec(content);
     if (result) {
       return new SchemaString(result[1].replace(/\\"/g, '"'), result[4]);
@@ -140,7 +149,7 @@ export class Rdfs {
   toString() {
     return `rdfs:${this.label}`;
   }
-  static Parse(content: string): Rdfs|null {
+  static Parse(content: string): Rdfs | null {
     const result = /^rdfs:(.+)$/.exec(content);
     return result && new Rdfs(result[1]);
   }

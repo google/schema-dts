@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import {CustomOntology, IsCustom, ParseFlags, StandardOntology} from '../../src/cli/args';
+import {
+  CustomOntology,
+  IsCustom,
+  ParseFlags,
+  StandardOntology,
+} from '../../src/cli/args';
 
 describe('ParseFlags', () => {
   it('defaults', () => {

@@ -26,8 +26,10 @@ import {assert, assertTypeof} from '../../src/util/assert';
 
 import {flush} from './async';
 
-export async function inlineCli(content: string, args: string[]):
-    Promise<{actual: string, actualLogs: string}> {
+export async function inlineCli(
+  content: string,
+  args: string[]
+): Promise<{actual: string; actualLogs: string}> {
   // Restorables
   const realWrite = process.stdout.write;
   const realGet = https.get;
@@ -38,31 +40,34 @@ export async function inlineCli(content: string, args: string[]):
     let innerOnEnd: () => void;
 
     // Mockables
-    process.stdout.write =
-        ((...params: Parameters<typeof process.stdout.write>): boolean => {
-          const str = params[0];
-          assertTypeof(str, 'string');
-          writes.push(str);
-          return true;
-        }) as typeof process.stdout.write;
+    process.stdout.write = ((
+      ...params: Parameters<typeof process.stdout.write>
+    ): boolean => {
+      const str = params[0];
+      assertTypeof(str, 'string');
+      writes.push(str);
+      return true;
+    }) as typeof process.stdout.write;
 
     SetLogger((msg: string) => void logs.push(msg));
 
     // TODO(eyas): A lot of the mocking here is due to the fact that https.get
     // cannot read local file:/// paths. If it were possible, the get mocking
     // would go away, making a lot of this much simpler.
-    https.get = ((_: string,
-                  callback: (inc: IncomingMessage) => void): ClientRequest => {
-                  callback({
-                    statusCode: 200,
-                    statusMessage: 'Ok',
-                    on: (event: string, listener: (arg?: unknown) => void) => {
-                      if (event === 'data') innerOnData = listener;
-                      if (event === 'end') innerOnEnd = listener;
-                    }
-                  } as IncomingMessage);
-                  return {on: () => {}} as {} as ClientRequest;
-                }) as typeof https.get;
+    https.get = ((
+      _: string,
+      callback: (inc: IncomingMessage) => void
+    ): ClientRequest => {
+      callback({
+        statusCode: 200,
+        statusMessage: 'Ok',
+        on: (event: string, listener: (arg?: unknown) => void) => {
+          if (event === 'data') innerOnData = listener;
+          if (event === 'end') innerOnEnd = listener;
+        },
+      } as IncomingMessage);
+      return ({on: () => {}} as {}) as ClientRequest;
+    }) as typeof https.get;
 
     // Outputs
     const writes: string[] = [];

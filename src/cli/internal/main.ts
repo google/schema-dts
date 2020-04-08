@@ -25,9 +25,9 @@ export async function main(args?: string[]) {
   const options = ParseFlags(args);
   SetOptions(options);
 
-  const ontologyUrl = IsCustom(options) ?
-      options.ontology :
-      `https://schema.org/version/${options.schema}/${options.layer}.nt`;
+  const ontologyUrl = IsCustom(options)
+    ? options.ontology
+    : `https://schema.org/version/${options.schema}/${options.layer}.nt`;
   Log(`Loading Ontology from URL: ${ontologyUrl}`);
 
   const result = load(ontologyUrl);

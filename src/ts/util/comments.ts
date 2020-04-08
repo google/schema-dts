@@ -43,27 +43,32 @@ interface OnTag {
 // Some handlers for behaviors that apply to multiple tags:
 const em: OnTag = {
   open: () => '_',
-  close: () => '_'
+  close: () => '_',
 };
 const strong = {
   open: () => '__',
-  close: () => '__'
+  close: () => '__',
 };
 const code = {
   open: () => '`',
-  close: () => '`'
+  close: () => '`',
 };
 
 // Our top-level tag handler.
 const onTag = new Map<string, OnTag>([
-  ['a', {open: (attrs) => `{@link ${attrs['href']} `, close: () => '}'}],
+  ['a', {open: attrs => `{@link ${attrs['href']} `, close: () => '}'}],
   ['em', em],
   ['i', em],
   ['strong', strong],
   ['b', strong],
-  ['br', {open: () => '\n', /* Ignore closing of <BR> */}],
+  ['br', {open: () => '\n' /* Ignore closing of <BR> */}],
   ['li', {open: () => '- ', close: () => '\n'}],
-  ['ul', {/* Ignore <UL> entirely. */}],
+  [
+    'ul',
+    {
+      /* Ignore <UL> entirely. */
+    },
+  ],
   ['code', code],
   ['pre', code],
 ]);
@@ -89,30 +94,35 @@ function parseComment(comment: string): string {
       if (handler.close) {
         result.push(handler.close());
       }
-    }
+    },
   });
   parser.write(comment);
   parser.end();
 
-  const lines = (result.join('')).split('\n');
+  const lines = result.join('').split('\n');
   if (lines[lines.length - 1] === '') {
     lines.pop();
   }
 
   // Hack to get JSDOCs working. Microsoft does not expose JSDOC-creation API.
-  return lines.length === 1 ? `* ${lines[0]} ` :
-                              ('*\n * ' + lines.join('\n * ') + '\n ');
+  return lines.length === 1
+    ? `* ${lines[0]} `
+    : '*\n * ' + lines.join('\n * ') + '\n ';
 }
 
 export function withComments<T extends Node>(
-    comment: string|undefined, node: T): T {
+  comment: string | undefined,
+  node: T
+): T {
   if (!comment) return node;
 
-  return setSyntheticLeadingComments(node, [{
-                                       text: parseComment(comment),
-                                       kind: SyntaxKind.MultiLineCommentTrivia,
-                                       hasTrailingNewLine: true,
-                                       pos: -1,
-                                       end: -1,
-                                     }]);
+  return setSyntheticLeadingComments(node, [
+    {
+      text: parseComment(comment),
+      kind: SyntaxKind.MultiLineCommentTrivia,
+      hasTrailingNewLine: true,
+      pos: -1,
+      end: -1,
+    },
+  ]);
 }

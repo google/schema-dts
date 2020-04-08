@@ -13,19 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {ObjectPredicate, TObject, TPredicate, TSubject, TTypeName, TypedTopic} from './triple';
+import {
+  ObjectPredicate,
+  TObject,
+  TPredicate,
+  TSubject,
+  TTypeName,
+  TypedTopic,
+} from './triple';
 import {UrlNode} from './types';
 
 /** Whether the context corresponds to rdf-schema. */
 export function IsRdfSchema(value: UrlNode): boolean {
-  return value.context.hostname === 'www.w3.org' &&
-      value.context.path[value.context.path.length - 1] === 'rdf-schema';
+  return (
+    value.context.hostname === 'www.w3.org' &&
+    value.context.path[value.context.path.length - 1] === 'rdf-schema'
+  );
 }
 /** Whether the context corresponds to rdf-syntax. */
 export function IsRdfSyntax(value: UrlNode): boolean {
-  return value.context.hostname === 'www.w3.org' &&
-      value.context.path[value.context.path.length - 1].match(
-          /^\d\d-rdf-syntax-ns$/) !== null;
+  return (
+    value.context.hostname === 'www.w3.org' &&
+    value.context.path[value.context.path.length - 1].match(
+      /^\d\d-rdf-syntax-ns$/
+    ) !== null
+  );
 }
 /** Whether the context corresponds to schema.org. */
 export function IsSchemaObject(value: UrlNode): boolean {
@@ -36,13 +48,14 @@ export function IsSchemaObject(value: UrlNode): boolean {
  * If an ObjectPredicate represents a comment, returns the comment. Otherwise
  * returns null.
  */
-export function GetComment(value: ObjectPredicate): {comment: string}|null {
+export function GetComment(value: ObjectPredicate): {comment: string} | null {
   if (IsRdfSchema(value.Predicate) && value.Predicate.name === 'comment') {
     if (value.Object.type === 'SchemaString') {
       return {comment: value.Object.value};
     }
     throw new Error(
-        `Unexpected Comment predicate with non-string object: ${value}.`);
+      `Unexpected Comment predicate with non-string object: ${value}.`
+    );
   }
   return null;
 }
@@ -51,12 +64,14 @@ export function GetComment(value: ObjectPredicate): {comment: string}|null {
  * If an ObjectPredicate represents a subClass relation, returns the parent
  * class. Otherwise returns null.
  */
-export function GetSubClassOf(value: ObjectPredicate): {subClassOf: TSubject}|
-    null {
+export function GetSubClassOf(
+  value: ObjectPredicate
+): {subClassOf: TSubject} | null {
   if (IsRdfSchema(value.Predicate) && value.Predicate.name === 'subClassOf') {
     if (value.Object.type === 'SchemaString' || value.Object.type === 'Rdfs') {
       throw new Error(
-          `Unexpected object for predicate 'subClassOf': ${value.Object}.`);
+        `Unexpected object for predicate 'subClassOf': ${value.Object}.`
+      );
     }
     return {subClassOf: value.Object};
   }
@@ -117,7 +132,7 @@ export function IsTypeName(value: TObject): value is TTypeName {
  * If an ObjectPredicate corresponds to a
  * http://www.w3.org/1999/02/22-rdf-syntax-ns#type, returns a Type it describes.
  */
-export function GetType(value: ObjectPredicate): TTypeName|null {
+export function GetType(value: ObjectPredicate): TTypeName | null {
   if (IsType(value.Predicate)) {
     if (!IsTypeName(value.Object)) {
       throw new Error(`Unexpected type ${value.Object}`);
@@ -131,18 +146,23 @@ export function GetType(value: ObjectPredicate): TTypeName|null {
  * Returns all Nodes described by a Topic's
  * http://www.w3.org/1999/02/22-rdf-syntax-ns#type predicates.
  */
-export function GetTypes(key: TSubject, values: ReadonlyArray<ObjectPredicate>):
-    ReadonlyArray<TTypeName> {
+export function GetTypes(
+  key: TSubject,
+  values: ReadonlyArray<ObjectPredicate>
+): ReadonlyArray<TTypeName> {
   const types = values.map(GetType).filter((t): t is TTypeName => !!t);
 
   if (types.length === 0) {
-    throw new Error(`No type found for Subject ${
-        key.toString()}. Triples include:\n${
-        values
-            .map(
-                v => `${v.Predicate.toString()}: ${
-                    JSON.stringify(v.Predicate)}\n\t=> ${v.Object.toString()}`)
-            .join('\n')}`);
+    throw new Error(
+      `No type found for Subject ${key.toString()}. Triples include:\n${values
+        .map(
+          v =>
+            `${v.Predicate.toString()}: ${JSON.stringify(
+              v.Predicate
+            )}\n\t=> ${v.Object.toString()}`
+        )
+        .join('\n')}`
+    );
   }
 
   return types;

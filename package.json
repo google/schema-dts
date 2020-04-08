@@ -56,6 +56,11 @@
     ],
     "all": true
   },
+  "prettier": {
+    "singleQuote": true,
+    "bracketSpacing": false,
+    "arrowParens": "avoid"
+  },
   "keywords": [
     "typescript",
     "tsd",

@@ -17,8 +17,10 @@
 import {Log, SetLogger, SetOptions} from '../../src/logging';
 
 describe('Log', () => {
-  let logErr:
-      jest.Mock<ReturnType<Console['error']>, Parameters<Console['error']>>;
+  let logErr: jest.Mock<
+    ReturnType<Console['error']>,
+    Parameters<Console['error']>
+  >;
 
   beforeEach(() => {
     logErr = jest.fn();
@@ -29,12 +31,12 @@ describe('Log', () => {
     SetLogger(console.error);
   });
 
-  it('doesn\'t log by default', () => {
+  it("doesn't log by default", () => {
     Log('Foo');
     expect(logErr).not.toBeCalled();
   });
 
-  it('doesn\'t log when verbose=false', () => {
+  it("doesn't log when verbose=false", () => {
     SetOptions({verbose: false});
     Log('Foo');
     expect(logErr).not.toBeCalled();

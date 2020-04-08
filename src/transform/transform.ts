@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 import {Observable} from 'rxjs';
-import {createPrinter, createSourceFile, EmitHint, NewLineKind, ScriptKind, ScriptTarget} from 'typescript';
+import {
+  createPrinter,
+  createSourceFile,
+  EmitHint,
+  NewLineKind,
+  ScriptKind,
+  ScriptTarget,
+} from 'typescript';
 
 import {asTopicArray} from '../triples/operators';
 import {Triple} from '../triples/triple';
@@ -23,7 +30,7 @@ import {Context} from '../ts/context';
 
 import {ProcessClasses} from './toClass';
 import {ProcessEnums} from './toEnum';
-import {ProcessProperties,} from './toProperty';
+import {ProcessProperties} from './toProperty';
 
 /**
  * Writes TypeScript declarations for all Classes, Typedefs, and Enums
@@ -39,10 +46,10 @@ import {ProcessProperties,} from './toProperty';
  * @returns Promise indicating completion.
  */
 export async function WriteDeclarations(
-    triples: Observable<Triple>,
-    includeDeprecated: boolean,
-    context: Context,
-    write: (content: string) => Promise<void>| void,
+  triples: Observable<Triple>,
+  includeDeprecated: boolean,
+  context: Context,
+  write: (content: string) => Promise<void> | void
 ) {
   const topics = await triples.pipe(asTopicArray()).toPromise();
 
@@ -53,8 +60,12 @@ export async function WriteDeclarations(
 
   await write('// tslint:disable\n\n');
   const source = createSourceFile(
-      'result.ts', '', ScriptTarget.ES2015, /*setParentNodes=*/false,
-      ScriptKind.TS);
+    'result.ts',
+    '',
+    ScriptTarget.ES2015,
+    /*setParentNodes=*/ false,
+    ScriptKind.TS
+  );
   const printer = createPrinter({newLine: NewLineKind.LineFeed});
 
   write(printer.printNode(EmitHint.Unspecified, context.toNode(), source));

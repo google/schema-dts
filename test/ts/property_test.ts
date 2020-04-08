@@ -33,73 +33,82 @@ describe('PropertyType', () => {
   describe('add', () => {
     describe('rangeIncludes', () => {
       const rangeIncludes = () =>
-          UrlNode.Parse('https://schema.org/rangeIncludes');
+        UrlNode.Parse('https://schema.org/rangeIncludes');
 
       it('non-type rangeIncludes object fails', () => {
-        expect(
-            () => prop.add(
-                {
-                  Predicate: rangeIncludes(),
-                  Object: new SchemaString('foo', 'en')
-                },
-                new Map()))
-            .toThrowError('Type expected to be a UrlNode');
+        expect(() =>
+          prop.add(
+            {
+              Predicate: rangeIncludes(),
+              Object: new SchemaString('foo', 'en'),
+            },
+            new Map()
+          )
+        ).toThrowError('Type expected to be a UrlNode');
 
-        expect(
-            () => prop.add(
-                {Predicate: rangeIncludes(), Object: new Rdfs('foo')},
-                new Map()))
-            .toThrowError('Type expected to be a UrlNode');
+        expect(() =>
+          prop.add(
+            {Predicate: rangeIncludes(), Object: new Rdfs('foo')},
+            new Map()
+          )
+        ).toThrowError('Type expected to be a UrlNode');
       });
 
       it('type rangeIncludes object succeeds', () => {
-        expect(prop.add(
-                   {
-                     Predicate: rangeIncludes(),
-                     Object: UrlNode.Parse('https://schema.org/Thing')
-                   },
-                   new Map()))
-            .toBe(true);
+        expect(
+          prop.add(
+            {
+              Predicate: rangeIncludes(),
+              Object: UrlNode.Parse('https://schema.org/Thing'),
+            },
+            new Map()
+          )
+        ).toBe(true);
       });
     });
   });
 
   describe('domainIncludes', () => {
     const domainIncludes = () =>
-        UrlNode.Parse('https://schema.org/domainIncludes');
+      UrlNode.Parse('https://schema.org/domainIncludes');
     it('failed lookup throws', () => {
       const classes = makeClassMap(makeClass('https://schema.org/Person'));
-      expect(
-          () => prop.add(
-              {
-                Predicate: domainIncludes(),
-                Object: UrlNode.Parse('https://schema.org/Thing')
-              },
-              classes))
-          .toThrowError('Could not find class');
+      expect(() =>
+        prop.add(
+          {
+            Predicate: domainIncludes(),
+            Object: UrlNode.Parse('https://schema.org/Thing'),
+          },
+          classes
+        )
+      ).toThrowError('Could not find class');
     });
 
     it('real lookup works', () => {
       const classes = makeClassMap(makeClass('https://schema.org/Person'));
-      expect(prop.add(
-                 {
-                   Predicate: domainIncludes(),
-                   Object: UrlNode.Parse('https://schema.org/Person')
-                 },
-                 classes))
-          .toBe(true);
+      expect(
+        prop.add(
+          {
+            Predicate: domainIncludes(),
+            Object: UrlNode.Parse('https://schema.org/Person'),
+          },
+          classes
+        )
+      ).toBe(true);
     });
   });
 
   describe('supersededBy', () => {
     it('always works', () => {
-      expect(prop.add(
-                 {
-                   Predicate: UrlNode.Parse('https://schema.org/supersededBy'),
-                   Object: UrlNode.Parse('https://schema.org/Person')
-                 },
-                 new Map()))
-          .toBe(true);
+      expect(
+        prop.add(
+          {
+            Predicate: UrlNode.Parse('https://schema.org/supersededBy'),
+            Object: UrlNode.Parse('https://schema.org/Person'),
+          },
+          new Map()
+        )
+      ).toBe(true);
 
       expect(prop.comment).toMatch(/@deprecated/g);
       expect(prop.deprecated).toBe(true);
@@ -108,26 +117,29 @@ describe('PropertyType', () => {
 
   describe('comment', () => {
     const comment = () =>
-        UrlNode.Parse('http://www.w3.org/2000/01/rdf-schema#comment');
+      UrlNode.Parse('http://www.w3.org/2000/01/rdf-schema#comment');
 
     it('works with string', () => {
-      expect(prop.add(
-                 {Predicate: comment(), Object: new SchemaString('foo', 'en')},
-                 new Map()))
-          .toBe(true);
+      expect(
+        prop.add(
+          {Predicate: comment(), Object: new SchemaString('foo', 'en')},
+          new Map()
+        )
+      ).toBe(true);
 
       expect(prop.comment).toMatch(/foo/g);
     });
 
     it('only supports strings as comments', () => {
-      expect(
-          () => prop.add(
-              {
-                Predicate: comment(),
-                Object: UrlNode.Parse('http://schema.org/Amazing')
-              },
-              new Map()))
-          .toThrowError('non-string object');
+      expect(() =>
+        prop.add(
+          {
+            Predicate: comment(),
+            Object: UrlNode.Parse('http://schema.org/Amazing'),
+          },
+          new Map()
+        )
+      ).toThrowError('non-string object');
     });
   });
 });

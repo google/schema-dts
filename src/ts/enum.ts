@@ -13,7 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {createAsExpression, createLiteralTypeNode, createPropertyAssignment, createStringLiteral, createTypeReferenceNode} from 'typescript';
+import {
+  createAsExpression,
+  createLiteralTypeNode,
+  createPropertyAssignment,
+  createStringLiteral,
+  createTypeReferenceNode,
+} from 'typescript';
 
 import {Log} from '../logging';
 import {ObjectPredicate, TSubject, TTypeName} from '../triples/triple';
@@ -31,8 +37,10 @@ export class EnumValue {
 
   private comment?: string;
   constructor(
-      readonly value: TSubject, types: ReadonlyArray<TTypeName>,
-      map: ClassMap) {
+    readonly value: TSubject,
+    types: ReadonlyArray<TTypeName>,
+    map: ClassMap
+  ) {
     for (const type of types) {
       // If a Subject has a "Type", then it either means:
       // 1- Type is Class - This topic represents an object that can be
@@ -72,9 +80,9 @@ export class EnumValue {
     const comment = GetComment(value);
     if (comment) {
       if (this.comment) {
-        Log(`Duplicate comments provided on ${
-            this.value
-                .toString()} enum but one already exists. It will be overwritten.`);
+        Log(
+          `Duplicate comments provided on ${this.value.toString()} enum but one already exists. It will be overwritten.`
+        );
       }
       this.comment = comment.comment;
       return true;
@@ -85,12 +93,15 @@ export class EnumValue {
 
   toNode() {
     return withComments(
-        this.comment,
-        createPropertyAssignment(
-            toEnumName(this.value),
-            createAsExpression(
-                createStringLiteral(this.value.toString()),
-                createTypeReferenceNode('const', undefined))));
+      this.comment,
+      createPropertyAssignment(
+        toEnumName(this.value),
+        createAsExpression(
+          createStringLiteral(this.value.toString()),
+          createTypeReferenceNode('const', undefined)
+        )
+      )
+    );
   }
 
   toTypeLiteral() {
