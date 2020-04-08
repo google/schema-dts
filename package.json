@@ -24,6 +24,7 @@
     "coveralls": "^3.0.9",
     "jest": "^25.2.7",
     "mkdirp": "^1.0.4",
+    "prettier": "^2.0.4",
     "ts-jest": "^25.3.1",
     "tslint": "^6.1.0",
     "typescript": "^3.8.3"

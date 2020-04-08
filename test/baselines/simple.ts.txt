@@ -1,9 +1,0 @@
-type ThingBase = {
-    /** IRI identifying the canonical address of this object. */
-    "@id"?: string;
-    "name"?: Text | readonly Text[];
-};
-export type Thing = {
-    "@type": "Thing";
-} & ThingBase;
-
