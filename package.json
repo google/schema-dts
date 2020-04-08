@@ -76,7 +76,8 @@
   "license": "Apache-2.0",
   "scripts": {
     "clean": "del-cli built dist/gen dist/schema/**/* !dist/schema/package.json !dist/schema/README.md",
-    "test": "jest --coverage",
+    "lint": "tslint --project .",
+    "test": "npm run lint && jest --coverage",
     "coverage_on_travis": "cat ./coverage/lcov.info | coveralls",
     "build": "tsc -b",
     "build-gen": "tsc -p src",

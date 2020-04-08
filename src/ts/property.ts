@@ -60,9 +60,10 @@ export class PropertyType {
     }
 
     if (IsRangeIncludes(value.Predicate)) {
-      if (!IsTypeName(value.Object))
+      if (!IsTypeName(value.Object)) {
         throw new Error(`Type expected to be a UrlNode always. When adding ${
             Format(value)} to ${this.subject.toString()}.`);
+      }
       this.types.push(value.Object);
       return true;
     }
