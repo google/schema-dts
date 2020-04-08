@@ -1,3 +1,18 @@
+/**
+ * Copyright 2020 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 import {Rdfs, SchemaString, UrlNode} from '../../src/triples/types';
 import {GetComment, GetSubClassOf, GetType, GetTypes, IsClass} from '../../src/triples/wellKnown';
 
@@ -28,7 +43,8 @@ describe('wellKnown', () => {
                Predicate: UrlNode.Parse(
                    'http://www.w3.org/2000/01/rdf-schema#comment'),
                Object: UrlNode.Parse('http://schema.org/Amazing')
-             })).toThrowError('non-string object');
+             }))
+          .toThrowError('non-string object');
     });
   });
 
@@ -67,13 +83,15 @@ describe('wellKnown', () => {
                Predicate: UrlNode.Parse(
                    'http://www.w3.org/2000/01/rdf-schema#subClassOf'),
                Object: new SchemaString('foo', 'en')
-             })).toThrowError('Unexpected object for predicate');
+             }))
+          .toThrowError('Unexpected object for predicate');
 
       expect(() => GetSubClassOf({
                Predicate: UrlNode.Parse(
                    'http://www.w3.org/2000/01/rdf-schema#subClassOf'),
                Object: new Rdfs('foo')
-             })).toThrowError('Unexpected object for predicate');
+             }))
+          .toThrowError('Unexpected object for predicate');
     });
   });
 
@@ -112,33 +130,33 @@ describe('wellKnown', () => {
                Predicate: UrlNode.Parse(
                    'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
                Object: new SchemaString('foo', undefined)
-             })).toThrowError('Unexpected type');
+             }))
+          .toThrowError('Unexpected type');
 
       expect(() => GetType({
                Predicate: UrlNode.Parse(
                    'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
                Object: new Rdfs('foo')
-             })).toThrowError('Unexpected type');
+             }))
+          .toThrowError('Unexpected type');
     });
   });
 
   describe('GetTypes', () => {
     it('Returns one', () => {
-      expect(GetTypes(
-                 UrlNode.Parse('https://schema.org/Thing'),
-                 [
-                   {
-                     Predicate: UrlNode.Parse(
-                         'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-                     Object: UrlNode.Parse(
-                         'http://www.w3.org/2000/01/rdf-schema#Class')
-                   },
-                   {
-                     Predicate: UrlNode.Parse(
-                         'http://www.w3.org/2000/01/rdf-schema#label'),
-                     Object: new SchemaString('Thing', undefined)
-                   },
-                 ])).toEqual([UrlNode.Parse('http://www.w3.org/2000/01/rdf-schema#Class')]);
+      expect(GetTypes(UrlNode.Parse('https://schema.org/Thing'), [
+        {
+          Predicate:
+              UrlNode.Parse('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+          Object: UrlNode.Parse('http://www.w3.org/2000/01/rdf-schema#Class')
+        },
+        {
+          Predicate:
+              UrlNode.Parse('http://www.w3.org/2000/01/rdf-schema#label'),
+          Object: new SchemaString('Thing', undefined)
+        },
+      ])).toEqual([UrlNode
+                       .Parse('http://www.w3.org/2000/01/rdf-schema#Class')]);
     });
 
     it('Returns multiple', () => {
@@ -161,14 +179,16 @@ describe('wellKnown', () => {
                          'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
                      Object: UrlNode.Parse('http://schema.org/Thing')
                    },
-                 ])).toEqual([
+                 ]))
+          .toEqual([
             UrlNode.Parse('http://www.w3.org/2000/01/rdf-schema#Class'),
             UrlNode.Parse('http://schema.org/Thing')
           ]);
     });
 
     it('Throws if none', () => {
-      expect(() => GetTypes(UrlNode.Parse('https://schema.org/Widget'), [])).toThrowError('No type found');
+      expect(() => GetTypes(UrlNode.Parse('https://schema.org/Widget'), []))
+          .toThrowError('No type found');
 
       expect(
           () => GetTypes(
@@ -185,7 +205,8 @@ describe('wellKnown', () => {
                       'http://www.w3.org/2000/01/rdf-schema#label'),
                   Object: new SchemaString('Thing', undefined)
                 }
-              ])).toThrowError('No type found');
+              ]))
+          .toThrowError('No type found');
     });
   });
 
