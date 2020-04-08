@@ -17,6 +17,8 @@
  * correspond to full comparisons of a generate .ts output based on a set of
  * Triples representing an entire ontology.
  */
+import {basename} from 'path';
+
 import {inlineCli} from '../helpers/main_driver';
 
 test(`baseine_${basename(__filename)}`, async () => {
