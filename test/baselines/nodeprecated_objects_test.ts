@@ -17,9 +17,11 @@
  * correspond to full comparisons of a generate .ts output based on a set of
  * Triples representing an entire ontology.
  */
+import {basename} from 'path';
+
 import {inlineCli} from '../helpers/main_driver';
 
-test(`baseine_${__filename}`, async () => {
+test(`baseine_${basename(__filename)}`, async () => {
   const {actual} = await inlineCli(
       `
 <http://schema.org/name> <http://schema.org/rangeIncludes> <http://schema.org/Text> .
@@ -51,7 +53,10 @@ test(`baseine_${__filename}`, async () => {
 <http://schema.org/names> <http://schema.org/supersededBy> <http://schema.org/name> .
 <http://schema.org/names> <http://schema.org/supersededBy> <http://schema.org/height> .
 `,
-      ['--ontology', `https://fake.com/${__filename}.nt`, '--nodeprecated']);
+      [
+        '--ontology', `https://fake.com/${basename(__filename)}.nt`,
+        '--nodeprecated'
+      ]);
 
   expect(actual).toMatchInlineSnapshot(`
     "// tslint:disable
