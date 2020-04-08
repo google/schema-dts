@@ -17,7 +17,6 @@
  * function, for testing.
  */
 
-import {readFile} from 'fs';
 import {ClientRequest, IncomingMessage} from 'http';
 import https from 'https';
 
@@ -27,7 +26,7 @@ import {assert, assertTypeof} from '../../src/util/assert';
 
 import {flush} from './async';
 
-export async function cliOnFile(file: string, args: string[]):
+export async function inlineCli(content: string, args: string[]):
     Promise<{actual: string, actualLogs: string}> {
   // Restorables
   const realWrite = process.stdout.write;
@@ -72,12 +71,11 @@ export async function cliOnFile(file: string, args: string[]):
     const wholeProgram = main(args);
     await flush();
 
-    readFile(file, (err, data) => {
-      assert(!err, err!);
+    assert(innerOnData!);
+    assert(innerOnEnd!);
 
-      innerOnData(data);
-      innerOnEnd();
-    });
+    innerOnData(Buffer.from(content));
+    innerOnEnd();
 
     await wholeProgram;
 

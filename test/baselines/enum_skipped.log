@@ -1,4 +1,0 @@
-Loading Ontology from URL: https://fake.com/test/baselines/enum_skipped.nt
-Got Response 200: Ok.
-For Enum Item c, did not process:
-	(category, "issue-1156")

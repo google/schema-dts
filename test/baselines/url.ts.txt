@@ -1,4 +1,0 @@
-type URLBase = Text;
-/** Data type: URL. */
-export type URL = URLBase;
-
