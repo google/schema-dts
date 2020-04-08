@@ -14,14 +14,7 @@
  * limitations under the License.
  */
 
-import {
-    createPrinter,
-    createSourceFile,
-    EmitHint,
-    NewLineKind,
-    ScriptKind,
-    ScriptTarget,
-} from 'typescript';
+import {createPrinter, createSourceFile, EmitHint, NewLineKind, ScriptKind, ScriptTarget,} from 'typescript';
 
 import {SchemaString, UrlNode} from '../../src/triples/types';
 import {BooleanEnum, Builtin, Class, DataTypeUnion, Sort} from '../../src/ts/class';
@@ -46,7 +39,8 @@ describe('Class', () => {
                 Predicate: subClassOf(),
                 Object: UrlNode.Parse('https://schema.org/Thing')
               },
-              makeClassMap(cls))).toThrowError('Couldn\'t find parent');
+              makeClassMap(cls)))
+          .toThrowError('Couldn\'t find parent');
     });
 
     it('add parent with missing class', () => {
@@ -56,7 +50,8 @@ describe('Class', () => {
                 Predicate: supersededBy(),
                 Object: UrlNode.Parse('https://schema.org/CoolPerson')
               },
-              makeClassMap(cls))).toThrowError('Couldn\'t find class https://schema.org/CoolPerson');
+              makeClassMap(cls)))
+          .toThrowError('Couldn\'t find class https://schema.org/CoolPerson');
     });
   });
 
@@ -65,13 +60,15 @@ describe('Class', () => {
       // A class with no parent has a top-level "@id"
       const ctx = new Context();
       ctx.setUrlContext('https://schema.org/');
-      expect(asString(cls, ctx)).toBe('type PersonBase = {\n' +
-      '    /** IRI identifying the canonical address of this object. */\n' +
-      '    "@id"?: string;\n' +
-      '};\n' +
-      'export type Person = {\n' +
-      '    "@type": "Person";\n' +
-      '} & PersonBase;');
+      expect(asString(cls, ctx))
+          .toBe(
+              'type PersonBase = {\n' +
+              '    /** IRI identifying the canonical address of this object. */\n' +
+              '    "@id"?: string;\n' +
+              '};\n' +
+              'export type Person = {\n' +
+              '    "@type": "Person";\n' +
+              '} & PersonBase;');
     });
 
     it('empty (with parent)', () => {
@@ -79,10 +76,12 @@ describe('Class', () => {
       ctx.setUrlContext('https://schema.org/');
       addParent(cls, 'https://schema.org/Thing');
 
-      expect(asString(cls, ctx)).toBe('type PersonBase = ThingBase;\n' +
-      'export type Person = {\n' +
-      '    "@type": "Person";\n' +
-      '} & PersonBase;');
+      expect(asString(cls, ctx))
+          .toBe(
+              'type PersonBase = ThingBase;\n' +
+              'export type Person = {\n' +
+              '    "@type": "Person";\n' +
+              '} & PersonBase;');
     });
 
     it('deprecated once (only)', () => {
@@ -95,13 +94,16 @@ describe('Class', () => {
                    Predicate: supersededBy(),
                    Object: UrlNode.Parse('https://schema.org/CoolPerson')
                  },
-                 makeClassMap(cls, makeClass('https://schema.org/CoolPerson')))).toBe(true);
+                 makeClassMap(cls, makeClass('https://schema.org/CoolPerson'))))
+          .toBe(true);
 
-      expect(asString(cls, ctx)).toBe('type PersonBase = ThingBase;\n' +
-      '/** @deprecated Use CoolPerson instead. */\n' +
-      'export type Person = {\n' +
-      '    "@type": "Person";\n' +
-      '} & PersonBase;');
+      expect(asString(cls, ctx))
+          .toBe(
+              'type PersonBase = ThingBase;\n' +
+              '/** @deprecated Use CoolPerson instead. */\n' +
+              'export type Person = {\n' +
+              '    "@type": "Person";\n' +
+              '} & PersonBase;');
     });
 
     it('deprecated twice (alphabetical)', () => {
@@ -118,20 +120,24 @@ describe('Class', () => {
                    Predicate: supersededBy(),
                    Object: UrlNode.Parse('https://schema.org/CoolPerson')
                  },
-                 map)).toBe(true);
+                 map))
+          .toBe(true);
 
       expect(cls.add(
                  {
                    Predicate: supersededBy(),
                    Object: UrlNode.Parse('https://schema.org/APerson')
                  },
-                 map)).toBe(true);
+                 map))
+          .toBe(true);
 
-      expect(asString(cls, ctx)).toBe('type PersonBase = ThingBase;\n' +
-      '/** @deprecated Use APerson or CoolPerson instead. */\n' +
-      'export type Person = {\n' +
-      '    "@type": "Person";\n' +
-      '} & PersonBase;');
+      expect(asString(cls, ctx))
+          .toBe(
+              'type PersonBase = ThingBase;\n' +
+              '/** @deprecated Use APerson or CoolPerson instead. */\n' +
+              'export type Person = {\n' +
+              '    "@type": "Person";\n' +
+              '} & PersonBase;');
     });
 
     it('deprecated with comment', () => {
@@ -144,22 +150,26 @@ describe('Class', () => {
                    Predicate: supersededBy(),
                    Object: UrlNode.Parse('https://schema.org/CoolPerson')
                  },
-                 makeClassMap(cls, makeClass('https://schema.org/CoolPerson')))).toBe(true);
+                 makeClassMap(cls, makeClass('https://schema.org/CoolPerson'))))
+          .toBe(true);
       expect(cls.add(
                  {
                    Predicate: comment(),
                    Object: new SchemaString('Fantastic', 'en')
                  },
-                 new Map)).toBe(true);
+                 new Map()))
+          .toBe(true);
 
-      expect(asString(cls, ctx)).toBe('type PersonBase = ThingBase;\n' +
-      '/**\n' +
-      ' * Fantastic\n' +
-      ' * @deprecated Use CoolPerson instead.\n' +
-      ' */\n' +
-      'export type Person = {\n' +
-      '    "@type": "Person";\n' +
-      '} & PersonBase;');
+      expect(asString(cls, ctx))
+          .toBe(
+              'type PersonBase = ThingBase;\n' +
+              '/**\n' +
+              ' * Fantastic\n' +
+              ' * @deprecated Use CoolPerson instead.\n' +
+              ' */\n' +
+              'export type Person = {\n' +
+              '    "@type": "Person";\n' +
+              '} & PersonBase;');
     });
 
     it('complains about bad comment markup', () => {
@@ -178,7 +188,8 @@ describe('Class', () => {
                            '</table>',
                        undefined)
                  },
-                 new Map)).toBe(true);
+                 new Map()))
+          .toBe(true);
 
       expect(() => cls.toNode(ctx, true)).toThrowError('Unknown tag');
     });
@@ -190,36 +201,45 @@ describe('Sort(Class, Class)', () => {
     it('By name', () => {
       expect(Sort(
                  makeClass('https://schema.org/A'),
-                 makeClass('https://schema.org/B'))).toBe(-1);
+                 makeClass('https://schema.org/B')))
+          .toBe(-1);
       expect(Sort(
                  makeClass('https://schema.org/B'),
-                 makeClass('https://schema.org/A'))).toBe(+1);
+                 makeClass('https://schema.org/A')))
+          .toBe(+1);
       expect(Sort(
                  makeClass('https://schema.org/A'),
-                 makeClass('https://schema.org/A'))).toBe(0);
+                 makeClass('https://schema.org/A')))
+          .toBe(0);
 
       expect(Sort(
                  makeClass('https://schema.org/A'),
-                 makeClass('https://foo.bar/B'))).toBe(-1);
+                 makeClass('https://foo.bar/B')))
+          .toBe(-1);
       expect(Sort(
                  makeClass('https://schema.org/B'),
-                 makeClass('https://foo.bar/A'))).toBe(+1);
+                 makeClass('https://foo.bar/A')))
+          .toBe(+1);
 
       expect(Sort(
                  makeClass('https://schema.org/Z'),
-                 makeClass('https://schema.org/Z#A'))).toBe(+1);
+                 makeClass('https://schema.org/Z#A')))
+          .toBe(+1);
     });
 
     it('Same name different URL', () => {
       expect(Sort(
                  makeClass('https://schema.org/A'),
-                 makeClass('https://foo.bar/A'))).toBe(+1);
+                 makeClass('https://foo.bar/A')))
+          .toBe(+1);
       expect(Sort(
                  makeClass('https://schema.org/A'),
-                 makeClass('https://z.org/2010#A'))).toBe(-1);
+                 makeClass('https://z.org/2010#A')))
+          .toBe(-1);
       expect(Sort(
                  makeClass('https://schema.org/A'),
-                 makeClass('https://schema.org/Z#A'))).toBe(-1);
+                 makeClass('https://schema.org/Z#A')))
+          .toBe(-1);
     });
 
 
@@ -227,108 +247,132 @@ describe('Sort(Class, Class)', () => {
       // Before regular classes.
       expect(Sort(
                  new Builtin('https://schema.org/Text', 'string', ''),
-                 makeClass('https://schema.org/A'))).toBe(-1);
+                 makeClass('https://schema.org/A')))
+          .toBe(-1);
       expect(Sort(
                  makeClass('https://schema.org/A'),
-                 new Builtin('https://schema.org/Text', 'string', ''))).toBe(+1);
+                 new Builtin('https://schema.org/Text', 'string', '')))
+          .toBe(+1);
 
       // Before regular classes with different domains.
       expect(Sort(
                  new Builtin('https://schema.org/Text', 'string', ''),
-                 makeClass('https://a.org/DataType'))).toBe(-1);
+                 makeClass('https://a.org/DataType')))
+          .toBe(-1);
       expect(Sort(
                  makeClass('https://a.org/DataType'),
-                 new Builtin('https://schema.org/Text', 'string', ''))).toBe(+1);
+                 new Builtin('https://schema.org/Text', 'string', '')))
+          .toBe(+1);
 
       // Before builtins.
       expect(Sort(
                  new DataTypeUnion('https://schema.org/DataType', [], ''),
-                 new Builtin('https://schema.org/A', 'string', ''))).toBe(+1);
+                 new Builtin('https://schema.org/A', 'string', '')))
+          .toBe(+1);
       expect(Sort(
                  new Builtin('https://schema.org/A', 'string', ''),
-                 new DataTypeUnion('https://schema.org/DataType', [], ''))).toBe(-1);
+                 new DataTypeUnion('https://schema.org/DataType', [], '')))
+          .toBe(-1);
       expect(Sort(
                  new Builtin('https://schema.org/Z', 'string', ''),
-                 new DataTypeUnion('https://schema.org/DataType', [], ''))).toBe(-1);
+                 new DataTypeUnion('https://schema.org/DataType', [], '')))
+          .toBe(-1);
 
       // Can be same as more specific builtins.
       expect(Sort(
                  new BooleanEnum(
                      'https://schema.org/Boo', 'https://schema.org/B',
                      'https://schema.org/C', ''),
-                 new Builtin('https://schema.org/Boo', 'Text', ''))).toBe(0);
+                 new Builtin('https://schema.org/Boo', 'Text', '')))
+          .toBe(0);
 
       // Sorts within Builtins
       expect(Sort(
                  new Builtin('https://schema.org/A', 'string', ''),
-                 new Builtin('https://schema.org/B', 'string', ''))).toBe(-1);
+                 new Builtin('https://schema.org/B', 'string', '')))
+          .toBe(-1);
       expect(Sort(
                  new Builtin('https://schema.org/A', 'string', ''),
                  new BooleanEnum(
                      'https://schema.org/B', 'https://schema.org/B',
-                     'https://schema.org/C', ''))).toBe(-1);
+                     'https://schema.org/C', '')))
+          .toBe(-1);
 
       expect(Sort(
                  new Builtin('https://schema.org/B', 'string', ''),
-                 new Builtin('https://schema.org/A', 'string', ''))).toBe(+1);
+                 new Builtin('https://schema.org/A', 'string', '')))
+          .toBe(+1);
       expect(Sort(
                  new Builtin('https://schema.org/B', 'string', ''),
                  new BooleanEnum(
                      'https://schema.org/A', 'https://schema.org/B',
-                     'https://schema.org/C', ''))).toBe(+1);
+                     'https://schema.org/C', '')))
+          .toBe(+1);
 
       expect(Sort(
                  new Builtin('https://schema.org/C', 'string', ''),
-                 new Builtin('https://schema.org/C', 'string', ''))).toBe(0);
+                 new Builtin('https://schema.org/C', 'string', '')))
+          .toBe(0);
 
       expect(Sort(
                  new Builtin('https://schema.org/A#Z', 'string', ''),
-                 new Builtin('https://schema.org/C', 'string', ''))).toBe(+1);
+                 new Builtin('https://schema.org/C', 'string', '')))
+          .toBe(+1);
       expect(Sort(
                  new Builtin('https://z.org/C', 'string', ''),
-                 new Builtin('https://schema.org/C', 'string', ''))).toBe(+1);
+                 new Builtin('https://schema.org/C', 'string', '')))
+          .toBe(+1);
       expect(Sort(
                  new Builtin('https://z.org/Z#A', 'string', ''),
-                 new Builtin('https://schema.org/C', 'string', ''))).toBe(-1);
+                 new Builtin('https://schema.org/C', 'string', '')))
+          .toBe(-1);
     });
 
     it('DataType union comes next', () => {
       // Before regular classes.
       expect(Sort(
                  new DataTypeUnion('https://schema.org/DataType', [], ''),
-                 makeClass('https://schema.org/A'))).toBe(-1);
+                 makeClass('https://schema.org/A')))
+          .toBe(-1);
       expect(Sort(
                  makeClass('https://schema.org/A'),
-                 new DataTypeUnion('https://schema.org/DataType', [], ''))).toBe(+1);
+                 new DataTypeUnion('https://schema.org/DataType', [], '')))
+          .toBe(+1);
 
       // Before regular classes with different domains.
       expect(Sort(
                  new DataTypeUnion('https://schema.org/DataType', [], ''),
-                 makeClass('https://a.org/DataType'))).toBe(-1);
+                 makeClass('https://a.org/DataType')))
+          .toBe(-1);
       expect(Sort(
                  makeClass('https://a.org/DataType'),
-                 new DataTypeUnion('https://schema.org/DataType', [], ''))).toBe(+1);
+                 new DataTypeUnion('https://schema.org/DataType', [], '')))
+          .toBe(+1);
 
       // After specific builtins.
       expect(Sort(
                  new BooleanEnum(
                      'https://schema.org/A', 'https://schema.org/B',
                      'https://schema.org/C', ''),
-                 new DataTypeUnion('https://schema.org/DataType', [], ''))).toBe(-1);
+                 new DataTypeUnion('https://schema.org/DataType', [], '')))
+          .toBe(-1);
     });
 
     it('DataType union is equal', () => {
       expect(Sort(
                  new DataTypeUnion('https://schema.org/DataType', [], ''),
-                 new DataTypeUnion('https://schema.org/DataType', [], ''))).toBe(0);
+                 new DataTypeUnion('https://schema.org/DataType', [], '')))
+          .toBe(0);
 
       expect(Sort(
                  new DataTypeUnion('https://schema.org/A', [], ''),
-                 new DataTypeUnion('https://schema.org/Z', [], ''))).toBe(0);
+                 new DataTypeUnion('https://schema.org/Z', [], '')))
+          .toBe(0);
 
       expect(Sort(
                  new DataTypeUnion('https://schema.org/Z', [], ''),
-                 new DataTypeUnion('https://schema.org/A', [], ''))).toBe(0);
+                 new DataTypeUnion('https://schema.org/A', [], '')))
+          .toBe(0);
     });
   });
 });
@@ -361,5 +405,6 @@ function comment(): UrlNode {
 function addParent(cls: Class, parentUrl: string): void {
   expect(cls.add(
              {Predicate: subClassOf(), Object: UrlNode.Parse(parentUrl)},
-             makeClassMap(cls, makeClass(parentUrl)))).toBe(true);
+             makeClassMap(cls, makeClass(parentUrl))))
+      .toBe(true);
 }
