@@ -25,7 +25,9 @@ import {PropertyType} from '../ts/property';
  * @param classes return value of `ProcessClasses`.
  */
 export function ProcessProperties(
-    topics: ReadonlyArray<TypedTopic>, classes: ClassMap) {
+  topics: ReadonlyArray<TypedTopic>,
+  classes: ClassMap
+) {
   for (const topic of topics) {
     // Skip Topics that have no 'Property' Type.
     if (!topic.types.some(IsPropertyType)) continue;
@@ -40,8 +42,11 @@ export function ProcessProperties(
     }
     // Go over RangeIncludes or DomainIncludes:
     if (rest.length > 0) {
-      Log(`Still unadded for property: ${topic.Subject.name}:\n\t${
-          rest.map(Format).join('\n\t')}`);
+      Log(
+        `Still unadded for property: ${topic.Subject.name}:\n\t${rest
+          .map(Format)
+          .join('\n\t')}`
+      );
     }
   }
 }

@@ -20,19 +20,22 @@ import {Topic, Triple, TypedTopic} from './triple';
 import {GetTypes, IsType} from './wellKnown';
 
 function groupBySubject(): OperatorFunction<Triple, Topic> {
-  return (observable) => observable.pipe(
-             groupBy(triple => triple.Subject.toString()),
-             mergeMap(
-                 group => group.pipe(
-                     toArray(),
-                     map(array => ({
-                           Subject: array[0].Subject,  // All are the same
-                           values: array.map(
-                               ({Object, Predicate}) => ({Predicate, Object}))
-                         })),
-
-                     )),
-         );
+  return observable =>
+    observable.pipe(
+      groupBy(triple => triple.Subject.toString()),
+      mergeMap(group =>
+        group.pipe(
+          toArray(),
+          map(array => ({
+            Subject: array[0].Subject, // All are the same
+            values: array.map(({Object, Predicate}) => ({
+              Predicate,
+              Object,
+            })),
+          }))
+        )
+      )
+    );
 }
 
 function asTopic(): OperatorFunction<Topic, TypedTopic> {
@@ -46,6 +49,5 @@ function asTopic(): OperatorFunction<Topic, TypedTopic> {
 }
 
 export function asTopicArray(): OperatorFunction<Triple, TypedTopic[]> {
-  return (observable) =>
-             observable.pipe(groupBySubject(), asTopic(), toArray());
+  return observable => observable.pipe(groupBySubject(), asTopic(), toArray());
 }

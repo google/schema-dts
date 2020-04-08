@@ -26,7 +26,9 @@ import {EnumValue} from '../ts/enum';
  * @param classes return value of `ProcessClasses`.
  */
 export function ProcessEnums(
-    topics: ReadonlyArray<TypedTopic>, classes: ClassMap) {
+  topics: ReadonlyArray<TypedTopic>,
+  classes: ClassMap
+) {
   // Process Enums
   for (const topic of topics) {
     if (!HasEnumType(topic.types)) continue;
@@ -40,8 +42,11 @@ export function ProcessEnums(
     }
 
     if (skipped.length > 0) {
-      Log(`For Enum Item ${topic.Subject.name}, did not process:\n\t${
-          skipped.map(Format).join('\n\t')}`);
+      Log(
+        `For Enum Item ${topic.Subject.name}, did not process:\n\t${skipped
+          .map(Format)
+          .join('\n\t')}`
+      );
     }
   }
 }

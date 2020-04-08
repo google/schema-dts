@@ -3,6 +3,6 @@
   "editor.tabSize": 2,
   "tslint.enable": true,
   "tslint.configFile": "tslint.json",
-  "clang-format.executable": "${workspaceRoot}/node_modules/.bin/clang-format",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "typescript.tsdk": "node_modules/typescript/lib"
 }

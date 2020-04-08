@@ -25,8 +25,10 @@ import {SchemaString, UrlNode} from '../../src/triples/types';
 import {flush} from '../helpers/async';
 
 describe('load', () => {
-  let get: jest
-      .Mock<ReturnType<typeof https['get']>, Parameters<typeof https['get']>>;
+  let get: jest.Mock<
+    ReturnType<typeof https['get']>,
+    Parameters<typeof https['get']>
+  >;
   let ogGet: typeof https['get'];
 
   beforeEach(() => {
@@ -63,7 +65,7 @@ describe('load', () => {
       const triples$ = load('https://schema.org/');
       get.mockImplementationOnce((_, cb) => {
         // Unfortunately, we use another overload that doesn't appear here.
-        const callback = cb as {} as (inc: IncomingMessage) => void;
+        const callback = (cb as {}) as (inc: IncomingMessage) => void;
         fakeResponse = makeFakeResponse(callback);
 
         return passThrough();
@@ -106,22 +108,27 @@ describe('load', () => {
     it('Oneshot', async () => {
       const control = fakeResponse(200, 'Ok');
       control.data(
-          `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`);
+        `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`
+      );
       control.end();
 
-      await expect(triples).resolves.toEqual([{
-        Subject: UrlNode.Parse('https://schema.org/Person'),
-        Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-        Object: SchemaString.Parse('"math"')!,
-      }]);
+      await expect(triples).resolves.toEqual([
+        {
+          Subject: UrlNode.Parse('https://schema.org/Person'),
+          Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
+          Object: SchemaString.Parse('"math"')!,
+        },
+      ]);
     });
 
     it('Multiple (clean broken)', async () => {
       const control = fakeResponse(200, 'Ok');
       control.data(
-          `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`);
+        `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`
+      );
       control.data(
-          `<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`);
+        `<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`
+      );
       control.end();
 
       await expect(triples).resolves.toEqual([
@@ -134,18 +141,21 @@ describe('load', () => {
           Subject: UrlNode.Parse('https://schema.org/Person'),
           Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
           Object: SchemaString.Parse('"science"')!,
-        }
+        },
       ]);
     });
 
     it('Multiple (skip test comment)', async () => {
       const control = fakeResponse(200, 'Ok');
       control.data(
-          `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`);
+        `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`
+      );
       control.data(
-          `<http://meta.schema.org/> <http://www.w3.org/2000/01/rdf-schema#comment> "A test comment." .\n`);
+        `<http://meta.schema.org/> <http://www.w3.org/2000/01/rdf-schema#comment> "A test comment." .\n`
+      );
       control.data(
-          `<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`);
+        `<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`
+      );
       control.end();
 
       await expect(triples).resolves.toEqual([
@@ -158,51 +168,61 @@ describe('load', () => {
           Subject: UrlNode.Parse('https://schema.org/Person'),
           Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
           Object: SchemaString.Parse('"science"')!,
-        }
+        },
       ]);
     });
 
     it('Multiple (throws from bad URL: Subject)', async () => {
       const control = fakeResponse(200, 'Ok');
       control.data(
-          `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`);
+        `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`
+      );
       control.data(
-          `<http://schema.org/> <http://www.w3.org/2000/01/rdf-schema#comment> "A test comment." .\n`);
+        `<http://schema.org/> <http://www.w3.org/2000/01/rdf-schema#comment> "A test comment." .\n`
+      );
       control.end();
 
       await expect(triples).rejects.toThrow(
-          'ParseError: Error: Unexpected URL');
+        'ParseError: Error: Unexpected URL'
+      );
     });
 
     it('Multiple (throws from bad URL: Predicate)', async () => {
       const control = fakeResponse(200, 'Ok');
       control.data(
-          `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`);
+        `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`
+      );
       control.data(
-          `<http://schema.org/A> <https://schema.org> "A test comment." .\n`);
+        `<http://schema.org/A> <https://schema.org> "A test comment." .\n`
+      );
       control.end();
 
       await expect(triples).rejects.toThrow(
-          'ParseError: Error: Unexpected URL');
+        'ParseError: Error: Unexpected URL'
+      );
     });
 
     it('Multiple (throws from bad URL: Object)', async () => {
       const control = fakeResponse(200, 'Ok');
       control.data(
-          `<https://schema.org/Person> <https://schema.org/knowsAbout> <https://schema.org/> .\n`);
+        `<https://schema.org/Person> <https://schema.org/knowsAbout> <https://schema.org/> .\n`
+      );
       control.data(
-          `<http://schema.org/A> <http://www.w3.org/2000/01/rdf-schema#comment> "A test comment." .\n`);
+        `<http://schema.org/A> <http://www.w3.org/2000/01/rdf-schema#comment> "A test comment." .\n`
+      );
       control.end();
 
       await expect(triples).rejects.toThrow(
-          'ParseError: Error: Unexpected URL');
+        'ParseError: Error: Unexpected URL'
+      );
     });
 
     it('Multiple (dirty broken)', async () => {
       const control = fakeResponse(200, 'Ok');
       control.data(`<https://schema.org/Person> <https://sc`);
       control.data(
-          `hema.org/knowsAbout> "math" .\n<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`);
+        `hema.org/knowsAbout> "math" .\n<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`
+      );
       control.end();
 
       await expect(triples).resolves.toEqual([
@@ -215,7 +235,7 @@ describe('load', () => {
           Subject: UrlNode.Parse('https://schema.org/Person'),
           Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
           Object: SchemaString.Parse('"science"')!,
-        }
+        },
       ]);
     });
 
@@ -223,30 +243,37 @@ describe('load', () => {
       const control = fakeResponse(200, 'Ok');
       control.data(`<https://schema.org/Person> <https://sc`);
       control.data(
-          `hema.org/knowsAbout> "math" .\n<file:///usr/Person> <https://schema.org/knowsAbout> "science" .\n`);
+        `hema.org/knowsAbout> "math" .\n<file:///usr/Person> <https://schema.org/knowsAbout> "science" .\n`
+      );
       control.end();
 
-      await expect(triples).resolves.toEqual([{
-        Subject: UrlNode.Parse('https://schema.org/Person'),
-        Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-        Object: SchemaString.Parse('"math"')!,
-      }]);
+      await expect(triples).resolves.toEqual([
+        {
+          Subject: UrlNode.Parse('https://schema.org/Person'),
+          Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
+          Object: SchemaString.Parse('"math"')!,
+        },
+      ]);
     });
 
     it('Skips schema layer attributions', async () => {
       const control = fakeResponse(200, 'Ok');
       control.data(`<https://schema.org/knowsAbout> <https://sc`);
       control.data(
-          `hema.org/domainIncludes> <https://schema.org/Thing> .\n<https://schema.`);
+        `hema.org/domainIncludes> <https://schema.org/Thing> .\n<https://schema.`
+      );
       control.data(
-          `org/knowsAbout> <http://schema.org/isPartOf> <http://pending.schema.org> .\n`);
+        `org/knowsAbout> <http://schema.org/isPartOf> <http://pending.schema.org> .\n`
+      );
       control.end();
 
-      await expect(triples).resolves.toEqual([{
-        Subject: UrlNode.Parse('https://schema.org/knowsAbout'),
-        Predicate: UrlNode.Parse('https://schema.org/domainIncludes'),
-        Object: UrlNode.Parse('https://schema.org/Thing'),
-      }]);
+      await expect(triples).resolves.toEqual([
+        {
+          Subject: UrlNode.Parse('https://schema.org/knowsAbout'),
+          Predicate: UrlNode.Parse('https://schema.org/domainIncludes'),
+          Object: UrlNode.Parse('https://schema.org/Thing'),
+        },
+      ]);
     });
 
     describe('.nt syntax errors', () => {
@@ -267,7 +294,8 @@ describe('load', () => {
       it('missing dot', async () => {
         const control = fakeResponse(200, 'Ok');
         control.data(
-            `<https://schema.org/knowsAbout> <https://scema.org/domainIncludes> "a"`);
+          `<https://schema.org/knowsAbout> <https://scema.org/domainIncludes> "a"`
+        );
         control.end();
         await expect(triples).rejects.toThrow('Unexpected');
       });
@@ -308,15 +336,15 @@ describe('load', () => {
         // on second call:
         get.mockImplementationOnce((_, cb) => {
           // Unfortunately, we use another overload that doesn't appear here.
-          const callback = cb as {} as (inc: IncomingMessage) => void;
+          const callback = (cb as {}) as (inc: IncomingMessage) => void;
           fakeResponse2 = makeFakeResponse(callback);
 
           return passThrough();
         });
 
-        fakeResponse(
-            302, 'Redirect',
-            {'location': 'https://schema.org/6.0/all-layers.nt'});
+        fakeResponse(302, 'Redirect', {
+          location: 'https://schema.org/6.0/all-layers.nt',
+        });
         await flush();
       });
 
@@ -347,22 +375,27 @@ describe('load', () => {
       it('Post Redirect Oneshot', async () => {
         const control = fakeResponse2(200, 'Ok');
         control.data(
-            `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`);
+          `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`
+        );
         control.end();
 
-        await expect(triples).resolves.toEqual([{
-          Subject: UrlNode.Parse('https://schema.org/Person'),
-          Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-          Object: SchemaString.Parse('"math"')!,
-        }]);
+        await expect(triples).resolves.toEqual([
+          {
+            Subject: UrlNode.Parse('https://schema.org/Person'),
+            Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
+            Object: SchemaString.Parse('"math"')!,
+          },
+        ]);
       });
 
       it('Post Redirect Multiple (clean broken)', async () => {
         const control = fakeResponse2(200, 'Ok');
         control.data(
-            `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`);
+          `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`
+        );
         control.data(
-            `<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`);
+          `<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`
+        );
         control.end();
 
         await expect(triples).resolves.toEqual([
@@ -375,7 +408,7 @@ describe('load', () => {
             Subject: UrlNode.Parse('https://schema.org/Person'),
             Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
             Object: SchemaString.Parse('"science"')!,
-          }
+          },
         ]);
       });
 
@@ -383,7 +416,8 @@ describe('load', () => {
         const control = fakeResponse2(200, 'Ok');
         control.data(`<https://schema.org/Person> <https://sc`);
         control.data(
-            `hema.org/knowsAbout> "math" .\n<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`);
+          `hema.org/knowsAbout> "math" .\n<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`
+        );
         control.end();
 
         await expect(triples).resolves.toEqual([
@@ -396,7 +430,7 @@ describe('load', () => {
             Subject: UrlNode.Parse('https://schema.org/Person'),
             Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
             Object: SchemaString.Parse('"science"')!,
-          }
+          },
         ]);
       });
     });
@@ -404,7 +438,7 @@ describe('load', () => {
 });
 
 function passThrough(): ClientRequest {
-  return new PassThrough() as Writable as ClientRequest;
+  return (new PassThrough() as Writable) as ClientRequest;
 }
 
 interface Control {
@@ -412,20 +446,27 @@ interface Control {
   end(): void;
   error(s: string): void;
 }
-type Headers = {
-  'location': string
-}|{'content-location': string}|{};
+type Headers =
+  | {
+      location: string;
+    }
+  | {'content-location': string}
+  | {};
 
-type FakeResponseFunc =
-    (statusCode: number, statusMessage: string, headers?: Headers) => Control;
+type FakeResponseFunc = (
+  statusCode: number,
+  statusMessage: string,
+  headers?: Headers
+) => Control;
 
-function makeFakeResponse(callback: (inc: IncomingMessage) => void):
-    FakeResponseFunc {
+function makeFakeResponse(
+  callback: (inc: IncomingMessage) => void
+): FakeResponseFunc {
   return (statusCode: number, statusMessage: string, headers: Headers = {}) => {
     interface CBs {
-      'data': (b: Buffer) => void;
-      'end': () => void;
-      'error': (error: Error) => void;
+      data: (b: Buffer) => void;
+      end: () => void;
+      error: (error: Error) => void;
     }
 
     const cbs: CBs = {} as CBs;
@@ -437,7 +478,7 @@ function makeFakeResponse(callback: (inc: IncomingMessage) => void):
         if (event === 'data') cbs['data'] = cb;
         if (event === 'end') cbs['end'] = cb;
         if (event === 'error') cbs['error'] = cb;
-      }
+      },
     } as IncomingMessage;
     callback(message);
 
@@ -452,7 +493,7 @@ function makeFakeResponse(callback: (inc: IncomingMessage) => void):
       error(e: string) {
         const error = new Error(e);
         flush().then(() => cbs['error'](error));
-      }
+      },
     };
     return control;
   };

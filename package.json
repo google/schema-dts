@@ -56,6 +56,11 @@
     ],
     "all": true
   },
+  "prettier": {
+    "singleQuote": true,
+    "bracketSpacing": false,
+    "arrowParens": "avoid"
+  },
   "keywords": [
     "typescript",
     "tsd",
@@ -76,7 +81,8 @@
   "license": "Apache-2.0",
   "scripts": {
     "clean": "del-cli built dist/gen dist/schema/**/* !dist/schema/package.json !dist/schema/README.md",
-    "lint": "tslint --project .",
+    "lint": "tslint --project . && prettier --check src/ && prettier --check test/",
+    "fix": "tslint --fix --project . && prettier --write src/ && prettier --write test/",
     "test": "npm run lint && jest --coverage",
     "coverage_on_travis": "cat ./coverage/lcov.info | coveralls",
     "build": "tsc -b",

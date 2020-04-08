@@ -14,20 +14,32 @@
  * limitations under the License.
  */
 
-import {createIntersectionTypeNode, createLiteralTypeNode, createModifiersFromModifierFlags, createPropertySignature, createStringLiteral, createTypeAliasDeclaration, createTypeLiteralNode, createTypeParameterDeclaration, createTypeReferenceNode, ModifierFlags} from 'typescript';
+import {
+  createIntersectionTypeNode,
+  createLiteralTypeNode,
+  createModifiersFromModifierFlags,
+  createPropertySignature,
+  createStringLiteral,
+  createTypeAliasDeclaration,
+  createTypeLiteralNode,
+  createTypeParameterDeclaration,
+  createTypeReferenceNode,
+  ModifierFlags,
+} from 'typescript';
 
 import {TSubject} from '../triples/triple';
 
 import {withComments} from './util/comments';
 
 export class Context {
-  private readonly context: Array<readonly[string, string]> = [];
+  private readonly context: Array<readonly [string, string]> = [];
 
   setUrlContext(ctx: string) {
     if (this.context.length > 0) {
       throw new Error(
-          'Attempting to set a default URL context, ' +
-          'but other named contexts exist already.');
+        'Attempting to set a default URL context, ' +
+          'but other named contexts exist already.'
+      );
     }
     this.context.push(['', ctx]);
   }
@@ -36,7 +48,7 @@ export class Context {
   }
   validate() {
     if (this.context.length === 0) throw new Error('Invalid empty context.');
-    if (this.context.length === 1) return;  // One context is always right.
+    if (this.context.length === 1) return; // One context is always right.
 
     // Make sure no key is duplicated.
     const seen: Set<string> = new Set<string>();
@@ -46,7 +58,8 @@ export class Context {
       }
       if (name === '') {
         throw new Error(
-            'Context with multiple named contexts includes unnamed URL.');
+          'Context with multiple named contexts includes unnamed URL.'
+        );
       }
       seen.add(name);
     }
@@ -70,52 +83,59 @@ export class Context {
 
     // or "@context" is a literal object type of key-values of URLs:
     return createTypeLiteralNode(
-        /*members=*/ this.context.map(
-            ([name, url]) => createPropertySignature(
-                /*modifiers=*/[],
-                createStringLiteral(name),
-                /*questionToken=*/ undefined,
-                createLiteralTypeNode(createStringLiteral(url)),
-                /*initializer=*/ undefined,
-                )));
+      /*members=*/ this.context.map(([name, url]) =>
+        createPropertySignature(
+          /*modifiers=*/ [],
+          createStringLiteral(name),
+          /*questionToken=*/ undefined,
+          createLiteralTypeNode(createStringLiteral(url)),
+          /*initializer=*/ undefined
+        )
+      )
+    );
   }
 
   toNode() {
     // export type WithContent<T extends Thing> = T & { "@context": TYPE_NODE }
     return withComments(
-        'Used at the top-level node to indicate the context for the JSON-LD ' +
-            'objects used. The context provided in this type is compatible ' +
-            'with the keys and URLs in the rest of this generated file.',
-        createTypeAliasDeclaration(
-            /*decorators=*/[],
-            createModifiersFromModifierFlags(ModifierFlags.Export),
-            'WithContext',
-            [
-              createTypeParameterDeclaration(
-                  'T', /*constraint=*/
-                  createTypeReferenceNode(
-                      'Thing', /*typeArguments=*/ undefined)),
-            ],
-            createIntersectionTypeNode([
-              createTypeReferenceNode('T', /*typeArguments=*/ undefined),
-              createTypeLiteralNode([createPropertySignature(
-                  /*modifiers=*/[],
-                  createStringLiteral('@context'),
-                  /*questionToken=*/ undefined,
-                  this.typeNode(),
-                  /*initializer=*/ undefined,
-                  )]),
-            ])),
+      'Used at the top-level node to indicate the context for the JSON-LD ' +
+        'objects used. The context provided in this type is compatible ' +
+        'with the keys and URLs in the rest of this generated file.',
+      createTypeAliasDeclaration(
+        /*decorators=*/ [],
+        createModifiersFromModifierFlags(ModifierFlags.Export),
+        'WithContext',
+        [
+          createTypeParameterDeclaration(
+            'T' /*constraint=*/,
+            createTypeReferenceNode('Thing', /*typeArguments=*/ undefined)
+          ),
+        ],
+        createIntersectionTypeNode([
+          createTypeReferenceNode('T', /*typeArguments=*/ undefined),
+          createTypeLiteralNode([
+            createPropertySignature(
+              /*modifiers=*/ [],
+              createStringLiteral('@context'),
+              /*questionToken=*/ undefined,
+              this.typeNode(),
+              /*initializer=*/ undefined
+            ),
+          ]),
+        ])
+      )
     );
   }
 
   static Parse(contextSpec: string): Context {
-    const keyVals = contextSpec.split(',').map(s => s.trim()).filter(s => !!s);
+    const keyVals = contextSpec
+      .split(',')
+      .map(s => s.trim())
+      .filter(s => !!s);
     const context = new Context();
 
     if (keyVals.length === 1) {
       context.setUrlContext(keyVals[0]);
-
     } else {
       for (const keyVal of keyVals) {
         const match = /^([^:]+):((http|https):.+)$/g.exec(keyVal);

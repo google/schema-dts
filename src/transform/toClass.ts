@@ -18,7 +18,13 @@ import {Log} from '../logging';
 import {ObjectPredicate, Topic, TypedTopic} from '../triples/triple';
 import {UrlNode} from '../triples/types';
 import {IsClass} from '../triples/wellKnown';
-import {BooleanEnum, Builtin, Class, ClassMap, DataTypeUnion} from '../ts/class';
+import {
+  BooleanEnum,
+  Builtin,
+  Class,
+  ClassMap,
+  DataTypeUnion,
+} from '../ts/class';
 import {assert} from '../util/assert';
 
 function toClass(cls: Class, topic: Topic, map: ClassMap): Class {
@@ -29,9 +35,11 @@ function toClass(cls: Class, topic: Topic, map: ClassMap): Class {
   }
 
   if (rest.length > 0) {
-    Log(`Class ${cls.subject.name}: Did not add [${
-        rest.map(r => `(${r.Predicate.name} ${r.Object.toString()})`)
-            .join(',')}]`);
+    Log(
+      `Class ${cls.subject.name}: Did not add [${rest
+        .map(r => `(${r.Predicate.name} ${r.Object.toString()})`)
+        .join(',')}]`
+    );
   }
   return cls;
 }
@@ -40,20 +48,29 @@ const wellKnownTypes = [
   new Builtin('http://schema.org/Text', 'string', 'Data type: Text.'),
   new Builtin('http://schema.org/Number', 'number', 'Data type: Number.'),
   new Builtin(
-      'http://schema.org/Time', 'string',
-      'DateTime represented in string, e.g. 2017-01-04T17:10:00-05:00.'),
+    'http://schema.org/Time',
+    'string',
+    'DateTime represented in string, e.g. 2017-01-04T17:10:00-05:00.'
+  ),
   new Builtin(
-      'http://schema.org/Date', 'string',
-      'A date value in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">' +
-          'ISO 8601 date format</a>.'),
+    'http://schema.org/Date',
+    'string',
+    'A date value in <a href="http://en.wikipedia.org/wiki/ISO_8601">' +
+      'ISO 8601 date format</a>.'
+  ),
   new Builtin(
-      'http://schema.org/DateTime', 'string',
-      'A combination of date and time of day in the form ' +
-          '[-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] ' +
-          '(see Chapter 5.4 of ISO 8601).'),
+    'http://schema.org/DateTime',
+    'string',
+    'A combination of date and time of day in the form ' +
+      '[-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] ' +
+      '(see Chapter 5.4 of ISO 8601).'
+  ),
   new BooleanEnum(
-      'http://schema.org/Boolean', 'https://schema.org/True',
-      'https://schema.org/False', 'Boolean: True or False.'),
+    'http://schema.org/Boolean',
+    'https://schema.org/True',
+    'https://schema.org/False',
+    'Boolean: True or False.'
+  ),
 ];
 
 // Should we allow 'string' to be a valid type for all values of this type?
@@ -71,8 +88,10 @@ const wellKnownStrings = [
 ];
 
 const dataType = new DataTypeUnion(
-    'http://schema.org/DataType', wellKnownTypes,
-    'The basic data types such as Integers, Strings, etc.');
+  'http://schema.org/DataType',
+  wellKnownTypes,
+  'The basic data types such as Integers, Strings, etc.'
+);
 
 function ForwardDeclareClasses(topics: ReadonlyArray<TypedTopic>): ClassMap {
   const classes = new Map<string, Class>();
@@ -85,7 +104,9 @@ function ForwardDeclareClasses(topics: ReadonlyArray<TypedTopic>): ClassMap {
 
     const allowString = wellKnownStrings.some(wks => wks.equals(topic.Subject));
     classes.set(
-        topic.Subject.toString(), new Class(topic.Subject, allowString));
+      topic.Subject.toString(),
+      new Class(topic.Subject, allowString)
+    );
   }
 
   return classes;

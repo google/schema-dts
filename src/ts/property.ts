@@ -14,12 +14,29 @@
  * limitations under the License.
  */
 
-import {createArrayTypeNode, createKeywordTypeNode, createPropertySignature, createStringLiteral, createToken, createTypeOperatorNode, createTypeReferenceNode, createUnionTypeNode, PropertySignature, SyntaxKind} from 'typescript';
+import {
+  createArrayTypeNode,
+  createKeywordTypeNode,
+  createPropertySignature,
+  createStringLiteral,
+  createToken,
+  createTypeOperatorNode,
+  createTypeReferenceNode,
+  createUnionTypeNode,
+  PropertySignature,
+  SyntaxKind,
+} from 'typescript';
 
 import {Log} from '../logging';
 import {Format, ObjectPredicate, TObject, TSubject} from '../triples/triple';
 import {UrlNode} from '../triples/types';
-import {GetComment, IsDomainIncludes, IsRangeIncludes, IsSupersededBy, IsTypeName} from '../triples/wellKnown';
+import {
+  GetComment,
+  IsDomainIncludes,
+  IsRangeIncludes,
+  IsSupersededBy,
+  IsTypeName,
+} from '../triples/wellKnown';
 
 import {ClassMap} from './class';
 import {Context} from './context';
@@ -38,8 +55,9 @@ export class PropertyType {
 
   get comment() {
     if (!this.deprecated) return this._comment;
-    const deprecated = `@deprecated Consider using ${
-        this._supersededBy.map(o => o.toString()).join(' or ')} instead.`;
+    const deprecated = `@deprecated Consider using ${this._supersededBy
+      .map(o => o.toString())
+      .join(' or ')} instead.`;
 
     return this._comment ? `${this._comment}\n${deprecated}` : deprecated;
   }
@@ -52,8 +70,9 @@ export class PropertyType {
     const c = GetComment(value);
     if (c) {
       if (this._comment) {
-        Log(`Duplicate comments provided on property ${
-            this.subject.toString()}. It will be overwritten.`);
+        Log(
+          `Duplicate comments provided on property ${this.subject.toString()}. It will be overwritten.`
+        );
       }
       this._comment = c.comment;
       return true;
@@ -61,8 +80,11 @@ export class PropertyType {
 
     if (IsRangeIncludes(value.Predicate)) {
       if (!IsTypeName(value.Object)) {
-        throw new Error(`Type expected to be a UrlNode always. When adding ${
-            Format(value)} to ${this.subject.toString()}.`);
+        throw new Error(
+          `Type expected to be a UrlNode always. When adding ${Format(
+            value
+          )} to ${this.subject.toString()}.`
+        );
       }
       this.types.push(value.Object);
       return true;
@@ -72,7 +94,8 @@ export class PropertyType {
       const cls = classes.get(value.Object.toString());
       if (!cls) {
         throw new Error(
-            `Could not find class for ${this.subject.name}, ${Format(value)}.`);
+          `Could not find class for ${this.subject.name}, ${Format(value)}.`
+        );
       }
       cls.addProp(new Property(this.subject, this));
       return true;
@@ -87,9 +110,9 @@ export class PropertyType {
   }
 
   scalarTypeNode() {
-    const typeNodes =
-        this.types.sort((a, b) => toClassName(a).localeCompare(toClassName(b)))
-            .map(type => createTypeReferenceNode(toClassName(type), []));
+    const typeNodes = this.types
+      .sort((a, b) => toClassName(a).localeCompare(toClassName(b)))
+      .map(type => createTypeReferenceNode(toClassName(type), []));
     switch (typeNodes.length) {
       case 0:
         return createKeywordTypeNode(SyntaxKind.NeverKeyword);
@@ -116,20 +139,23 @@ export class Property {
     return createUnionTypeNode([
       node,
       createTypeOperatorNode(
-          SyntaxKind.ReadonlyKeyword, createArrayTypeNode(node))
+        SyntaxKind.ReadonlyKeyword,
+        createArrayTypeNode(node)
+      ),
     ]);
   }
 
   toNode(context: Context): PropertySignature {
     return withComments(
-        this.type.comment,
-        createPropertySignature(
-            /* modifiers= */[],
-            createStringLiteral(context.getScopedName(this.key)),
-            createToken(SyntaxKind.QuestionToken),
-            /*typeNode=*/ this.typeNode(),
-            /*initializer=*/ undefined,
-            ));
+      this.type.comment,
+      createPropertySignature(
+        /* modifiers= */ [],
+        createStringLiteral(context.getScopedName(this.key)),
+        createToken(SyntaxKind.QuestionToken),
+        /*typeNode=*/ this.typeNode(),
+        /*initializer=*/ undefined
+      )
+    );
   }
 }
 
@@ -138,14 +164,15 @@ export class TypeProperty {
 
   toNode(context: Context) {
     return createPropertySignature(
-        /* modifiers= */[],
-        createStringLiteral('@type'),
-        /* questionToken= */ undefined,
-        /* typeNode= */
-        createTypeReferenceNode(
-            `"${context.getScopedName(this.className)}"`,
-            /*typeArguments=*/ undefined),
-        /* initializer= */ undefined,
+      /* modifiers= */ [],
+      createStringLiteral('@type'),
+      /* questionToken= */ undefined,
+      /* typeNode= */
+      createTypeReferenceNode(
+        `"${context.getScopedName(this.className)}"`,
+        /*typeArguments=*/ undefined
+      ),
+      /* initializer= */ undefined
     );
   }
 
@@ -154,15 +181,14 @@ export class TypeProperty {
 
 export function IdPropertyNode() {
   return withComments(
-      'IRI identifying the canonical address of this object.',
-      createPropertySignature(
-          /* modifiers= */[],
-          createStringLiteral('@id'),
-          createToken(SyntaxKind.QuestionToken),
-          /* typeNode= */
-          createTypeReferenceNode(
-              'string',
-              /*typeArguments=*/ undefined),
-          /* initializer= */ undefined,
-          ));
+    'IRI identifying the canonical address of this object.',
+    createPropertySignature(
+      /* modifiers= */ [],
+      createStringLiteral('@id'),
+      createToken(SyntaxKind.QuestionToken),
+      /* typeNode= */
+      createTypeReferenceNode('string', /*typeArguments=*/ undefined),
+      /* initializer= */ undefined
+    )
+  );
 }

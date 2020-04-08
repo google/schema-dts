@@ -13,7 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {createAsExpression, createIntersectionTypeNode, createLiteralTypeNode, createModifiersFromModifierFlags, createObjectLiteral, createParenthesizedType, createPropertyAssignment, createStringLiteral, createTypeAliasDeclaration, createTypeLiteralNode, createTypeReferenceNode, createUnionTypeNode, createVariableDeclaration, createVariableDeclarationList, createVariableStatement, DeclarationStatement, ModifierFlags, NodeFlags, Statement, TypeAliasDeclaration, TypeNode, VariableStatement} from 'typescript';
+import {
+  createAsExpression,
+  createIntersectionTypeNode,
+  createLiteralTypeNode,
+  createModifiersFromModifierFlags,
+  createObjectLiteral,
+  createParenthesizedType,
+  createPropertyAssignment,
+  createStringLiteral,
+  createTypeAliasDeclaration,
+  createTypeLiteralNode,
+  createTypeReferenceNode,
+  createUnionTypeNode,
+  createVariableDeclaration,
+  createVariableDeclarationList,
+  createVariableStatement,
+  DeclarationStatement,
+  ModifierFlags,
+  NodeFlags,
+  Statement,
+  TypeAliasDeclaration,
+  TypeNode,
+  VariableStatement,
+} from 'typescript';
 
 import {Log} from '../logging';
 import {TObject, TPredicate, TSubject} from '../triples/triple';
@@ -64,29 +87,34 @@ export class Class {
 
   private get comment() {
     if (!this.deprecated) return this._comment;
-    const deprecated = `@deprecated Use ${
-        this.supersededBy().map(c => c.className()).join(' or ')} instead.`;
+    const deprecated = `@deprecated Use ${this.supersededBy()
+      .map(c => c.className())
+      .join(' or ')} instead.`;
     return this._comment ? `${this._comment}\n${deprecated}` : deprecated;
   }
 
   private properties() {
-    return Array.from(this._props.values())
-        .sort((a, b) => CompareKeys(a.key, b.key));
+    return Array.from(this._props.values()).sort((a, b) =>
+      CompareKeys(a.key, b.key)
+    );
   }
 
   private supersededBy() {
-    return Array.from(this._supersededBy)
-        .sort((a, b) => CompareKeys(a.subject, b.subject));
+    return Array.from(this._supersededBy).sort((a, b) =>
+      CompareKeys(a.subject, b.subject)
+    );
   }
 
   private enums() {
-    return Array.from(this._enums)
-        .sort((a, b) => CompareKeys(a.value, b.value));
+    return Array.from(this._enums).sort((a, b) =>
+      CompareKeys(a.value, b.value)
+    );
   }
 
   private get allowString(): boolean {
-    return this._allowStringType ||
-        this.parents.some(parent => parent.allowString);
+    return (
+      this._allowStringType || this.parents.some(parent => parent.allowString)
+    );
   }
 
   protected baseName() {
@@ -97,14 +125,19 @@ export class Class {
   }
 
   constructor(
-      readonly subject: TSubject, private readonly _allowStringType: boolean) {}
-  add(value: {Predicate: TPredicate; Object: TObject},
-      classMap: ClassMap): boolean {
+    readonly subject: TSubject,
+    private readonly _allowStringType: boolean
+  ) {}
+  add(
+    value: {Predicate: TPredicate; Object: TObject},
+    classMap: ClassMap
+  ): boolean {
     const c = GetComment(value);
     if (c) {
       if (this._comment) {
-        Log(`Duplicate comments provided on class ${
-            this.subject.toString()}. It will be overwritten.`);
+        Log(
+          `Duplicate comments provided on class ${this.subject.toString()}. It will be overwritten.`
+        );
       }
       this._comment = c.comment;
       return true;
@@ -116,8 +149,11 @@ export class Class {
         this.parents.push(parentClass);
         parentClass.children.push(this);
       } else {
-        throw new Error(`Couldn't find parent of ${this.subject.name}, ${
-            s.subClassOf.toString()}`);
+        throw new Error(
+          `Couldn't find parent of ${
+            this.subject.name
+          }, ${s.subClassOf.toString()}`
+        );
       }
       return true;
     }
@@ -125,9 +161,11 @@ export class Class {
     if (IsSupersededBy(value.Predicate)) {
       const supersededBy = classMap.get(value.Object.toString());
       if (!supersededBy) {
-        throw new Error(`Couldn't find class ${
-            value.Object.toString()}, which supersedes class ${
-            this.subject.name}`);
+        throw new Error(
+          `Couldn't find class ${value.Object.toString()}, which supersedes class ${
+            this.subject.name
+          }`
+        );
       }
       this._supersededBy.add(supersededBy);
       return true;
@@ -142,15 +180,19 @@ export class Class {
     this._enums.add(e);
   }
 
-  private baseNode(skipDeprecatedProperties: boolean, context: Context):
-      TypeNode {
-    const parentTypes = this.parents.map(
-        parent => createTypeReferenceNode(parent.baseName(), []));
-    const parentNode = parentTypes.length === 0 ?
-        null :
-        parentTypes.length === 1 ?
-        parentTypes[0] :
-        createParenthesizedType(createIntersectionTypeNode(parentTypes));
+  private baseNode(
+    skipDeprecatedProperties: boolean,
+    context: Context
+  ): TypeNode {
+    const parentTypes = this.parents.map(parent =>
+      createTypeReferenceNode(parent.baseName(), [])
+    );
+    const parentNode =
+      parentTypes.length === 0
+        ? null
+        : parentTypes.length === 1
+        ? parentTypes[0]
+        : createParenthesizedType(createIntersectionTypeNode(parentTypes));
 
     const isRoot = parentNode === null;
 
@@ -160,8 +202,8 @@ export class Class {
       ...(isRoot ? [IdPropertyNode()] : []),
       // ... then everything else.
       ...this.properties()
-          .filter(property => !property.deprecated || !skipDeprecatedProperties)
-          .map(prop => prop.toNode(context))
+        .filter(property => !property.deprecated || !skipDeprecatedProperties)
+        .map(prop => prop.toNode(context)),
     ]);
 
     if (parentNode && propLiteral.members.length > 0) {
@@ -173,45 +215,55 @@ export class Class {
     }
   }
 
-  private baseDecl(skipDeprecatedProperties: boolean, context: Context):
-      TypeAliasDeclaration {
+  private baseDecl(
+    skipDeprecatedProperties: boolean,
+    context: Context
+  ): TypeAliasDeclaration {
     const baseNode = this.baseNode(skipDeprecatedProperties, context);
 
     return createTypeAliasDeclaration(
-        /*decorators=*/[], /*modifiers=*/[], this.baseName(),
-        /*typeParameters=*/[], baseNode);
+      /*decorators=*/ [],
+      /*modifiers=*/ [],
+      this.baseName(),
+      /*typeParameters=*/ [],
+      baseNode
+    );
   }
 
   private nonEnumType(context: Context, skipDeprecated: boolean): TypeNode {
     this.children.sort((a, b) => CompareKeys(a.subject, b.subject));
-    const children =
-        this.children.filter(child => !(child.deprecated && skipDeprecated))
-            .map(
-                child => createTypeReferenceNode(
-                    child.className(), /*typeArguments=*/[]));
+    const children = this.children
+      .filter(child => !(child.deprecated && skipDeprecated))
+      .map(child =>
+        createTypeReferenceNode(child.className(), /*typeArguments=*/ [])
+      );
 
     // 'String' is a valid Type sometimes, add that as a Child if so.
     if (this.allowString) {
-      children.push(createTypeReferenceNode('string', /*typeArguments=*/[]));
+      children.push(createTypeReferenceNode('string', /*typeArguments=*/ []));
     }
 
-    const childrenNode = children.length === 0 ?
-        null :
-        children.length === 1 ?
-        children[0] :
-        createParenthesizedType(createUnionTypeNode(children));
+    const childrenNode =
+      children.length === 0
+        ? null
+        : children.length === 1
+        ? children[0]
+        : createParenthesizedType(createUnionTypeNode(children));
 
-    const baseTypeReference =
-        createTypeReferenceNode(this.baseName(), /*typeArguments=*/[]);
+    const baseTypeReference = createTypeReferenceNode(
+      this.baseName(),
+      /*typeArguments=*/ []
+    );
 
     // If we inherit from a DataType (~= a Built In), then the type is _not_
     // represented as a node. Skip the leaf type.
-    const thisType = this.inheritsDataType() ?
-        baseTypeReference :
-        createIntersectionTypeNode([
-          createTypeLiteralNode(
-              [new TypeProperty(this.subject).toNode(context)]),
-          baseTypeReference
+    const thisType = this.inheritsDataType()
+      ? baseTypeReference
+      : createIntersectionTypeNode([
+          createTypeLiteralNode([
+            new TypeProperty(this.subject).toNode(context),
+          ]),
+          baseTypeReference,
         ]);
 
     if (childrenNode) {
@@ -234,32 +286,40 @@ export class Class {
     }
   }
 
-  private enumDecl(): VariableStatement|undefined {
+  private enumDecl(): VariableStatement | undefined {
     if (this._enums.size === 0) return undefined;
     const enums = this.enums();
 
     return createVariableStatement(
-        createModifiersFromModifierFlags(ModifierFlags.Export),
-        createVariableDeclarationList(
-            [createVariableDeclaration(
-                this.className(),
-                /*type=*/ undefined,
-                createObjectLiteral(
-                    enums.map(e => e.toNode()), /*multiLine=*/ true))],
-            NodeFlags.Const));
+      createModifiersFromModifierFlags(ModifierFlags.Export),
+      createVariableDeclarationList(
+        [
+          createVariableDeclaration(
+            this.className(),
+            /*type=*/ undefined,
+            createObjectLiteral(
+              enums.map(e => e.toNode()),
+              /*multiLine=*/ true
+            )
+          ),
+        ],
+        NodeFlags.Const
+      )
+    );
   }
 
   toNode(context: Context, skipDeprecated: boolean): readonly Statement[] {
     const typeValue: TypeNode = this.totalType(context, skipDeprecated);
     const declaration = withComments(
-        this.comment,
-        createTypeAliasDeclaration(
-            /* decorators = */[],
-            createModifiersFromModifierFlags(ModifierFlags.Export),
-            this.className(),
-            [],
-            typeValue,
-            ));
+      this.comment,
+      createTypeAliasDeclaration(
+        /* decorators = */ [],
+        createModifiersFromModifierFlags(ModifierFlags.Export),
+        this.className(),
+        [],
+        typeValue
+      )
+    );
 
     // Guide to Code Generated:
     // // Base: Always There -----------------------//
@@ -278,9 +338,9 @@ export class Class {
     // }
     // //-------------------------------------------//
     return arrayOf<Statement>(
-        this.baseDecl(skipDeprecated, context),
-        declaration,
-        this.enumDecl(),
+      this.baseDecl(skipDeprecated, context),
+      declaration,
+      this.enumDecl()
     );
   }
 }
@@ -291,21 +351,25 @@ export class Class {
  */
 export class Builtin extends Class {
   constructor(
-      url: string, private readonly equivTo: string,
-      protected readonly doc: string) {
+    url: string,
+    private readonly equivTo: string,
+    protected readonly doc: string
+  ) {
     super(UrlNode.Parse(url), false);
   }
 
   toNode(): readonly Statement[] {
     return [
       withComments(
-          this.doc,
-          createTypeAliasDeclaration(
-              /*decorators=*/[],
-              createModifiersFromModifierFlags(ModifierFlags.Export),
-              this.subject.name,
-              /*typeParameters=*/[],
-              createTypeReferenceNode(this.equivTo, []))),
+        this.doc,
+        createTypeAliasDeclaration(
+          /*decorators=*/ [],
+          createModifiersFromModifierFlags(ModifierFlags.Export),
+          this.subject.name,
+          /*typeParameters=*/ [],
+          createTypeReferenceNode(this.equivTo, [])
+        )
+      ),
     ];
   }
 
@@ -315,49 +379,62 @@ export class Builtin extends Class {
 }
 export class BooleanEnum extends Builtin {
   constructor(
-      url: string, private trueUrl: string, private falseUrl: string,
-      doc: string) {
+    url: string,
+    private trueUrl: string,
+    private falseUrl: string,
+    doc: string
+  ) {
     super(url, '', doc);
   }
 
   toNode(): readonly Statement[] {
     return [
       withComments(
-          this.doc,
-          createTypeAliasDeclaration(
-              /*decotrators=*/[],
-              createModifiersFromModifierFlags(ModifierFlags.Export),
-              this.subject.name,
-              /*typeParameters=*/[],
-              createUnionTypeNode([
-                createTypeReferenceNode('true', /*typeArgs=*/[]),
-                createTypeReferenceNode('false', /*typeArgs=*/[]),
-                createLiteralTypeNode(createStringLiteral(this.trueUrl)),
-                createLiteralTypeNode(createStringLiteral(this.falseUrl)),
-              ]),
-              )),
-      createVariableStatement(
+        this.doc,
+        createTypeAliasDeclaration(
+          /*decotrators=*/ [],
           createModifiersFromModifierFlags(ModifierFlags.Export),
-          createVariableDeclarationList(
-              [createVariableDeclaration(
-                  this.subject.name,
-                  /*type=*/ undefined,
-                  createObjectLiteral(
-                      [
-                        createPropertyAssignment(
-                            'True',
-                            createAsExpression(
-                                createStringLiteral(this.trueUrl),
-                                createTypeReferenceNode('const', undefined))),
-                        createPropertyAssignment(
-                            'False',
-                            createAsExpression(
-                                createStringLiteral(this.falseUrl),
-                                createTypeReferenceNode('const', undefined))),
-                      ],
-                      true),
-                  )],
-              NodeFlags.Const))
+          this.subject.name,
+          /*typeParameters=*/ [],
+          createUnionTypeNode([
+            createTypeReferenceNode('true', /*typeArgs=*/ []),
+            createTypeReferenceNode('false', /*typeArgs=*/ []),
+            createLiteralTypeNode(createStringLiteral(this.trueUrl)),
+            createLiteralTypeNode(createStringLiteral(this.falseUrl)),
+          ])
+        )
+      ),
+      createVariableStatement(
+        createModifiersFromModifierFlags(ModifierFlags.Export),
+        createVariableDeclarationList(
+          [
+            createVariableDeclaration(
+              this.subject.name,
+              /*type=*/ undefined,
+              createObjectLiteral(
+                [
+                  createPropertyAssignment(
+                    'True',
+                    createAsExpression(
+                      createStringLiteral(this.trueUrl),
+                      createTypeReferenceNode('const', undefined)
+                    )
+                  ),
+                  createPropertyAssignment(
+                    'False',
+                    createAsExpression(
+                      createStringLiteral(this.falseUrl),
+                      createTypeReferenceNode('const', undefined)
+                    )
+                  ),
+                ],
+                true
+              )
+            ),
+          ],
+          NodeFlags.Const
+        )
+      ),
     ];
   }
 }
@@ -368,15 +445,22 @@ export class DataTypeUnion extends Builtin {
   }
 
   toNode(): DeclarationStatement[] {
-    return [withComments(
+    return [
+      withComments(
         this.doc,
         createTypeAliasDeclaration(
-            /*decorators=*/[],
-            createModifiersFromModifierFlags(ModifierFlags.Export),
-            this.subject.name, /*typeParameters=*/[],
-            createUnionTypeNode(this.wk.map(
-                wk => createTypeReferenceNode(
-                    wk.subject.name, /*typeArguments=*/[])))))];
+          /*decorators=*/ [],
+          createModifiersFromModifierFlags(ModifierFlags.Export),
+          this.subject.name,
+          /*typeParameters=*/ [],
+          createUnionTypeNode(
+            this.wk.map(wk =>
+              createTypeReferenceNode(wk.subject.name, /*typeArguments=*/ [])
+            )
+          )
+        )
+      ),
+    ];
   }
 }
 

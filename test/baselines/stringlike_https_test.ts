@@ -23,7 +23,7 @@ import {inlineCli} from '../helpers/main_driver';
 
 test(`baseine_${basename(__filename)}`, async () => {
   const {actual} = await inlineCli(
-      `
+    `
 <https://schema.org/name> <https://schema.org/rangeIncludes> <https://schema.org/Text> .
 <https://schema.org/name> <https://schema.org/domainIncludes> <https://schema.org/Thing> .
 <https://schema.org/name> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
@@ -52,7 +52,8 @@ test(`baseine_${basename(__filename)}`, async () => {
 <https://schema.org/urlTemplate> <https://schema.org/rangeIncludes> <https://schema.org/URL> .
 <https://schema.org/urlTemplate> <https://schema.org/domainIncludes> <https://schema.org/Organization> .
       `,
-      ['--ontology', `https://fake.com/${basename(__filename)}.nt`]);
+    ['--ontology', `https://fake.com/${basename(__filename)}.nt`]
+  );
 
   expect(actual).toMatchInlineSnapshot(`
     "// tslint:disable

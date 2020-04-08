@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Rdfs, SchemaString, UrlNode } from '../../src/triples/types';
+import {Rdfs, SchemaString, UrlNode} from '../../src/triples/types';
 
 describe('UrlNode', () => {
   it('parses rdf-syntax', () => {
-    const node =
-        UrlNode.Parse('http://www.w3.org/1999/02/22-rdf-syntax-ns#type');
+    const node = UrlNode.Parse(
+      'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
+    );
 
     expect(node.name).toBe('type');
-    expect(node.context.href).toBe('http://www.w3.org/1999/02/22-rdf-syntax-ns');
+    expect(node.context.href).toBe(
+      'http://www.w3.org/1999/02/22-rdf-syntax-ns'
+    );
     expect(node.context.hostname).toBe('www.w3.org');
     expect(node.context.path).toEqual(['1999', '02', '22-rdf-syntax-ns']);
   });
@@ -45,85 +48,145 @@ describe('UrlNode', () => {
   });
 
   it('rejects search strings', () => {
-    expect(() => UrlNode.Parse('http://schema.org/Person?q=true&a')).toThrowError('Search string');
+    expect(() =>
+      UrlNode.Parse('http://schema.org/Person?q=true&a')
+    ).toThrowError('Search string');
 
-    expect(() => UrlNode.Parse('http://schema.org/Person?q&a')).toThrowError('Search string');
+    expect(() => UrlNode.Parse('http://schema.org/Person?q&a')).toThrowError(
+      'Search string'
+    );
 
-    expect(() => UrlNode.Parse('http://schema.org/Person?q')).toThrowError('Search string');
+    expect(() => UrlNode.Parse('http://schema.org/Person?q')).toThrowError(
+      'Search string'
+    );
 
-    expect(() => UrlNode.Parse('http://schema.org/abc?q#foo')).not.toThrowError();
+    expect(() =>
+      UrlNode.Parse('http://schema.org/abc?q#foo')
+    ).not.toThrowError();
     expect(() => UrlNode.Parse('http://schema.org/abc#?q')).not.toThrowError();
   });
 
   it('top-level domain', () => {
-    expect(() => UrlNode.Parse('http://schema.org/')).toThrowError('no room for \'name\'');
+    expect(() => UrlNode.Parse('http://schema.org/')).toThrowError(
+      "no room for 'name'"
+    );
 
-    expect(() => UrlNode.Parse('http://schema.org')).toThrowError('no room for \'name\'');
+    expect(() => UrlNode.Parse('http://schema.org')).toThrowError(
+      "no room for 'name'"
+    );
 
     expect(() => UrlNode.Parse('http://schema.org/#foo')).not.toThrowError();
   });
 
   describe('matches context', () => {
     it('matches exact urls', () => {
-      expect(UrlNode.Parse('http://schema.org/Person')
-                 .matchesContext('http://schema.org/')).toBe(true);
+      expect(
+        UrlNode.Parse('http://schema.org/Person').matchesContext(
+          'http://schema.org/'
+        )
+      ).toBe(true);
 
-      expect(UrlNode.Parse('http://schema.org/Person')
-                 .matchesContext('http://schema.org')).toBe(true);
+      expect(
+        UrlNode.Parse('http://schema.org/Person').matchesContext(
+          'http://schema.org'
+        )
+      ).toBe(true);
 
-      expect(UrlNode.Parse('https://schema.org/Person')
-                 .matchesContext('https://schema.org')).toBe(true);
+      expect(
+        UrlNode.Parse('https://schema.org/Person').matchesContext(
+          'https://schema.org'
+        )
+      ).toBe(true);
 
-      expect(UrlNode.Parse('https://schema.org/Person')
-                 .matchesContext('https://schema.org/')).toBe(true);
+      expect(
+        UrlNode.Parse('https://schema.org/Person').matchesContext(
+          'https://schema.org/'
+        )
+      ).toBe(true);
     });
 
     it('http matches https', () => {
-      expect(UrlNode.Parse('http://schema.org/Person')
-                 .matchesContext('https://schema.org/')).toBe(true);
+      expect(
+        UrlNode.Parse('http://schema.org/Person').matchesContext(
+          'https://schema.org/'
+        )
+      ).toBe(true);
     });
 
     it('https does not matche http (security)', () => {
-      expect(UrlNode.Parse('https://schema.org/Person')
-                 .matchesContext('http://schema.org/')).toBe(false);
+      expect(
+        UrlNode.Parse('https://schema.org/Person').matchesContext(
+          'http://schema.org/'
+        )
+      ).toBe(false);
     });
 
     it('matches exact path', () => {
-      expect(UrlNode.Parse('https://webschema.com/5.0/Person')
-                 .matchesContext('https://webschema.com/5.0')).toBe(true);
+      expect(
+        UrlNode.Parse('https://webschema.com/5.0/Person').matchesContext(
+          'https://webschema.com/5.0'
+        )
+      ).toBe(true);
 
-      expect(UrlNode.Parse('https://webschema.com/5.0#Person')
-                 .matchesContext('https://webschema.com/5.0')).toBe(true);
+      expect(
+        UrlNode.Parse('https://webschema.com/5.0#Person').matchesContext(
+          'https://webschema.com/5.0'
+        )
+      ).toBe(true);
     });
 
     it('different URLs', () => {
-      expect(UrlNode.Parse('https://webschema.com/5.0/Person')
-                 .matchesContext('https://foo.com/5.0')).toBe(false);
+      expect(
+        UrlNode.Parse('https://webschema.com/5.0/Person').matchesContext(
+          'https://foo.com/5.0'
+        )
+      ).toBe(false);
 
-      expect(UrlNode.Parse('https://webschema.com/5.0#Person')
-                 .matchesContext('https://foo.com/5.0')).toBe(false);
+      expect(
+        UrlNode.Parse('https://webschema.com/5.0#Person').matchesContext(
+          'https://foo.com/5.0'
+        )
+      ).toBe(false);
     });
 
     it('different path lengths', () => {
-      expect(UrlNode.Parse('https://webschema.com/5.0/g/Person')
-                 .matchesContext('https://webschema.com/5.0')).toBe(false);
+      expect(
+        UrlNode.Parse('https://webschema.com/5.0/g/Person').matchesContext(
+          'https://webschema.com/5.0'
+        )
+      ).toBe(false);
 
-      expect(UrlNode.Parse('https://webschema.com/5.0/Person')
-                 .matchesContext('https://webschema.com/g/5.0')).toBe(false);
+      expect(
+        UrlNode.Parse('https://webschema.com/5.0/Person').matchesContext(
+          'https://webschema.com/g/5.0'
+        )
+      ).toBe(false);
 
-      expect(UrlNode.Parse('https://webschema.com/5.0/g#Person')
-                 .matchesContext('https://webschema.com/5.0')).toBe(false);
+      expect(
+        UrlNode.Parse('https://webschema.com/5.0/g#Person').matchesContext(
+          'https://webschema.com/5.0'
+        )
+      ).toBe(false);
 
-      expect(UrlNode.Parse('https://webschema.com/5.0#Person')
-                 .matchesContext('https://webschema.com/5.0/g')).toBe(false);
+      expect(
+        UrlNode.Parse('https://webschema.com/5.0#Person').matchesContext(
+          'https://webschema.com/5.0/g'
+        )
+      ).toBe(false);
     });
 
     it('different paths same length', () => {
-      expect(UrlNode.Parse('https://webschema.com/6.0/Person')
-                 .matchesContext('https://webschema.com/5.0')).toBe(false);
+      expect(
+        UrlNode.Parse('https://webschema.com/6.0/Person').matchesContext(
+          'https://webschema.com/5.0'
+        )
+      ).toBe(false);
 
-      expect(UrlNode.Parse('https://webschema.com/5.0#Person')
-                 .matchesContext('https://webschema.com/6.0')).toBe(false);
+      expect(
+        UrlNode.Parse('https://webschema.com/5.0#Person').matchesContext(
+          'https://webschema.com/6.0'
+        )
+      ).toBe(false);
     });
   });
 });
