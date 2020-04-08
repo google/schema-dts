@@ -90,7 +90,7 @@ test(`baseine_${basename(__filename)}`, async () => {
     "
   `);
   expect(actualLogs).toMatchInlineSnapshot(`
-    "Loading Ontology from URL: https://fake.com/C:\\\\Users\\\\eyas_\\\\Source\\\\Repos\\\\SchemaDTS\\\\test\\\\baselines\\\\category_test.ts.nt
+    "Loading Ontology from URL: https://fake.com/category_test.ts.nt
     Got Response 200: Ok.
     Class Distillery: Did not add [(category \\"issue-743\\")]
     "

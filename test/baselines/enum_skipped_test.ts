@@ -89,7 +89,7 @@ test(`baseine_${basename(__filename)}`, async () => {
     "
   `);
   expect(actualLogs).toMatchInlineSnapshot(`
-    "Loading Ontology from URL: https://fake.com/C:\\\\Users\\\\eyas_\\\\Source\\\\Repos\\\\SchemaDTS\\\\test\\\\baselines\\\\enum_skipped_test.ts.nt
+    "Loading Ontology from URL: https://fake.com/enum_skipped_test.ts.nt
     Got Response 200: Ok.
     For Enum Item c, did not process:
     	(category, \\"issue-1156\\")

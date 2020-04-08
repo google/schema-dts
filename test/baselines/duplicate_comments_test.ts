@@ -99,7 +99,7 @@ test(`baseine_${basename(__filename)}`, async () => {
     "
   `);
   expect(actualLogs).toMatchInlineSnapshot(`
-    "Loading Ontology from URL: https://fake.com/C:\\\\Users\\\\eyas_\\\\Source\\\\Repos\\\\SchemaDTS\\\\test\\\\baselines\\\\duplicate_comments_test.ts.nt
+    "Loading Ontology from URL: https://fake.com/duplicate_comments_test.ts.nt
     Got Response 200: Ok.
     Duplicate comments provided on class http://schema.org/Thing. It will be overwritten.
     Duplicate comments provided on property http://schema.org/name. It will be overwritten.
