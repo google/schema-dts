@@ -21,11 +21,12 @@ import {PropertyType} from '../ts/property';
 
 /**
  * Annotates classes with any Property values they blong to.
+ *
  * @param topics a sequence of processed triples describing an Ontology.
  * @param classes return value of `ProcessClasses`.
  */
 export function ProcessProperties(
-  topics: ReadonlyArray<TypedTopic>,
+  topics: readonly TypedTopic[],
   classes: ClassMap
 ) {
   for (const topic of topics) {
