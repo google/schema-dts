@@ -76,7 +76,7 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"@type\\": \\"Thing\\";
     } & ThingBase;
     /** A Thing! */
-    export type Thing = \\"http://schema.org/a\\" | \\"http://schema.org/b\\" | \\"http://schema.org/c\\" | \\"http://schema.org/d\\" | (ThingLeaf);
+    export type Thing = \\"http://schema.org/a\\" | \\"http://schema.org/b\\" | \\"http://schema.org/c\\" | \\"http://schema.org/d\\" | ThingLeaf;
     export const Thing = {
         a: (\\"http://schema.org/a\\" as const),
         b: (\\"http://schema.org/b\\" as const),

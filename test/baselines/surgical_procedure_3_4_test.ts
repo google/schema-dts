@@ -109,7 +109,7 @@ test(`baseine_${basename(__filename)}`, async () => {
     type MedicalProcedureTypeLeaf = {
         \\"@type\\": \\"MedicalProcedureType\\";
     } & MedicalProcedureTypeBase;
-    export type MedicalProcedureType = \\"http://schema.org/SurgicalProcedure\\" | (MedicalProcedureTypeLeaf);
+    export type MedicalProcedureType = \\"http://schema.org/SurgicalProcedure\\" | MedicalProcedureTypeLeaf;
     export const MedicalProcedureType = {
         /** A type of medical procedure that involves invasive surgical techniques. */
         SurgicalProcedure: (\\"http://schema.org/SurgicalProcedure\\" as const)
@@ -129,7 +129,7 @@ test(`baseine_${basename(__filename)}`, async () => {
     type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
     } & ThingBase;
-    export type Thing = ThingLeaf | (Intangible | MedicalProcedure);
+    export type Thing = ThingLeaf | Intangible | MedicalProcedure;
 
     "
   `);

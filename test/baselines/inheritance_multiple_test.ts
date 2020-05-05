@@ -91,7 +91,7 @@ test(`baseine_${basename(__filename)}`, async () => {
     type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
     } & ThingBase;
-    export type Thing = ThingLeaf | (PersonLike | Vehicle);
+    export type Thing = ThingLeaf | PersonLike | Vehicle;
 
     type VehicleBase = ThingBase & {
         \\"doors\\"?: Number | readonly Number[];

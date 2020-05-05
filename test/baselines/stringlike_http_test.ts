@@ -133,7 +133,7 @@ test(`baseine_${basename(__filename)}`, async () => {
     type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
     } & ThingBase;
-    export type Thing = ThingLeaf | (EntryPoint | Organization | Person | Place | Quantity);
+    export type Thing = ThingLeaf | EntryPoint | Organization | Person | Place | Quantity;
 
     "
   `);

@@ -113,7 +113,7 @@ test(`baseine_${basename(__filename)}`, async () => {
     type QuantityLeaf = {
         \\"@type\\": \\"Quantity\\";
     } & QuantityBase;
-    export type Quantity = QuantityLeaf | (Distance | Duration | Energy | Mass | string);
+    export type Quantity = QuantityLeaf | Distance | Duration | Energy | Mass | string;
 
     type ThingBase = {
         /** IRI identifying the canonical address of this object. */

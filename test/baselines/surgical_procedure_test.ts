@@ -134,21 +134,21 @@ test(`baseine_${basename(__filename)}`, async () => {
     type MedicalEnumerationLeaf = {
         \\"@type\\": \\"MedicalEnumeration\\";
     } & MedicalEnumerationBase;
-    export type MedicalEnumeration = MedicalEnumerationLeaf | (MedicalProcedureType | PhysicalExam);
+    export type MedicalEnumeration = MedicalEnumerationLeaf | MedicalProcedureType | PhysicalExam;
 
     type MedicalProcedureBase = MedicalEntityBase;
     type MedicalProcedureLeaf = {
         \\"@type\\": \\"MedicalProcedure\\";
     } & MedicalProcedureBase;
     /** A process of care used in either a diagnostic, therapeutic, preventive or palliative capacity that relies on invasive (surgical), non-invasive, or other techniques. */
-    export type MedicalProcedure = MedicalProcedureLeaf | (DiagnosticProcedure | PalliativeProcedure | PhysicalExam | SurgicalProcedure | TherapeuticProcedure);
+    export type MedicalProcedure = MedicalProcedureLeaf | DiagnosticProcedure | PalliativeProcedure | PhysicalExam | SurgicalProcedure | TherapeuticProcedure;
 
     type MedicalProcedureTypeBase = MedicalEnumerationBase;
     type MedicalProcedureTypeLeaf = {
         \\"@type\\": \\"MedicalProcedureType\\";
     } & MedicalProcedureTypeBase;
     /** An enumeration that describes different types of medical procedures. */
-    export type MedicalProcedureType = \\"http://schema.org/NoninvasiveProcedure\\" | \\"http://schema.org/PercutaneousProcedure\\" | (MedicalProcedureTypeLeaf);
+    export type MedicalProcedureType = \\"http://schema.org/NoninvasiveProcedure\\" | \\"http://schema.org/PercutaneousProcedure\\" | MedicalProcedureTypeLeaf;
     export const MedicalProcedureType = {
         NoninvasiveProcedure: (\\"http://schema.org/NoninvasiveProcedure\\" as const),
         PercutaneousProcedure: (\\"http://schema.org/PercutaneousProcedure\\" as const)
@@ -170,7 +170,7 @@ test(`baseine_${basename(__filename)}`, async () => {
     type PhysicalExamLeaf = {
         \\"@type\\": \\"PhysicalExam\\";
     } & PhysicalExamBase;
-    export type PhysicalExam = \\"http://schema.org/Head\\" | \\"http://schema.org/Neuro\\" | (PhysicalExamLeaf);
+    export type PhysicalExam = \\"http://schema.org/Head\\" | \\"http://schema.org/Neuro\\" | PhysicalExamLeaf;
     export const PhysicalExam = {
         Head: (\\"http://schema.org/Head\\" as const),
         Neuro: (\\"http://schema.org/Neuro\\" as const)
@@ -197,7 +197,7 @@ test(`baseine_${basename(__filename)}`, async () => {
     type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
     } & ThingBase;
-    export type Thing = ThingLeaf | (Intangible | MedicalEntity);
+    export type Thing = ThingLeaf | Intangible | MedicalEntity;
 
     "
   `);
