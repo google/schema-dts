@@ -93,7 +93,7 @@ module.exports = {
     'no-new-wrappers': 'error',
     'no-return-await': 'error',
     'no-throw-literal': 'error',
-    'no-underscore-dangle': 'error',
+    'no-underscore-dangle': ['error', {allowAfterThis: true}],
     'no-unsafe-finally': 'error',
     'no-unused-expressions': 'error',
     'no-unused-labels': 'error',
