@@ -268,7 +268,7 @@ export class Class {
     );
   }
 
-  private nonEnumType(skipDeprecated: boolean): TypeNode {
+  private nonEnumType(skipDeprecated: boolean): TypeNode[] {
     this.children.sort((a, b) => CompareKeys(a.subject, b.subject));
     const children = this.children
       .filter(child => !(child.deprecated && skipDeprecated))
@@ -281,13 +281,6 @@ export class Class {
       children.push(createTypeReferenceNode('string', /*typeArguments=*/ []));
     }
 
-    const childrenNode =
-      children.length === 0
-        ? null
-        : children.length === 1
-        ? children[0]
-        : createParenthesizedType(createUnionTypeNode(children));
-
     const leafTypeReference = createTypeReferenceNode(
       // If we inherit from a DataType (~= a Built In), then the type is _not_
       // represented as a node. Skip the leaf type.
@@ -298,11 +291,7 @@ export class Class {
       /*typeArguments=*/ []
     );
 
-    if (childrenNode) {
-      return createUnionTypeNode([leafTypeReference, childrenNode]);
-    } else {
-      return leafTypeReference;
-    }
+    return [leafTypeReference, ...children];
   }
 
   private totalType(skipDeprecated: boolean): TypeNode {
@@ -311,10 +300,10 @@ export class Class {
     if (isEnum) {
       return createUnionTypeNode([
         ...this.enums().map(e => e.toTypeLiteral()),
-        createParenthesizedType(this.nonEnumType(skipDeprecated)),
+        ...this.nonEnumType(skipDeprecated),
       ]);
     } else {
-      return this.nonEnumType(skipDeprecated);
+      return createUnionTypeNode(this.nonEnumType(skipDeprecated));
     }
   }
 
