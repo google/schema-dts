@@ -41,6 +41,8 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"@context\\": \\"https://schema.org\\";
     };
 
+    type SchemaValue<T> = T | readonly T[];
+
     /** Boolean: True or False. */
     export type Boolean = true | false | \\"https://schema.org/True\\" | \\"https://schema.org/False\\";
     export const Boolean = {
@@ -69,8 +71,8 @@ test(`baseine_${basename(__filename)}`, async () => {
     type ThingBase = {
         /** IRI identifying the canonical address of this object. */
         \\"@id\\"?: string;
-        \\"knows\\"?: never | readonly never[];
-        \\"name\\"?: Text | readonly Text[];
+        \\"knows\\"?: SchemaValue<never>;
+        \\"name\\"?: SchemaValue<Text>;
     };
     type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
