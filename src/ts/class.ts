@@ -49,6 +49,7 @@ import {IdPropertyNode, Property, TypeProperty} from './property';
 import {arrayOf} from './util/arrayof';
 import {withComments} from './util/comments';
 import {toClassName} from './util/names';
+import {assert} from '../util/assert';
 
 /** Maps fully qualified IDs of each Class to the class itself. */
 export type ClassMap = Map<string, Class>;
@@ -117,7 +118,13 @@ export class Class {
     );
   }
 
-  protected baseName() {
+  protected baseName(): string {
+    // If Skip Base, we use the parent type instead.
+    if (this.skipBase()) {
+      assert(this.parents.length === 1);
+      return this.parents[0].baseName();
+    }
+
     return toClassName(this.subject) + 'Base';
   }
 
@@ -185,10 +192,18 @@ export class Class {
     this._enums.add(e);
   }
 
+  private skipBase(): boolean {
+    return this.parents.length === 1 && this._props.size === 0;
+  }
+
   private baseNode(
     skipDeprecatedProperties: boolean,
     context: Context
-  ): TypeNode {
+  ): TypeNode | undefined {
+    if (this.skipBase()) {
+      return undefined;
+    }
+
     const parentTypes = this.parents.map(parent =>
       createTypeReferenceNode(parent.baseName(), [])
     );
@@ -223,8 +238,10 @@ export class Class {
   private baseDecl(
     skipDeprecatedProperties: boolean,
     context: Context
-  ): TypeAliasDeclaration {
+  ): TypeAliasDeclaration | undefined {
     const baseNode = this.baseNode(skipDeprecatedProperties, context);
+
+    if (!baseNode) return undefined;
 
     return createTypeAliasDeclaration(
       /*decorators=*/ [],

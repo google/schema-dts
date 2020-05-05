@@ -61,6 +61,8 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"@context\\": \\"https://schema.org\\";
     };
 
+    type SchemaValue<T> = T | readonly T[];
+
     /** Boolean: True or False. */
     export type Boolean = true | false | \\"https://schema.org/True\\" | \\"https://schema.org/False\\";
     export const Boolean = {
@@ -86,16 +88,15 @@ test(`baseine_${basename(__filename)}`, async () => {
     /** The basic data types such as Integers, Strings, etc. */
     export type DataType = Text | Number | Time | Date | DateTime | Boolean;
 
-    type EntryPointBase = ThingBase;
     type EntryPointLeaf = {
         \\"@type\\": \\"EntryPoint\\";
-    } & EntryPointBase;
+    } & ThingBase;
     export type EntryPoint = EntryPointLeaf | string;
 
     type OrganizationBase = ThingBase & {
-        \\"locatedIn\\"?: Place | readonly Place[];
-        \\"owner\\"?: Person | readonly Person[];
-        \\"urlTemplate\\"?: URL | readonly URL[];
+        \\"locatedIn\\"?: SchemaValue<Place>;
+        \\"owner\\"?: SchemaValue<Person>;
+        \\"urlTemplate\\"?: SchemaValue<URL>;
     };
     type OrganizationLeaf = {
         \\"@type\\": \\"Organization\\";
@@ -103,30 +104,28 @@ test(`baseine_${basename(__filename)}`, async () => {
     export type Organization = OrganizationLeaf | string;
 
     type PersonBase = ThingBase & {
-        \\"height\\"?: Quantity | readonly Quantity[];
-        \\"locatedIn\\"?: Place | readonly Place[];
+        \\"height\\"?: SchemaValue<Quantity>;
+        \\"locatedIn\\"?: SchemaValue<Place>;
     };
     type PersonLeaf = {
         \\"@type\\": \\"Person\\";
     } & PersonBase;
     export type Person = PersonLeaf | string;
 
-    type PlaceBase = ThingBase;
     type PlaceLeaf = {
         \\"@type\\": \\"Place\\";
-    } & PlaceBase;
+    } & ThingBase;
     export type Place = PlaceLeaf | string;
 
-    type QuantityBase = ThingBase;
     type QuantityLeaf = {
         \\"@type\\": \\"Quantity\\";
-    } & QuantityBase;
+    } & ThingBase;
     export type Quantity = QuantityLeaf | string;
 
     type ThingBase = {
         /** IRI identifying the canonical address of this object. */
         \\"@id\\"?: string;
-        \\"name\\"?: Text | readonly Text[];
+        \\"name\\"?: SchemaValue<Text>;
     };
     type ThingLeaf = {
         \\"@type\\": \\"Thing\\";

@@ -79,6 +79,8 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"@context\\": \\"https://schema.org\\";
     };
 
+    type SchemaValue<T> = T | readonly T[];
+
     /** Boolean: True or False. */
     export type Boolean = true | false | \\"https://schema.org/True\\" | \\"https://schema.org/False\\";
     export const Boolean = {
@@ -104,47 +106,40 @@ test(`baseine_${basename(__filename)}`, async () => {
     /** The basic data types such as Integers, Strings, etc. */
     export type DataType = Text | Number | Time | Date | DateTime | Boolean;
 
-    type DiagnosticProcedureBase = MedicalProcedureBase;
     type DiagnosticProcedureLeaf = {
         \\"@type\\": \\"DiagnosticProcedure\\";
-    } & DiagnosticProcedureBase;
+    } & ThingBase;
     export type DiagnosticProcedure = DiagnosticProcedureLeaf;
 
-    type EnumerationBase = IntangibleBase;
     type EnumerationLeaf = {
         \\"@type\\": \\"Enumeration\\";
-    } & EnumerationBase;
+    } & ThingBase;
     export type Enumeration = EnumerationLeaf | MedicalEnumeration;
 
-    type IntangibleBase = ThingBase;
     type IntangibleLeaf = {
         \\"@type\\": \\"Intangible\\";
-    } & IntangibleBase;
+    } & ThingBase;
     export type Intangible = IntangibleLeaf | Enumeration;
 
-    type MedicalEntityBase = ThingBase;
     type MedicalEntityLeaf = {
         \\"@type\\": \\"MedicalEntity\\";
-    } & MedicalEntityBase;
+    } & ThingBase;
     export type MedicalEntity = MedicalEntityLeaf | MedicalProcedure;
 
-    type MedicalEnumerationBase = EnumerationBase;
     type MedicalEnumerationLeaf = {
         \\"@type\\": \\"MedicalEnumeration\\";
-    } & MedicalEnumerationBase;
+    } & ThingBase;
     export type MedicalEnumeration = MedicalEnumerationLeaf | MedicalProcedureType | PhysicalExam;
 
-    type MedicalProcedureBase = MedicalEntityBase;
     type MedicalProcedureLeaf = {
         \\"@type\\": \\"MedicalProcedure\\";
-    } & MedicalProcedureBase;
+    } & ThingBase;
     /** A process of care used in either a diagnostic, therapeutic, preventive or palliative capacity that relies on invasive (surgical), non-invasive, or other techniques. */
     export type MedicalProcedure = MedicalProcedureLeaf | DiagnosticProcedure | PalliativeProcedure | PhysicalExam | SurgicalProcedure | TherapeuticProcedure;
 
-    type MedicalProcedureTypeBase = MedicalEnumerationBase;
     type MedicalProcedureTypeLeaf = {
         \\"@type\\": \\"MedicalProcedureType\\";
-    } & MedicalProcedureTypeBase;
+    } & ThingBase;
     /** An enumeration that describes different types of medical procedures. */
     export type MedicalProcedureType = \\"http://schema.org/NoninvasiveProcedure\\" | \\"http://schema.org/PercutaneousProcedure\\" | MedicalProcedureTypeLeaf;
     export const MedicalProcedureType = {
@@ -152,19 +147,18 @@ test(`baseine_${basename(__filename)}`, async () => {
         PercutaneousProcedure: (\\"http://schema.org/PercutaneousProcedure\\" as const)
     };
 
-    type MedicalTherapyBase = TherapeuticProcedureBase;
     type MedicalTherapyLeaf = {
         \\"@type\\": \\"MedicalTherapy\\";
-    } & MedicalTherapyBase;
+    } & ThingBase;
     export type MedicalTherapy = MedicalTherapyLeaf | PalliativeProcedure;
 
-    type PalliativeProcedureBase = (MedicalProcedureBase & MedicalTherapyBase);
+    type PalliativeProcedureBase = (ThingBase & ThingBase);
     type PalliativeProcedureLeaf = {
         \\"@type\\": \\"PalliativeProcedure\\";
     } & PalliativeProcedureBase;
     export type PalliativeProcedure = PalliativeProcedureLeaf;
 
-    type PhysicalExamBase = (MedicalProcedureBase & MedicalEnumerationBase);
+    type PhysicalExamBase = (ThingBase & ThingBase);
     type PhysicalExamLeaf = {
         \\"@type\\": \\"PhysicalExam\\";
     } & PhysicalExamBase;
@@ -174,23 +168,21 @@ test(`baseine_${basename(__filename)}`, async () => {
         Neuro: (\\"http://schema.org/Neuro\\" as const)
     };
 
-    type SurgicalProcedureBase = MedicalProcedureBase;
     type SurgicalProcedureLeaf = {
         \\"@type\\": \\"SurgicalProcedure\\";
-    } & SurgicalProcedureBase;
+    } & ThingBase;
     /** A medical procedure involving an incision with instruments; performed for diagnose, or therapeutic purposes. */
     export type SurgicalProcedure = SurgicalProcedureLeaf;
 
-    type TherapeuticProcedureBase = MedicalProcedureBase;
     type TherapeuticProcedureLeaf = {
         \\"@type\\": \\"TherapeuticProcedure\\";
-    } & TherapeuticProcedureBase;
+    } & ThingBase;
     export type TherapeuticProcedure = TherapeuticProcedureLeaf | MedicalTherapy;
 
     type ThingBase = {
         /** IRI identifying the canonical address of this object. */
         \\"@id\\"?: string;
-        \\"procedureType\\"?: MedicalProcedureType | readonly MedicalProcedureType[];
+        \\"procedureType\\"?: SchemaValue<MedicalProcedureType>;
     };
     type ThingLeaf = {
         \\"@type\\": \\"Thing\\";

@@ -93,7 +93,21 @@ describe('Class', () => {
       addParent(cls, 'https://schema.org/Thing');
 
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
-        "type PersonBase = ThingBase;
+        "type PersonLeaf = {
+            \\"@type\\": \\"Person\\";
+        } & ThingBase;
+        export type Person = PersonLeaf;"
+      `);
+    });
+
+    it('empty (two parents)', () => {
+      const ctx = new Context();
+      ctx.setUrlContext('https://schema.org/');
+      addParent(cls, 'https://schema.org/Thing1');
+      addParent(cls, 'https://schema.org/Thing2');
+
+      expect(asString(cls, ctx)).toMatchInlineSnapshot(`
+        "type PersonBase = (Thing1Base & Thing2Base);
         type PersonLeaf = {
             \\"@type\\": \\"Person\\";
         } & PersonBase;
@@ -117,10 +131,9 @@ describe('Class', () => {
       ).toBe(true);
 
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
-        "type PersonBase = ThingBase;
-        type PersonLeaf = {
+        "type PersonLeaf = {
             \\"@type\\": \\"Person\\";
-        } & PersonBase;
+        } & ThingBase;
         /** @deprecated Use CoolPerson instead. */
         export type Person = PersonLeaf;"
       `);
@@ -158,10 +171,9 @@ describe('Class', () => {
       ).toBe(true);
 
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
-        "type PersonBase = ThingBase;
-        type PersonLeaf = {
+        "type PersonLeaf = {
             \\"@type\\": \\"Person\\";
-        } & PersonBase;
+        } & ThingBase;
         /** @deprecated Use APerson or CoolPerson instead. */
         export type Person = PersonLeaf;"
       `);
@@ -192,10 +204,9 @@ describe('Class', () => {
       ).toBe(true);
 
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
-        "type PersonBase = ThingBase;
-        type PersonLeaf = {
+        "type PersonLeaf = {
             \\"@type\\": \\"Person\\";
-        } & PersonBase;
+        } & ThingBase;
         /**
          * Fantastic
          * @deprecated Use CoolPerson instead.

@@ -42,6 +42,8 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"@context\\": \\"https://schema.org\\";
     };
 
+    type SchemaValue<T> = T | readonly T[];
+
     /** Boolean: True or False. */
     export type Boolean = true | false | \\"https://schema.org/True\\" | \\"https://schema.org/False\\";
     export const Boolean = {

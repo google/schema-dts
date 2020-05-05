@@ -52,6 +52,8 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"@context\\": \\"https://schema.org\\";
     };
 
+    type SchemaValue<T> = T | readonly T[];
+
     /** Boolean: True or False. */
     export type Boolean = true | false | \\"https://schema.org/True\\" | \\"https://schema.org/False\\";
     export const Boolean = {
@@ -77,46 +79,40 @@ test(`baseine_${basename(__filename)}`, async () => {
     /** The basic data types such as Integers, Strings, etc. */
     export type DataType = Text | Number | Time | Date | DateTime | Boolean;
 
-    type DistanceBase = QuantityBase;
     type DistanceLeaf = {
         \\"@type\\": \\"Distance\\";
-    } & DistanceBase;
+    } & ThingBase;
     export type Distance = DistanceLeaf | string;
 
-    type DurationBase = QuantityBase;
     type DurationLeaf = {
         \\"@type\\": \\"Duration\\";
-    } & DurationBase;
+    } & ThingBase;
     export type Duration = DurationLeaf | string;
 
-    type EnergyBase = QuantityBase;
     type EnergyLeaf = {
         \\"@type\\": \\"Energy\\";
-    } & EnergyBase;
+    } & ThingBase;
     export type Energy = EnergyLeaf | string;
 
-    type IntangibleBase = ThingBase;
     type IntangibleLeaf = {
         \\"@type\\": \\"Intangible\\";
-    } & IntangibleBase;
+    } & ThingBase;
     export type Intangible = IntangibleLeaf | Quantity;
 
-    type MassBase = QuantityBase;
     type MassLeaf = {
         \\"@type\\": \\"Mass\\";
-    } & MassBase;
+    } & ThingBase;
     export type Mass = MassLeaf | string;
 
-    type QuantityBase = IntangibleBase;
     type QuantityLeaf = {
         \\"@type\\": \\"Quantity\\";
-    } & QuantityBase;
+    } & ThingBase;
     export type Quantity = QuantityLeaf | Distance | Duration | Energy | Mass | string;
 
     type ThingBase = {
         /** IRI identifying the canonical address of this object. */
         \\"@id\\"?: string;
-        \\"name\\"?: Text | readonly Text[];
+        \\"name\\"?: SchemaValue<Text>;
     };
     type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
