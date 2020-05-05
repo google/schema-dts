@@ -73,10 +73,11 @@ test(`baseine_${basename(__filename)}`, async () => {
         /** IRI identifying the canonical address of this object. */
         \\"@id\\"?: string;
     };
-    /** A Thing! */
-    export type Thing = \\"http://schema.org/a\\" | \\"http://schema.org/b\\" | \\"http://schema.org/c\\" | \\"http://schema.org/d\\" | ({
+    type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
-    } & ThingBase);
+    } & ThingBase;
+    /** A Thing! */
+    export type Thing = \\"http://schema.org/a\\" | \\"http://schema.org/b\\" | \\"http://schema.org/c\\" | \\"http://schema.org/d\\" | ThingLeaf;
     export const Thing = {
         a: (\\"http://schema.org/a\\" as const),
         b: (\\"http://schema.org/b\\" as const),

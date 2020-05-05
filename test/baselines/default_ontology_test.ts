@@ -66,9 +66,10 @@ test(`baseine_${basename(__filename)}`, async () => {
         /** IRI identifying the canonical address of this object. */
         \\"@id\\"?: string;
     };
-    export type Thing = {
+    type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
     } & ThingBase;
+    export type Thing = ThingLeaf;
 
     "
   `);

@@ -82,9 +82,10 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"c\\"?: Text | readonly Text[];
         \\"d\\"?: Text | readonly Text[];
     };
-    export type Thing = {
+    type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
     } & ThingBase;
+    export type Thing = ThingLeaf;
 
     "
   `);

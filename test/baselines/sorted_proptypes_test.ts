@@ -75,9 +75,10 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"@id\\"?: string;
         \\"a\\"?: (Boolean | Date | DateTime | Number | Text | Time) | readonly (Boolean | Date | DateTime | Number | Text | Time)[];
     };
-    export type Thing = {
+    type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
     } & ThingBase;
+    export type Thing = ThingLeaf;
 
     "
   `);

@@ -72,19 +72,21 @@ test(`baseine_${basename(__filename)}`, async () => {
     export type DataType = Text | Number | Time | Date | DateTime | Boolean;
 
     type DistilleryBase = ThingBase;
-    /** A distillery. */
-    export type Distillery = {
+    type DistilleryLeaf = {
         \\"@type\\": \\"Distillery\\";
     } & DistilleryBase;
+    /** A distillery. */
+    export type Distillery = DistilleryLeaf;
 
     type ThingBase = {
         /** IRI identifying the canonical address of this object. */
         \\"@id\\"?: string;
         \\"name\\"?: Text | readonly Text[];
     };
-    export type Thing = ({
+    type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
-    } & ThingBase) | Distillery;
+    } & ThingBase;
+    export type Thing = ThingLeaf | Distillery;
 
     "
   `);
