@@ -15,16 +15,15 @@
  */
 
 import {
-  createArrayTypeNode,
   createKeywordTypeNode,
   createPropertySignature,
   createStringLiteral,
   createToken,
-  createTypeOperatorNode,
   createTypeReferenceNode,
   createUnionTypeNode,
   PropertySignature,
   SyntaxKind,
+  createIdentifier,
 } from 'typescript';
 
 import {Log} from '../logging';
@@ -42,6 +41,7 @@ import {ClassMap} from './class';
 import {Context} from './context';
 import {withComments} from './util/comments';
 import {toClassName} from './util/names';
+import {SchemaValueName} from './helper_types';
 
 /**
  * A "class" of properties, not associated with any particuar object.
@@ -135,14 +135,10 @@ export class Property {
   }
 
   private typeNode() {
-    const node = this.type.scalarTypeNode();
-    return createUnionTypeNode([
-      node,
-      createTypeOperatorNode(
-        SyntaxKind.ReadonlyKeyword,
-        createArrayTypeNode(node)
-      ),
-    ]);
+    return createTypeReferenceNode(
+      createIdentifier(SchemaValueName),
+      /* typeArguments = */ [this.type.scalarTypeNode()]
+    );
   }
 
   toNode(context: Context): PropertySignature {

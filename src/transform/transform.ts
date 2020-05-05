@@ -31,6 +31,7 @@ import {Context} from '../ts/context';
 import {ProcessClasses} from './toClass';
 import {ProcessEnums} from './toEnum';
 import {ProcessProperties} from './toProperty';
+import {HelperTypes} from '../ts/helper_types';
 
 /**
  * Writes TypeScript declarations for all Classes, Typedefs, and Enums
@@ -69,6 +70,12 @@ export async function WriteDeclarations(
 
   write(printer.printNode(EmitHint.Unspecified, context.toNode(), source));
   write('\n\n');
+
+  for (const helperType of HelperTypes()) {
+    write(printer.printNode(EmitHint.Unspecified, helperType, source));
+    write('\n');
+  }
+  write('\n');
 
   for (const cls of sorted) {
     if (cls.deprecated && !includeDeprecated) continue;
