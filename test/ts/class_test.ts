@@ -75,15 +75,16 @@ describe('Class', () => {
       // A class with no parent has a top-level "@id"
       const ctx = new Context();
       ctx.setUrlContext('https://schema.org/');
-      expect(asString(cls, ctx)).toBe(
-        'type PersonBase = {\n' +
-          '    /** IRI identifying the canonical address of this object. */\n' +
-          '    "@id"?: string;\n' +
-          '};\n' +
-          'export type Person = {\n' +
-          '    "@type": "Person";\n' +
-          '} & PersonBase;'
-      );
+      expect(asString(cls, ctx)).toMatchInlineSnapshot(`
+        "type PersonBase = {
+            /** IRI identifying the canonical address of this object. */
+            \\"@id\\"?: string;
+        };
+        type PersonLeaf = {
+            \\"@type\\": \\"Person\\";
+        } & PersonBase;
+        export type Person = PersonLeaf;"
+      `);
     });
 
     it('empty (with parent)', () => {
@@ -91,12 +92,13 @@ describe('Class', () => {
       ctx.setUrlContext('https://schema.org/');
       addParent(cls, 'https://schema.org/Thing');
 
-      expect(asString(cls, ctx)).toBe(
-        'type PersonBase = ThingBase;\n' +
-          'export type Person = {\n' +
-          '    "@type": "Person";\n' +
-          '} & PersonBase;'
-      );
+      expect(asString(cls, ctx)).toMatchInlineSnapshot(`
+        "type PersonBase = ThingBase;
+        type PersonLeaf = {
+            \\"@type\\": \\"Person\\";
+        } & PersonBase;
+        export type Person = PersonLeaf;"
+      `);
     });
 
     it('deprecated once (only)', () => {
@@ -114,13 +116,14 @@ describe('Class', () => {
         )
       ).toBe(true);
 
-      expect(asString(cls, ctx)).toBe(
-        'type PersonBase = ThingBase;\n' +
-          '/** @deprecated Use CoolPerson instead. */\n' +
-          'export type Person = {\n' +
-          '    "@type": "Person";\n' +
-          '} & PersonBase;'
-      );
+      expect(asString(cls, ctx)).toMatchInlineSnapshot(`
+        "type PersonBase = ThingBase;
+        type PersonLeaf = {
+            \\"@type\\": \\"Person\\";
+        } & PersonBase;
+        /** @deprecated Use CoolPerson instead. */
+        export type Person = PersonLeaf;"
+      `);
     });
 
     it('deprecated twice (alphabetical)', () => {
@@ -154,13 +157,14 @@ describe('Class', () => {
         )
       ).toBe(true);
 
-      expect(asString(cls, ctx)).toBe(
-        'type PersonBase = ThingBase;\n' +
-          '/** @deprecated Use APerson or CoolPerson instead. */\n' +
-          'export type Person = {\n' +
-          '    "@type": "Person";\n' +
-          '} & PersonBase;'
-      );
+      expect(asString(cls, ctx)).toMatchInlineSnapshot(`
+        "type PersonBase = ThingBase;
+        type PersonLeaf = {
+            \\"@type\\": \\"Person\\";
+        } & PersonBase;
+        /** @deprecated Use APerson or CoolPerson instead. */
+        export type Person = PersonLeaf;"
+      `);
     });
 
     it('deprecated with comment', () => {
@@ -187,16 +191,17 @@ describe('Class', () => {
         )
       ).toBe(true);
 
-      expect(asString(cls, ctx)).toBe(
-        'type PersonBase = ThingBase;\n' +
-          '/**\n' +
-          ' * Fantastic\n' +
-          ' * @deprecated Use CoolPerson instead.\n' +
-          ' */\n' +
-          'export type Person = {\n' +
-          '    "@type": "Person";\n' +
-          '} & PersonBase;'
-      );
+      expect(asString(cls, ctx)).toMatchInlineSnapshot(`
+        "type PersonBase = ThingBase;
+        type PersonLeaf = {
+            \\"@type\\": \\"Person\\";
+        } & PersonBase;
+        /**
+         * Fantastic
+         * @deprecated Use CoolPerson instead.
+         */
+        export type Person = PersonLeaf;"
+      `);
     });
 
     it('complains about bad comment markup', () => {
