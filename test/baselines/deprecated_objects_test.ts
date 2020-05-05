@@ -92,16 +92,18 @@ test(`baseine_${basename(__filename)}`, async () => {
     type CarBase = ThingBase & {
         \\"doorNumber\\"?: Number | readonly Number[];
     };
-    export type Car = {
+    type CarLeaf = {
         \\"@type\\": \\"Car\\";
     } & CarBase;
+    export type Car = CarLeaf;
 
     type PersonLikeBase = ThingBase & {
         \\"height\\"?: Number | readonly Number[];
     };
-    export type PersonLike = {
+    type PersonLikeLeaf = {
         \\"@type\\": \\"PersonLike\\";
     } & PersonLikeBase;
+    export type PersonLike = PersonLikeLeaf;
 
     type ThingBase = {
         /** IRI identifying the canonical address of this object. */
@@ -113,19 +115,21 @@ test(`baseine_${basename(__filename)}`, async () => {
          */
         \\"names\\"?: Text | readonly Text[];
     };
-    export type Thing = ({
+    type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
-    } & ThingBase) | (Car | PersonLike | Vehicle);
+    } & ThingBase;
+    export type Thing = ThingLeaf | (Car | PersonLike | Vehicle);
 
     type VehicleBase = ThingBase & {
         \\"doorNumber\\"?: Number | readonly Number[];
         /** @deprecated Consider using http://schema.org/doorNumber instead. */
         \\"doors\\"?: Number | readonly Number[];
     };
-    /** @deprecated Use Car instead. */
-    export type Vehicle = {
+    type VehicleLeaf = {
         \\"@type\\": \\"Vehicle\\";
     } & VehicleBase;
+    /** @deprecated Use Car instead. */
+    export type Vehicle = VehicleLeaf;
 
     "
   `);

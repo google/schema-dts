@@ -74,9 +74,10 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"knows\\"?: never | readonly never[];
         \\"name\\"?: Text | readonly Text[];
     };
-    export type Thing = {
+    type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
     } & ThingBase;
+    export type Thing = ThingLeaf;
 
     "
   `);

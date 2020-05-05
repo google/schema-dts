@@ -80,43 +80,50 @@ test(`baseine_${basename(__filename)}`, async () => {
     export type DataType = Text | Number | Time | Date | DateTime | Boolean;
 
     type DistanceBase = QuantityBase;
-    export type Distance = ({
+    type DistanceLeaf = {
         \\"@type\\": \\"Distance\\";
-    } & DistanceBase) | string;
+    } & DistanceBase;
+    export type Distance = DistanceLeaf | string;
 
     type DurationBase = QuantityBase;
-    export type Duration = ({
+    type DurationLeaf = {
         \\"@type\\": \\"Duration\\";
-    } & DurationBase) | string;
+    } & DurationBase;
+    export type Duration = DurationLeaf | string;
 
     type EnergyBase = QuantityBase;
-    export type Energy = ({
+    type EnergyLeaf = {
         \\"@type\\": \\"Energy\\";
-    } & EnergyBase) | string;
+    } & EnergyBase;
+    export type Energy = EnergyLeaf | string;
 
     type IntangibleBase = ThingBase;
-    export type Intangible = ({
+    type IntangibleLeaf = {
         \\"@type\\": \\"Intangible\\";
-    } & IntangibleBase) | Quantity;
+    } & IntangibleBase;
+    export type Intangible = IntangibleLeaf | Quantity;
 
     type MassBase = QuantityBase;
-    export type Mass = ({
+    type MassLeaf = {
         \\"@type\\": \\"Mass\\";
-    } & MassBase) | string;
+    } & MassBase;
+    export type Mass = MassLeaf | string;
 
     type QuantityBase = IntangibleBase;
-    export type Quantity = ({
+    type QuantityLeaf = {
         \\"@type\\": \\"Quantity\\";
-    } & QuantityBase) | (Distance | Duration | Energy | Mass | string);
+    } & QuantityBase;
+    export type Quantity = QuantityLeaf | (Distance | Duration | Energy | Mass | string);
 
     type ThingBase = {
         /** IRI identifying the canonical address of this object. */
         \\"@id\\"?: string;
         \\"name\\"?: Text | readonly Text[];
     };
-    export type Thing = ({
+    type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
-    } & ThingBase) | Intangible;
+    } & ThingBase;
+    export type Thing = ThingLeaf | Intangible;
 
     "
   `);

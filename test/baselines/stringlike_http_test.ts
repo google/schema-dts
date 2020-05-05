@@ -89,45 +89,51 @@ test(`baseine_${basename(__filename)}`, async () => {
     export type DataType = Text | Number | Time | Date | DateTime | Boolean;
 
     type EntryPointBase = ThingBase;
-    export type EntryPoint = ({
+    type EntryPointLeaf = {
         \\"@type\\": \\"EntryPoint\\";
-    } & EntryPointBase) | string;
+    } & EntryPointBase;
+    export type EntryPoint = EntryPointLeaf | string;
 
     type OrganizationBase = ThingBase & {
         \\"locatedIn\\"?: Place | readonly Place[];
         \\"owner\\"?: Person | readonly Person[];
         \\"urlTemplate\\"?: URL | readonly URL[];
     };
-    export type Organization = ({
+    type OrganizationLeaf = {
         \\"@type\\": \\"Organization\\";
-    } & OrganizationBase) | string;
+    } & OrganizationBase;
+    export type Organization = OrganizationLeaf | string;
 
     type PersonBase = ThingBase & {
         \\"height\\"?: Quantity | readonly Quantity[];
         \\"locatedIn\\"?: Place | readonly Place[];
     };
-    export type Person = ({
+    type PersonLeaf = {
         \\"@type\\": \\"Person\\";
-    } & PersonBase) | string;
+    } & PersonBase;
+    export type Person = PersonLeaf | string;
 
     type PlaceBase = ThingBase;
-    export type Place = ({
+    type PlaceLeaf = {
         \\"@type\\": \\"Place\\";
-    } & PlaceBase) | string;
+    } & PlaceBase;
+    export type Place = PlaceLeaf | string;
 
     type QuantityBase = ThingBase;
-    export type Quantity = ({
+    type QuantityLeaf = {
         \\"@type\\": \\"Quantity\\";
-    } & QuantityBase) | string;
+    } & QuantityBase;
+    export type Quantity = QuantityLeaf | string;
 
     type ThingBase = {
         /** IRI identifying the canonical address of this object. */
         \\"@id\\"?: string;
         \\"name\\"?: Text | readonly Text[];
     };
-    export type Thing = ({
+    type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
-    } & ThingBase) | (EntryPoint | Organization | Person | Place | Quantity);
+    } & ThingBase;
+    export type Thing = ThingLeaf | (EntryPoint | Organization | Person | Place | Quantity);
 
     "
   `);

@@ -82,47 +82,54 @@ test(`baseine_${basename(__filename)}`, async () => {
     export type DataType = Text | Number | Time | Date | DateTime | Boolean;
 
     type EnumerationBase = IntangibleBase;
-    export type Enumeration = ({
+    type EnumerationLeaf = {
         \\"@type\\": \\"Enumeration\\";
-    } & EnumerationBase) | MedicalEnumeration;
+    } & EnumerationBase;
+    export type Enumeration = EnumerationLeaf | MedicalEnumeration;
 
     type IntangibleBase = ThingBase;
-    export type Intangible = ({
+    type IntangibleLeaf = {
         \\"@type\\": \\"Intangible\\";
-    } & IntangibleBase) | Enumeration;
+    } & IntangibleBase;
+    export type Intangible = IntangibleLeaf | Enumeration;
 
     type MedicalEnumerationBase = EnumerationBase;
-    export type MedicalEnumeration = ({
+    type MedicalEnumerationLeaf = {
         \\"@type\\": \\"MedicalEnumeration\\";
-    } & MedicalEnumerationBase) | MedicalProcedureType;
+    } & MedicalEnumerationBase;
+    export type MedicalEnumeration = MedicalEnumerationLeaf | MedicalProcedureType;
 
     type MedicalProcedureBase = ThingBase;
-    export type MedicalProcedure = ({
+    type MedicalProcedureLeaf = {
         \\"@type\\": \\"MedicalProcedure\\";
-    } & MedicalProcedureBase) | SurgicalProcedure;
+    } & MedicalProcedureBase;
+    export type MedicalProcedure = MedicalProcedureLeaf | SurgicalProcedure;
 
     type MedicalProcedureTypeBase = MedicalEnumerationBase;
-    export type MedicalProcedureType = \\"http://schema.org/SurgicalProcedure\\" | ({
+    type MedicalProcedureTypeLeaf = {
         \\"@type\\": \\"MedicalProcedureType\\";
-    } & MedicalProcedureTypeBase);
+    } & MedicalProcedureTypeBase;
+    export type MedicalProcedureType = \\"http://schema.org/SurgicalProcedure\\" | (MedicalProcedureTypeLeaf);
     export const MedicalProcedureType = {
         /** A type of medical procedure that involves invasive surgical techniques. */
         SurgicalProcedure: (\\"http://schema.org/SurgicalProcedure\\" as const)
     };
 
     type SurgicalProcedureBase = MedicalProcedureBase;
-    /** A type of medical procedure that involves invasive surgical techniques. */
-    export type SurgicalProcedure = {
+    type SurgicalProcedureLeaf = {
         \\"@type\\": \\"SurgicalProcedure\\";
     } & SurgicalProcedureBase;
+    /** A type of medical procedure that involves invasive surgical techniques. */
+    export type SurgicalProcedure = SurgicalProcedureLeaf;
 
     type ThingBase = {
         /** IRI identifying the canonical address of this object. */
         \\"@id\\"?: string;
     };
-    export type Thing = ({
+    type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
-    } & ThingBase) | (Intangible | MedicalProcedure);
+    } & ThingBase;
+    export type Thing = ThingLeaf | (Intangible | MedicalProcedure);
 
     "
   `);

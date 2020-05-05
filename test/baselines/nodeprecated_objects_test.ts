@@ -96,25 +96,28 @@ test(`baseine_${basename(__filename)}`, async () => {
     type CarBase = ThingBase & {
         \\"doorNumber\\"?: Number | readonly Number[];
     };
-    export type Car = {
+    type CarLeaf = {
         \\"@type\\": \\"Car\\";
     } & CarBase;
+    export type Car = CarLeaf;
 
     type PersonLikeBase = ThingBase & {
         \\"height\\"?: Number | readonly Number[];
     };
-    export type PersonLike = {
+    type PersonLikeLeaf = {
         \\"@type\\": \\"PersonLike\\";
     } & PersonLikeBase;
+    export type PersonLike = PersonLikeLeaf;
 
     type ThingBase = {
         /** IRI identifying the canonical address of this object. */
         \\"@id\\"?: string;
         \\"name\\"?: Text | readonly Text[];
     };
-    export type Thing = ({
+    type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
-    } & ThingBase) | (Car | PersonLike);
+    } & ThingBase;
+    export type Thing = ThingLeaf | (Car | PersonLike);
 
     "
   `);

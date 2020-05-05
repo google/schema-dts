@@ -79,6 +79,9 @@ test(`baseine_${basename(__filename)}`, async () => {
         /** Names are great! {@link X Y} */
         \\"name\\"?: Text | readonly Text[];
     };
+    type ThingLeaf = {
+        \\"@type\\": \\"Thing\\";
+    } & ThingBase;
     /**
      * Things are amazing!
      *
@@ -86,9 +89,7 @@ test(`baseine_${basename(__filename)}`, async () => {
      * - Bar
      * - _Baz_, and __Bat__
      */
-    export type Thing = \\"http://schema.org/Gadget\\" | \\"http://schema.org/Widget\\" | ({
-        \\"@type\\": \\"Thing\\";
-    } & ThingBase);
+    export type Thing = \\"http://schema.org/Gadget\\" | \\"http://schema.org/Widget\\" | (ThingLeaf);
     export const Thing = {
         /** Complex! */
         Gadget: (\\"http://schema.org/Gadget\\" as const),
