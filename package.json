@@ -19,22 +19,22 @@
     "@types/argparse": "^1.0.38",
     "@types/diff": "^4.0.2",
     "@types/jest": "^25.2.1",
-    "@types/node": "^13.9.1",
+    "@types/node": "^13.13.4",
     "clang-format": "^1.4.0",
-    "coveralls": "^3.0.9",
-    "cpy-cli": "^3.1.0",
+    "coveralls": "^3.1.0",
+    "cpy-cli": "^3.1.1",
     "del-cli": "^3.0.0",
-    "jest": "^25.2.7",
+    "jest": "^26.0.0",
     "mkdirp": "^1.0.4",
-    "prettier": "^2.0.4",
-    "ts-jest": "^25.3.1",
-    "tslint": "^6.1.0",
+    "prettier": "^2.0.5",
+    "ts-jest": "^25.4.0",
+    "tslint": "^6.1.2",
     "typescript": "^3.8.3"
   },
   "dependencies": {
     "argparse": "^1.0.10",
     "htmlparser2": "^4.1.0",
-    "rxjs": "^6.5.4"
+    "rxjs": "^6.5.5"
   },
   "peerDependencies": {
     "typescript": "^3.4.0"
