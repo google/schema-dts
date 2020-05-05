@@ -58,7 +58,6 @@ export async function WriteDeclarations(
   ProcessEnums(topics, classes);
   const sorted = Array.from(classes.values()).sort(Sort);
 
-  await write('// tslint:disable\n\n');
   const source = createSourceFile(
     'result.ts',
     '',
