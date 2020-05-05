@@ -120,6 +120,11 @@ export class Class {
   protected baseName() {
     return toClassName(this.subject) + 'Base';
   }
+
+  protected leafName() {
+    return toClassName(this.subject) + 'Leaf';
+  }
+
   private className() {
     return toClassName(this.subject);
   }
@@ -230,7 +235,40 @@ export class Class {
     );
   }
 
-  private nonEnumType(context: Context, skipDeprecated: boolean): TypeNode {
+  private leafDecl(context: Context): TypeAliasDeclaration | undefined {
+    // If we inherit from a DataType (~= a Built In), then the type is _not_
+    // represented as a node. Skip the leaf type.
+    //
+    // TODO: This should probably be modeled differently given the advent of 'PronounceableText'.
+    //
+    //       That is, 'PronounceableText' inherits 'Text', but does not _extend_ string per se;
+    //       string, in Text, is a leaf.
+    //
+    //       This breaks down because, e.g. 'URL' also inherits 'Text', but is string as well.
+    if (this.inheritsDataType()) {
+      return undefined;
+    }
+
+    const baseTypeReference = createTypeReferenceNode(
+      this.baseName(),
+      /*typeArguments=*/ []
+    );
+
+    const thisType = createIntersectionTypeNode([
+      createTypeLiteralNode([new TypeProperty(this.subject).toNode(context)]),
+      baseTypeReference,
+    ]);
+
+    return createTypeAliasDeclaration(
+      /*decorators=*/ [],
+      /*modifiers=*/ [],
+      this.leafName(),
+      /*typeParameters=*/ [],
+      thisType
+    );
+  }
+
+  private nonEnumType(skipDeprecated: boolean): TypeNode {
     this.children.sort((a, b) => CompareKeys(a.subject, b.subject));
     const children = this.children
       .filter(child => !(child.deprecated && skipDeprecated))
@@ -250,39 +288,33 @@ export class Class {
         ? children[0]
         : createParenthesizedType(createUnionTypeNode(children));
 
-    const baseTypeReference = createTypeReferenceNode(
-      this.baseName(),
+    const leafTypeReference = createTypeReferenceNode(
+      // If we inherit from a DataType (~= a Built In), then the type is _not_
+      // represented as a node. Skip the leaf type.
+      //
+      // TODO: This should probably be modeled differently given the advent of 'PronounceableText'.
+      //       See the note in 'leafDecl' for more details.
+      this.inheritsDataType() ? this.baseName() : this.leafName(),
       /*typeArguments=*/ []
     );
 
-    // If we inherit from a DataType (~= a Built In), then the type is _not_
-    // represented as a node. Skip the leaf type.
-    const thisType = this.inheritsDataType()
-      ? baseTypeReference
-      : createIntersectionTypeNode([
-          createTypeLiteralNode([
-            new TypeProperty(this.subject).toNode(context),
-          ]),
-          baseTypeReference,
-        ]);
-
     if (childrenNode) {
-      return createUnionTypeNode([thisType, childrenNode]);
+      return createUnionTypeNode([leafTypeReference, childrenNode]);
     } else {
-      return thisType;
+      return leafTypeReference;
     }
   }
 
-  private totalType(context: Context, skipDeprecated: boolean): TypeNode {
+  private totalType(skipDeprecated: boolean): TypeNode {
     const isEnum = this._enums.size > 0;
 
     if (isEnum) {
       return createUnionTypeNode([
         ...this.enums().map(e => e.toTypeLiteral()),
-        createParenthesizedType(this.nonEnumType(context, skipDeprecated)),
+        createParenthesizedType(this.nonEnumType(skipDeprecated)),
       ]);
     } else {
-      return this.nonEnumType(context, skipDeprecated);
+      return this.nonEnumType(skipDeprecated);
     }
   }
 
@@ -309,7 +341,7 @@ export class Class {
   }
 
   toNode(context: Context, skipDeprecated: boolean): readonly Statement[] {
-    const typeValue: TypeNode = this.totalType(context, skipDeprecated);
+    const typeValue: TypeNode = this.totalType(skipDeprecated);
     const declaration = withComments(
       this.comment,
       createTypeAliasDeclaration(
@@ -326,9 +358,13 @@ export class Class {
     // type XyzBase = (Parents) & {
     //   ... props;
     // };
+    // // Leaf:
+    // export type XyzLeaf = XyzBase & {
+    //   '@type': 'Xyz'
+    // }
     // // Complete Type ----------------------------//
     // export type Xyz = "Enum1"|"Enum2"|...        // Enum Piece: Optional.
-    //                  |XyzBase&{'@type': 'Xyz'}   // 'Leaf' Piece.
+    //                  |XyzLeaf                    // 'Leaf' Piece.
     //                  |Child1|Child2|...          // Child Piece: Optional.
     // // Enum Values: Optional --------------------//
     // export const Xyz = {
@@ -339,6 +375,7 @@ export class Class {
     // //-------------------------------------------//
     return arrayOf<Statement>(
       this.baseDecl(skipDeprecated, context),
+      this.leafDecl(context),
       declaration,
       this.enumDecl()
     );
