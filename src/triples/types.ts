@@ -47,6 +47,7 @@ function pathEqual(
 
 /**
  * In-memory representation of a node in a Triple corresponding to a URL.
+ *
  * @example <http://schema.org/domainIncludes>
  */
 export class UrlNode {

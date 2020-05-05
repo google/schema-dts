@@ -18,6 +18,7 @@ import {ArgumentParser} from 'argparse';
 export interface StandardOntology {
   /**
    * The version of the schema to use, formatted as a string.
+   *
    * @example
    * "3.4"
    * @example
@@ -27,6 +28,7 @@ export interface StandardOntology {
 
   /**
    * The "layer" of the schema to use.
+   *
    * @example <caption>The "Standard" approved schema</caption>
    * "schema"
    * @example <caption> Standard and pending schema, and extensions available
