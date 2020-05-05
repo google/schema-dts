@@ -56,9 +56,7 @@ test(`baseine_${basename(__filename)}`, async () => {
   );
 
   expect(actual).toMatchInlineSnapshot(`
-    "// tslint:disable
-
-    /** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
+    "/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
     export type WithContext<T extends Thing> = T & {
         \\"@context\\": \\"https://schema.org\\";
     };
