@@ -46,12 +46,12 @@ export type TTypeName = UrlNode;
 /** A set of statements applying to the same Subject. */
 export interface Topic {
   Subject: TSubject;
-  values: ReadonlyArray<ObjectPredicate>;
+  values: readonly ObjectPredicate[];
 }
 
 /** A Topic annotated by its types. */
 export interface TypedTopic extends Topic {
-  types: ReadonlyArray<TTypeName>;
+  types: readonly TTypeName[];
 }
 
 /** Compact Human-readable format of a Triple of ObjectPredicate. */

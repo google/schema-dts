@@ -21,7 +21,7 @@ export interface ReadonlyUrl {
   readonly href: string;
   readonly protocol: string;
   readonly hostname: string;
-  readonly path: ReadonlyArray<string>;
+  readonly path: readonly string[];
   readonly search: string;
 }
 function fromString(urlString: string): ReadonlyUrl {
@@ -34,10 +34,7 @@ function fromString(urlString: string): ReadonlyUrl {
     search: url.search,
   };
 }
-function pathEqual(
-  first: ReadonlyArray<string>,
-  second: ReadonlyArray<string>
-) {
+function pathEqual(first: readonly string[], second: readonly string[]) {
   if (first.length !== second.length) return false;
   for (let i = 0; i < first.length; ++i) {
     if (first[i] !== second[i]) return false;
@@ -119,6 +116,7 @@ export class UrlNode {
 /**
  * In-memory representation of a node in a Triple corresponding to a string
  * literal.
+ *
  * @example "BodyOfWater"
  * @example "BodyOfWater"@en
  */
@@ -142,6 +140,7 @@ export class SchemaString {
 /**
  * In-memory representation of a compact Node corresponding to a relative RDFS
  * reference.
+ *
  * @example <rdfs:label>
  */
 export class Rdfs {

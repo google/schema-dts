@@ -38,7 +38,7 @@ export class EnumValue {
   private comment?: string;
   constructor(
     readonly value: TSubject,
-    types: ReadonlyArray<TTypeName>,
+    types: readonly TTypeName[],
     map: ClassMap
   ) {
     for (const type of types) {

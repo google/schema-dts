@@ -93,7 +93,7 @@ const dataType = new DataTypeUnion(
   'The basic data types such as Integers, Strings, etc.'
 );
 
-function ForwardDeclareClasses(topics: ReadonlyArray<TypedTopic>): ClassMap {
+function ForwardDeclareClasses(topics: readonly TypedTopic[]): ClassMap {
   const classes = new Map<string, Class>();
   for (const wk of wellKnownTypes) {
     classes.set(wk.subject.toString(), wk);
@@ -112,7 +112,7 @@ function ForwardDeclareClasses(topics: ReadonlyArray<TypedTopic>): ClassMap {
   return classes;
 }
 
-function BuildClasses(topics: ReadonlyArray<TypedTopic>, classes: ClassMap) {
+function BuildClasses(topics: readonly TypedTopic[], classes: ClassMap) {
   for (const topic of topics) {
     if (!IsClass(topic)) continue;
 
@@ -130,7 +130,7 @@ function BuildClasses(topics: ReadonlyArray<TypedTopic>, classes: ClassMap) {
  * @param topics a sequence of processed triples describing an Ontology.
  * @returns ClassMap Mapping fully qualified ID of each type to a Class.
  */
-export function ProcessClasses(topics: ReadonlyArray<TypedTopic>): ClassMap {
+export function ProcessClasses(topics: readonly TypedTopic[]): ClassMap {
   const classes = ForwardDeclareClasses(topics);
   BuildClasses(topics, classes);
   return classes;

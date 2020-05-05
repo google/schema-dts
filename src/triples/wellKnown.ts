@@ -148,8 +148,8 @@ export function GetType(value: ObjectPredicate): TTypeName | null {
  */
 export function GetTypes(
   key: TSubject,
-  values: ReadonlyArray<ObjectPredicate>
-): ReadonlyArray<TTypeName> {
+  values: readonly ObjectPredicate[]
+): readonly TTypeName[] {
   const types = values.map(GetType).filter((t): t is TTypeName => !!t);
 
   if (types.length === 0) {
@@ -190,7 +190,7 @@ export function IsPropertyType(type: TTypeName): boolean {
  * Enum Values have, in addition to other Data or Class types, another object as
  * its "Type".
  */
-export function HasEnumType(types: ReadonlyArray<TTypeName>): boolean {
+export function HasEnumType(types: readonly TTypeName[]): boolean {
   for (const type of types) {
     // Skip well-known types.
     if (IsClassType(type) || IsPropertyType(type) || IsDataType(type)) continue;

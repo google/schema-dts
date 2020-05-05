@@ -22,13 +22,11 @@ import {EnumValue} from '../ts/enum';
 
 /**
  * Annotates classes with any Enum values they blong to.
+ *
  * @param topics a sequence of processed triples describing an Ontology.
  * @param classes return value of `ProcessClasses`.
  */
-export function ProcessEnums(
-  topics: ReadonlyArray<TypedTopic>,
-  classes: ClassMap
-) {
+export function ProcessEnums(topics: readonly TypedTopic[], classes: ClassMap) {
   // Process Enums
   for (const topic of topics) {
     if (!HasEnumType(topic.types)) continue;

@@ -39,13 +39,11 @@ function groupBySubject(): OperatorFunction<Triple, Topic> {
 }
 
 function asTopic(): OperatorFunction<Topic, TypedTopic> {
-  return map(bySubject => {
-    return {
-      Subject: bySubject.Subject,
-      types: GetTypes(bySubject.Subject, bySubject.values),
-      values: bySubject.values.filter(value => !IsType(value.Predicate)),
-    };
-  });
+  return map(bySubject => ({
+    Subject: bySubject.Subject,
+    types: GetTypes(bySubject.Subject, bySubject.values),
+    values: bySubject.values.filter(value => !IsType(value.Predicate)),
+  }));
 }
 
 export function asTopicArray(): OperatorFunction<Triple, TypedTopic[]> {
