@@ -65,9 +65,8 @@ test(`baseine_${basename(__filename)}`, async () => {
     /** The basic data types such as Integers, Strings, etc. */
     export type DataType = Text | Number | Time | Date | DateTime | Boolean;
 
-    type URLBase = Text;
     /** Data type: URL. */
-    export type URL = URLBase;
+    export type URL = Text;
 
     "
   `);

@@ -81,44 +81,38 @@ test(`baseine_${basename(__filename)}`, async () => {
     /** The basic data types such as Integers, Strings, etc. */
     export type DataType = Text | Number | Time | Date | DateTime | Boolean;
 
-    type EnumerationBase = IntangibleBase;
     type EnumerationLeaf = {
         \\"@type\\": \\"Enumeration\\";
-    } & EnumerationBase;
+    } & ThingBase;
     export type Enumeration = EnumerationLeaf | MedicalEnumeration;
 
-    type IntangibleBase = ThingBase;
     type IntangibleLeaf = {
         \\"@type\\": \\"Intangible\\";
-    } & IntangibleBase;
+    } & ThingBase;
     export type Intangible = IntangibleLeaf | Enumeration;
 
-    type MedicalEnumerationBase = EnumerationBase;
     type MedicalEnumerationLeaf = {
         \\"@type\\": \\"MedicalEnumeration\\";
-    } & MedicalEnumerationBase;
+    } & ThingBase;
     export type MedicalEnumeration = MedicalEnumerationLeaf | MedicalProcedureType;
 
-    type MedicalProcedureBase = ThingBase;
     type MedicalProcedureLeaf = {
         \\"@type\\": \\"MedicalProcedure\\";
-    } & MedicalProcedureBase;
+    } & ThingBase;
     export type MedicalProcedure = MedicalProcedureLeaf | SurgicalProcedure;
 
-    type MedicalProcedureTypeBase = MedicalEnumerationBase;
     type MedicalProcedureTypeLeaf = {
         \\"@type\\": \\"MedicalProcedureType\\";
-    } & MedicalProcedureTypeBase;
+    } & ThingBase;
     export type MedicalProcedureType = \\"http://schema.org/SurgicalProcedure\\" | MedicalProcedureTypeLeaf;
     export const MedicalProcedureType = {
         /** A type of medical procedure that involves invasive surgical techniques. */
         SurgicalProcedure: (\\"http://schema.org/SurgicalProcedure\\" as const)
     };
 
-    type SurgicalProcedureBase = MedicalProcedureBase;
     type SurgicalProcedureLeaf = {
         \\"@type\\": \\"SurgicalProcedure\\";
-    } & SurgicalProcedureBase;
+    } & ThingBase;
     /** A type of medical procedure that involves invasive surgical techniques. */
     export type SurgicalProcedure = SurgicalProcedureLeaf;
 

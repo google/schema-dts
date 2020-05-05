@@ -71,10 +71,9 @@ test(`baseine_${basename(__filename)}`, async () => {
     /** The basic data types such as Integers, Strings, etc. */
     export type DataType = Text | Number | Time | Date | DateTime | Boolean;
 
-    type DistilleryBase = ThingBase;
     type DistilleryLeaf = {
         \\"@type\\": \\"Distillery\\";
-    } & DistilleryBase;
+    } & ThingBase;
     /** A distillery. */
     export type Distillery = DistilleryLeaf;
 

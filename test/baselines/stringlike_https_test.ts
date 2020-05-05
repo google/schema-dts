@@ -88,10 +88,9 @@ test(`baseine_${basename(__filename)}`, async () => {
     /** The basic data types such as Integers, Strings, etc. */
     export type DataType = Text | Number | Time | Date | DateTime | Boolean;
 
-    type EntryPointBase = ThingBase;
     type EntryPointLeaf = {
         \\"@type\\": \\"EntryPoint\\";
-    } & EntryPointBase;
+    } & ThingBase;
     export type EntryPoint = EntryPointLeaf | string;
 
     type OrganizationBase = ThingBase & {
@@ -113,16 +112,14 @@ test(`baseine_${basename(__filename)}`, async () => {
     } & PersonBase;
     export type Person = PersonLeaf | string;
 
-    type PlaceBase = ThingBase;
     type PlaceLeaf = {
         \\"@type\\": \\"Place\\";
-    } & PlaceBase;
+    } & ThingBase;
     export type Place = PlaceLeaf | string;
 
-    type QuantityBase = ThingBase;
     type QuantityLeaf = {
         \\"@type\\": \\"Quantity\\";
-    } & QuantityBase;
+    } & ThingBase;
     export type Quantity = QuantityLeaf | string;
 
     type ThingBase = {
