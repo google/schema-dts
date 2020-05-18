@@ -19,6 +19,7 @@ import {
   createPropertyAssignment,
   createStringLiteral,
   createTypeReferenceNode,
+  TypeNode,
 } from 'typescript';
 
 import {Log} from '../logging';
@@ -28,6 +29,7 @@ import {GetComment, IsClassType, IsDataType} from '../triples/wellKnown';
 import {ClassMap} from './class';
 import {withComments} from './util/comments';
 import {toEnumName} from './util/names';
+import {Context} from './context';
 
 /**
  * Corresponds to a value that belongs to an Enumeration.
@@ -104,7 +106,23 @@ export class EnumValue {
     );
   }
 
-  toTypeLiteral() {
-    return createLiteralTypeNode(createStringLiteral(this.value.toString()));
+  toTypeLiteral(context: Context): TypeNode[] {
+    const types = [
+      createLiteralTypeNode(createStringLiteral(this.value.toString())),
+    ];
+    if (this.value.context.protocol === 'http:') {
+      types.push(
+        createLiteralTypeNode(
+          createStringLiteral(this.value.toString().replace(/^http:/, 'https:'))
+        )
+      );
+    }
+
+    const scoped = context.getScopedName(this.value);
+    if (scoped !== this.value.href) {
+      types.push(createLiteralTypeNode(createStringLiteral(scoped)));
+    }
+
+    return types;
   }
 }

@@ -326,13 +326,7 @@ export class Class {
 
     if (isEnum) {
       return createUnionTypeNode([
-        ...this.enums().map(e => e.toTypeLiteral()),
-        ...this.enums()
-          .map(e => [context.getScopedName(e.value), e.value.href])
-          .filter(([scoped, href]) => scoped !== href)
-          .map(([scoped]) =>
-            createLiteralTypeNode(createStringLiteral(scoped))
-          ),
+        ...this.enums().flatMap(e => e.toTypeLiteral(context)),
         ...this.nonEnumType(skipDeprecated),
       ]);
     } else {
