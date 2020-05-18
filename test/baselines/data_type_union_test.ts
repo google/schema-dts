@@ -24,29 +24,20 @@ import {inlineCli} from '../helpers/main_driver';
 test(`baseine_${basename(__filename)}`, async () => {
   const {actual} = await inlineCli(
     `
-<http://schema.org/a> <http://schema.org/rangeIncludes> <http://schema.org/Time> .
-<http://schema.org/a> <http://schema.org/rangeIncludes> <http://schema.org/Date> .
-<http://schema.org/a> <http://schema.org/rangeIncludes> <http://schema.org/Boolean> .
-<http://schema.org/a> <http://schema.org/rangeIncludes> <http://schema.org/DateTime> .
-<http://schema.org/a> <http://schema.org/rangeIncludes> <http://schema.org/Number> .
-<http://schema.org/a> <http://schema.org/rangeIncludes> <http://schema.org/Text> .
-<http://schema.org/a> <http://schema.org/domainIncludes> <http://schema.org/Thing> .
-<http://schema.org/a> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
+<http://schema.org/name> <http://schema.org/rangeIncludes> <http://schema.org/Text> .
+<http://schema.org/name> <http://schema.org/domainIncludes> <http://schema.org/Thing> .
+<http://schema.org/name> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
+<http://schema.org/age> <http://schema.org/rangeIncludes> <http://schema.org/Number> .
+<http://schema.org/age> <http://schema.org/domainIncludes> <http://schema.org/Thing> .
+<http://schema.org/age> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
 <http://schema.org/Thing> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
 <http://schema.org/Text> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/DataType> .
 <http://schema.org/Text> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
 <http://schema.org/Number> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/DataType> .
 <http://schema.org/Number> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
-<http://schema.org/DateTime> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/DataType> .
-<http://schema.org/DateTime> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
-<http://schema.org/Date> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/DataType> .
-<http://schema.org/Date> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
-<http://schema.org/Boolean> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/DataType> .
-<http://schema.org/Boolean> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
-<http://schema.org/Time> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/DataType> .
-<http://schema.org/Time> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
-<http://schema.org/True> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Boolean> .
-<http://schema.org/False> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Boolean> .
+<http://schema.org/DataType> <http://www.w3.org/2000/01/rdf-schema#comment> "The basic data types such as Integers, Strings, etc." .
+<http://schema.org/DataType> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
+<http://schema.org/DataType> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/2000/01/rdf-schema#Class> .
       `,
     ['--ontology', `https://fake.com/${basename(__filename)}.nt`]
   );
@@ -63,24 +54,16 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"@id\\": string;
     };
 
-    export type Boolean = \\"http://schema.org/False\\" | \\"https://schema.org/False\\" | \\"False\\" | \\"http://schema.org/True\\" | \\"https://schema.org/True\\" | \\"True\\" | boolean;
-    export const Boolean = {
-        False: (\\"http://schema.org/False\\" as const),
-        True: (\\"http://schema.org/True\\" as const)
-    };
-
-    export type Date = string;
-
-    export type DateTime = string;
-
     export type Number = number;
 
     export type Text = string;
 
-    export type Time = string;
+    /** The basic data types such as Integers, Strings, etc. */
+    export type DataType = Text | Number;
 
     type ThingBase = Partial<IdReference> & {
-        \\"a\\"?: SchemaValue<Boolean | Date | DateTime | Number | Text | Time>;
+        \\"age\\"?: SchemaValue<Number>;
+        \\"name\\"?: SchemaValue<Text>;
     };
     type ThingLeaf = {
         \\"@type\\": \\"Thing\\";

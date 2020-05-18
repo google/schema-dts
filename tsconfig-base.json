@@ -8,6 +8,7 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "composite": true
+    "composite": true,
+    "lib": ["ES2015", "ES2019.Array"]
   }
 }

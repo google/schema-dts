@@ -28,7 +28,6 @@ import {
 
 import {Log} from '../logging';
 import {Format, ObjectPredicate, TObject, TSubject} from '../triples/triple';
-import {UrlNode} from '../triples/types';
 import {
   GetComment,
   IsDomainIncludes,
@@ -37,17 +36,16 @@ import {
   IsTypeName,
 } from '../triples/wellKnown';
 
-import {ClassMap} from './class';
+import type {Class, ClassMap} from './class';
 import {Context} from './context';
 import {withComments} from './util/comments';
-import {toClassName} from './util/names';
-import {SchemaValueName} from './helper_types';
+import {SchemaValueName, IdReferenceName} from './helper_types';
 
 /**
  * A "class" of properties, not associated with any particuar object.
  */
 export class PropertyType {
-  private readonly types: UrlNode[] = [];
+  private readonly types: Class[] = [];
   private _comment?: string;
   private readonly _supersededBy: TObject[] = [];
 
@@ -86,7 +84,11 @@ export class PropertyType {
           )} to ${this.subject.toString()}.`
         );
       }
-      this.types.push(value.Object);
+      const cls = classes.get(value.Object.toString());
+      if (!cls) {
+        throw new Error(`Could not find class for ${value.Object.toString()}`);
+      }
+      this.types.push(cls);
       return true;
     }
 
@@ -110,9 +112,15 @@ export class PropertyType {
   }
 
   scalarTypeNode() {
-    const typeNodes = this.types
-      .sort((a, b) => toClassName(a).localeCompare(toClassName(b)))
-      .map(type => createTypeReferenceNode(toClassName(type), []));
+    const typeNames = this.types.map(cls => cls.className()).sort();
+    if (this.types.some(cls => cls.isNodeType())) {
+      typeNames.push(IdReferenceName);
+    }
+
+    const typeNodes = typeNames.map(type =>
+      createTypeReferenceNode(type, /*typeArguments=*/ [])
+    );
+
     switch (typeNodes.length) {
       case 0:
         return createKeywordTypeNode(SyntaxKind.NeverKeyword);
@@ -173,18 +181,4 @@ export class TypeProperty {
   }
 
   readonly deprecated = false;
-}
-
-export function IdPropertyNode() {
-  return withComments(
-    'IRI identifying the canonical address of this object.',
-    createPropertySignature(
-      /* modifiers= */ [],
-      createStringLiteral('@id'),
-      createToken(SyntaxKind.QuestionToken),
-      /* typeNode= */
-      createTypeReferenceNode('string', /*typeArguments=*/ undefined),
-      /* initializer= */ undefined
-    )
-  );
 }

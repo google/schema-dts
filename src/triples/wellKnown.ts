@@ -83,18 +83,16 @@ export function IsDataType(t: TTypeName): boolean {
   return IsSchemaObject(t) && t.name === 'DataType';
 }
 
-/** Returns true iff a Topic represents a non-DataType class. */
-export function IsClass(topic: TypedTopic): boolean {
-  // Skip all Native types. These are covered in wellKnownTypes.
-  if (topic.types.some(IsDataType)) return false;
+/** Returns true iff a Topic represents a DataType. */
+export function IsWellKnown(topic: TypedTopic): boolean {
+  if (topic.types.some(IsDataType)) return true;
+  return false;
+}
 
-  // Skip the DataType Type itself.
-  if (IsDataType(topic.Subject)) return false;
-
+/** Returns true iff a Topic represents a named class. */
+export function IsNamedClass(topic: TypedTopic): boolean {
   // Skip anything that isn't a class.
-  if (!topic.types.some(IsClassType)) return false;
-
-  return true;
+  return topic.types.some(IsClassType);
 }
 
 /**

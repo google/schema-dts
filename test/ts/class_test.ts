@@ -25,11 +25,11 @@ import {
 
 import {SchemaString, UrlNode} from '../../src/triples/types';
 import {
-  BooleanEnum,
-  Builtin,
+  AliasBuiltin,
   Class,
   DataTypeUnion,
   Sort,
+  Builtin,
 } from '../../src/ts/class';
 import {Context} from '../../src/ts/context';
 import {makeClass, makeClassMap} from '../helpers/make_class';
@@ -76,10 +76,7 @@ describe('Class', () => {
       const ctx = new Context();
       ctx.setUrlContext('https://schema.org/');
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
-        "type PersonBase = {
-            /** IRI identifying the canonical address of this object. */
-            \\"@id\\"?: string;
-        };
+        "type PersonBase = Partial<IdReference>;
         type PersonLeaf = {
             \\"@type\\": \\"Person\\";
         } & PersonBase;
@@ -301,124 +298,97 @@ describe('Sort(Class, Class)', () => {
       // Before regular classes.
       expect(
         Sort(
-          new Builtin('https://schema.org/Text', 'string', ''),
+          new AliasBuiltin('https://schema.org/Text', 'string'),
           makeClass('https://schema.org/A')
         )
       ).toBe(-1);
       expect(
         Sort(
           makeClass('https://schema.org/A'),
-          new Builtin('https://schema.org/Text', 'string', '')
+          new AliasBuiltin('https://schema.org/Text', 'string')
         )
       ).toBe(+1);
 
       // Before regular classes with different domains.
       expect(
         Sort(
-          new Builtin('https://schema.org/Text', 'string', ''),
+          new AliasBuiltin('https://schema.org/Text', 'string'),
           makeClass('https://a.org/DataType')
         )
       ).toBe(-1);
       expect(
         Sort(
           makeClass('https://a.org/DataType'),
-          new Builtin('https://schema.org/Text', 'string', '')
+          new AliasBuiltin('https://schema.org/Text', 'string')
         )
       ).toBe(+1);
 
       // Before builtins.
       expect(
         Sort(
-          new DataTypeUnion('https://schema.org/DataType', [], ''),
-          new Builtin('https://schema.org/A', 'string', '')
+          new DataTypeUnion('https://schema.org/DataType', []),
+          new AliasBuiltin('https://schema.org/A', 'string')
         )
       ).toBe(+1);
       expect(
         Sort(
-          new Builtin('https://schema.org/A', 'string', ''),
-          new DataTypeUnion('https://schema.org/DataType', [], '')
+          new AliasBuiltin('https://schema.org/A', 'string'),
+          new DataTypeUnion('https://schema.org/DataType', [])
         )
       ).toBe(-1);
       expect(
         Sort(
-          new Builtin('https://schema.org/Z', 'string', ''),
-          new DataTypeUnion('https://schema.org/DataType', [], '')
+          new AliasBuiltin('https://schema.org/Z', 'string'),
+          new DataTypeUnion('https://schema.org/DataType', [])
         )
       ).toBe(-1);
 
-      // Can be same as more specific builtins.
+      // Can be same as less specific builtins.
       expect(
         Sort(
-          new BooleanEnum(
-            'https://schema.org/Boo',
-            'https://schema.org/B',
-            'https://schema.org/C',
-            ''
-          ),
-          new Builtin('https://schema.org/Boo', 'Text', '')
+          new Builtin(UrlNode.Parse('https://schema.org/Boo'), false),
+          new AliasBuiltin('https://schema.org/Boo', 'Text')
         )
       ).toBe(0);
 
       // Sorts within Builtins
       expect(
         Sort(
-          new Builtin('https://schema.org/A', 'string', ''),
-          new Builtin('https://schema.org/B', 'string', '')
-        )
-      ).toBe(-1);
-      expect(
-        Sort(
-          new Builtin('https://schema.org/A', 'string', ''),
-          new BooleanEnum(
-            'https://schema.org/B',
-            'https://schema.org/B',
-            'https://schema.org/C',
-            ''
-          )
+          new AliasBuiltin('https://schema.org/A', 'string'),
+          new AliasBuiltin('https://schema.org/B', 'string')
         )
       ).toBe(-1);
 
       expect(
         Sort(
-          new Builtin('https://schema.org/B', 'string', ''),
-          new Builtin('https://schema.org/A', 'string', '')
-        )
-      ).toBe(+1);
-      expect(
-        Sort(
-          new Builtin('https://schema.org/B', 'string', ''),
-          new BooleanEnum(
-            'https://schema.org/A',
-            'https://schema.org/B',
-            'https://schema.org/C',
-            ''
-          )
+          new AliasBuiltin('https://schema.org/B', 'string'),
+          new AliasBuiltin('https://schema.org/A', 'string')
         )
       ).toBe(+1);
 
       expect(
         Sort(
-          new Builtin('https://schema.org/C', 'string', ''),
-          new Builtin('https://schema.org/C', 'string', '')
+          new AliasBuiltin('https://schema.org/C', 'string'),
+          new AliasBuiltin('https://schema.org/C', 'string')
         )
       ).toBe(0);
 
       expect(
         Sort(
-          new Builtin('https://schema.org/A#Z', 'string', ''),
-          new Builtin('https://schema.org/C', 'string', '')
+          new AliasBuiltin('https://schema.org/A#Z', 'string'),
+          new AliasBuiltin('https://schema.org/C', 'string')
         )
       ).toBe(+1);
       expect(
         Sort(
-          new Builtin('https://z.org/C', 'string', ''),
-          new Builtin('https://schema.org/C', 'string', '')
+          new AliasBuiltin('https://z.org/C', 'string'),
+          new AliasBuiltin('https://schema.org/C', 'string')
         )
       ).toBe(+1);
       expect(
         Sort(
-          new Builtin('https://z.org/Z#A', 'string', ''),
-          new Builtin('https://schema.org/C', 'string', '')
+          new AliasBuiltin('https://z.org/Z#A', 'string'),
+          new AliasBuiltin('https://schema.org/C', 'string')
         )
       ).toBe(-1);
     });
@@ -427,64 +397,51 @@ describe('Sort(Class, Class)', () => {
       // Before regular classes.
       expect(
         Sort(
-          new DataTypeUnion('https://schema.org/DataType', [], ''),
+          new DataTypeUnion('https://schema.org/DataType', []),
           makeClass('https://schema.org/A')
         )
       ).toBe(-1);
       expect(
         Sort(
           makeClass('https://schema.org/A'),
-          new DataTypeUnion('https://schema.org/DataType', [], '')
+          new DataTypeUnion('https://schema.org/DataType', [])
         )
       ).toBe(+1);
 
       // Before regular classes with different domains.
       expect(
         Sort(
-          new DataTypeUnion('https://schema.org/DataType', [], ''),
+          new DataTypeUnion('https://schema.org/DataType', []),
           makeClass('https://a.org/DataType')
         )
       ).toBe(-1);
       expect(
         Sort(
           makeClass('https://a.org/DataType'),
-          new DataTypeUnion('https://schema.org/DataType', [], '')
+          new DataTypeUnion('https://schema.org/DataType', [])
         )
       ).toBe(+1);
-
-      // After specific builtins.
-      expect(
-        Sort(
-          new BooleanEnum(
-            'https://schema.org/A',
-            'https://schema.org/B',
-            'https://schema.org/C',
-            ''
-          ),
-          new DataTypeUnion('https://schema.org/DataType', [], '')
-        )
-      ).toBe(-1);
     });
 
     it('DataType union is equal', () => {
       expect(
         Sort(
-          new DataTypeUnion('https://schema.org/DataType', [], ''),
-          new DataTypeUnion('https://schema.org/DataType', [], '')
+          new DataTypeUnion('https://schema.org/DataType', []),
+          new DataTypeUnion('https://schema.org/DataType', [])
         )
       ).toBe(0);
 
       expect(
         Sort(
-          new DataTypeUnion('https://schema.org/A', [], ''),
-          new DataTypeUnion('https://schema.org/Z', [], '')
+          new DataTypeUnion('https://schema.org/A', []),
+          new DataTypeUnion('https://schema.org/Z', [])
         )
       ).toBe(0);
 
       expect(
         Sort(
-          new DataTypeUnion('https://schema.org/Z', [], ''),
-          new DataTypeUnion('https://schema.org/A', [], '')
+          new DataTypeUnion('https://schema.org/Z', []),
+          new DataTypeUnion('https://schema.org/A', [])
         )
       ).toBe(0);
     });

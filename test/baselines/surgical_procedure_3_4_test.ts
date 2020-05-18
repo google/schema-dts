@@ -55,31 +55,10 @@ test(`baseine_${basename(__filename)}`, async () => {
     };
 
     type SchemaValue<T> = T | readonly T[];
-
-    /** Boolean: True or False. */
-    export type Boolean = true | false | \\"https://schema.org/True\\" | \\"https://schema.org/False\\";
-    export const Boolean = {
-        True: (\\"https://schema.org/True\\" as const),
-        False: (\\"https://schema.org/False\\" as const)
+    type IdReference = {
+        /** IRI identifying the canonical address of this object. */
+        \\"@id\\": string;
     };
-
-    /** A date value in {@link http://en.wikipedia.org/wiki/ISO_8601 ISO 8601 date format}. */
-    export type Date = string;
-
-    /** A combination of date and time of day in the form [-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] (see Chapter 5.4 of ISO 8601). */
-    export type DateTime = string;
-
-    /** Data type: Number. */
-    export type Number = number;
-
-    /** Data type: Text. */
-    export type Text = string;
-
-    /** DateTime represented in string, e.g. 2017-01-04T17:10:00-05:00. */
-    export type Time = string;
-
-    /** The basic data types such as Integers, Strings, etc. */
-    export type DataType = Text | Number | Time | Date | DateTime | Boolean;
 
     type EnumerationLeaf = {
         \\"@type\\": \\"Enumeration\\";
@@ -104,7 +83,7 @@ test(`baseine_${basename(__filename)}`, async () => {
     type MedicalProcedureTypeLeaf = {
         \\"@type\\": \\"MedicalProcedureType\\";
     } & ThingBase;
-    export type MedicalProcedureType = \\"http://schema.org/SurgicalProcedure\\" | MedicalProcedureTypeLeaf;
+    export type MedicalProcedureType = \\"http://schema.org/SurgicalProcedure\\" | \\"https://schema.org/SurgicalProcedure\\" | \\"SurgicalProcedure\\" | MedicalProcedureTypeLeaf;
     export const MedicalProcedureType = {
         /** A type of medical procedure that involves invasive surgical techniques. */
         SurgicalProcedure: (\\"http://schema.org/SurgicalProcedure\\" as const)
@@ -116,10 +95,7 @@ test(`baseine_${basename(__filename)}`, async () => {
     /** A type of medical procedure that involves invasive surgical techniques. */
     export type SurgicalProcedure = SurgicalProcedureLeaf;
 
-    type ThingBase = {
-        /** IRI identifying the canonical address of this object. */
-        \\"@id\\"?: string;
-    };
+    type ThingBase = Partial<IdReference>;
     type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
     } & ThingBase;

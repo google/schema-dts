@@ -42,6 +42,8 @@ test(`baseine_${basename(__filename)}`, async () => {
 <http://schema.org/Duration> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
 <http://schema.org/Mass> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
 <http://schema.org/Energy> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
+<http://schema.org/Text> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/DataType> .
+<http://schema.org/Text> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
       `,
     ['--ontology', `https://fake.com/${basename(__filename)}.nt`]
   );
@@ -53,31 +55,12 @@ test(`baseine_${basename(__filename)}`, async () => {
     };
 
     type SchemaValue<T> = T | readonly T[];
-
-    /** Boolean: True or False. */
-    export type Boolean = true | false | \\"https://schema.org/True\\" | \\"https://schema.org/False\\";
-    export const Boolean = {
-        True: (\\"https://schema.org/True\\" as const),
-        False: (\\"https://schema.org/False\\" as const)
+    type IdReference = {
+        /** IRI identifying the canonical address of this object. */
+        \\"@id\\": string;
     };
 
-    /** A date value in {@link http://en.wikipedia.org/wiki/ISO_8601 ISO 8601 date format}. */
-    export type Date = string;
-
-    /** A combination of date and time of day in the form [-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] (see Chapter 5.4 of ISO 8601). */
-    export type DateTime = string;
-
-    /** Data type: Number. */
-    export type Number = number;
-
-    /** Data type: Text. */
     export type Text = string;
-
-    /** DateTime represented in string, e.g. 2017-01-04T17:10:00-05:00. */
-    export type Time = string;
-
-    /** The basic data types such as Integers, Strings, etc. */
-    export type DataType = Text | Number | Time | Date | DateTime | Boolean;
 
     type DistanceLeaf = {
         \\"@type\\": \\"Distance\\";
@@ -109,9 +92,7 @@ test(`baseine_${basename(__filename)}`, async () => {
     } & ThingBase;
     export type Quantity = QuantityLeaf | Distance | Duration | Energy | Mass | string;
 
-    type ThingBase = {
-        /** IRI identifying the canonical address of this object. */
-        \\"@id\\"?: string;
+    type ThingBase = Partial<IdReference> & {
         \\"name\\"?: SchemaValue<Text>;
     };
     type ThingLeaf = {

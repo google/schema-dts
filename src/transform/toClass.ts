@@ -17,14 +17,8 @@
 import {Log} from '../logging';
 import {ObjectPredicate, Topic, TypedTopic} from '../triples/triple';
 import {UrlNode} from '../triples/types';
-import {IsClass} from '../triples/wellKnown';
-import {
-  BooleanEnum,
-  Builtin,
-  Class,
-  ClassMap,
-  DataTypeUnion,
-} from '../ts/class';
+import {IsNamedClass, IsWellKnown, IsDataType} from '../triples/wellKnown';
+import {AliasBuiltin, Class, ClassMap, DataTypeUnion} from '../ts/class';
 import {assert} from '../util/assert';
 
 function toClass(cls: Class, topic: Topic, map: ClassMap): Class {
@@ -45,32 +39,12 @@ function toClass(cls: Class, topic: Topic, map: ClassMap): Class {
 }
 
 const wellKnownTypes = [
-  new Builtin('http://schema.org/Text', 'string', 'Data type: Text.'),
-  new Builtin('http://schema.org/Number', 'number', 'Data type: Number.'),
-  new Builtin(
-    'http://schema.org/Time',
-    'string',
-    'DateTime represented in string, e.g. 2017-01-04T17:10:00-05:00.'
-  ),
-  new Builtin(
-    'http://schema.org/Date',
-    'string',
-    'A date value in <a href="http://en.wikipedia.org/wiki/ISO_8601">' +
-      'ISO 8601 date format</a>.'
-  ),
-  new Builtin(
-    'http://schema.org/DateTime',
-    'string',
-    'A combination of date and time of day in the form ' +
-      '[-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] ' +
-      '(see Chapter 5.4 of ISO 8601).'
-  ),
-  new BooleanEnum(
-    'http://schema.org/Boolean',
-    'https://schema.org/True',
-    'https://schema.org/False',
-    'Boolean: True or False.'
-  ),
+  new AliasBuiltin('http://schema.org/Text', 'string'),
+  new AliasBuiltin('http://schema.org/Number', 'number'),
+  new AliasBuiltin('http://schema.org/Time', 'string'),
+  new AliasBuiltin('http://schema.org/Date', 'string'),
+  new AliasBuiltin('http://schema.org/DateTime', 'string'),
+  new AliasBuiltin('http://schema.org/Boolean', 'boolean'),
 ];
 
 // Should we allow 'string' to be a valid type for all values of this type?
@@ -87,22 +61,29 @@ const wellKnownStrings = [
   UrlNode.Parse('https://schema.org/Place'),
 ];
 
-const dataType = new DataTypeUnion(
-  'http://schema.org/DataType',
-  wellKnownTypes,
-  'The basic data types such as Integers, Strings, etc.'
-);
-
 function ForwardDeclareClasses(topics: readonly TypedTopic[]): ClassMap {
   const classes = new Map<string, Class>();
-  for (const wk of wellKnownTypes) {
-    classes.set(wk.subject.toString(), wk);
-  }
-  classes.set(dataType.subject.toString(), dataType);
-  for (const topic of topics) {
-    if (!IsClass(topic)) continue;
+  const dataType = new DataTypeUnion('http://schema.org/DataType', []);
 
-    const allowString = wellKnownStrings.some(wks => wks.equals(topic.Subject));
+  for (const topic of topics) {
+    if (IsDataType(topic.Subject)) {
+      classes.set(topic.Subject.toString(), dataType);
+      continue;
+    } else if (IsWellKnown(topic)) {
+      const wk = wellKnownTypes.find(wk => wk.subject.equivTo(topic.Subject));
+      if (!wk) {
+        throw new Error(
+          `Non-Object type ${topic.Subject.toString()} has no corresponding well-known type.`
+        );
+      }
+      classes.set(topic.Subject.toString(), wk);
+      dataType.wk.push(wk);
+      continue;
+    } else if (!IsNamedClass(topic)) continue;
+
+    const allowString = wellKnownStrings.some(wks =>
+      wks.equivTo(topic.Subject)
+    );
     classes.set(
       topic.Subject.toString(),
       new Class(topic.Subject, allowString)
@@ -114,7 +95,7 @@ function ForwardDeclareClasses(topics: readonly TypedTopic[]): ClassMap {
 
 function BuildClasses(topics: readonly TypedTopic[], classes: ClassMap) {
   for (const topic of topics) {
-    if (!IsClass(topic)) continue;
+    if (!IsNamedClass(topic)) continue;
 
     const cls = classes.get(topic.Subject.toString());
     assert(cls);

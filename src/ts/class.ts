@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 import {
-  createAsExpression,
   createIntersectionTypeNode,
-  createLiteralTypeNode,
   createModifiersFromModifierFlags,
   createObjectLiteral,
   createParenthesizedType,
-  createPropertyAssignment,
-  createStringLiteral,
   createTypeAliasDeclaration,
   createTypeLiteralNode,
   createTypeReferenceNode,
@@ -41,15 +37,21 @@ import {
 import {Log} from '../logging';
 import {TObject, TPredicate, TSubject} from '../triples/triple';
 import {UrlNode} from '../triples/types';
-import {GetComment, GetSubClassOf, IsSupersededBy} from '../triples/wellKnown';
+import {
+  GetComment,
+  GetSubClassOf,
+  IsSupersededBy,
+  IsClassType,
+} from '../triples/wellKnown';
 
 import {Context} from './context';
 import {EnumValue} from './enum';
-import {IdPropertyNode, Property, TypeProperty} from './property';
+import {Property, TypeProperty} from './property';
 import {arrayOf} from './util/arrayof';
 import {withComments} from './util/comments';
 import {toClassName} from './util/names';
 import {assert} from '../util/assert';
+import {IdReferenceName} from './helper_types';
 
 /** Maps fully qualified IDs of each Class to the class itself. */
 export type ClassMap = Map<string, Class>;
@@ -74,6 +76,7 @@ export class Class {
   private readonly _supersededBy: Set<Class> = new Set();
 
   private inheritsDataType(): boolean {
+    if (this instanceof Builtin) return true;
     for (const parent of this.parents) {
       if (parent instanceof Builtin || parent.inheritsDataType()) {
         return true;
@@ -82,11 +85,15 @@ export class Class {
     return false;
   }
 
+  isNodeType(): boolean {
+    return !this.inheritsDataType();
+  }
+
   get deprecated() {
     return this._supersededBy.size > 0;
   }
 
-  private get comment() {
+  protected get comment() {
     if (!this.deprecated) return this._comment;
     const deprecated = `@deprecated Use ${this.supersededBy()
       .map(c => c.className())
@@ -132,7 +139,7 @@ export class Class {
     return toClassName(this.subject) + 'Leaf';
   }
 
-  private className() {
+  className() {
     return toClassName(this.subject);
   }
 
@@ -156,6 +163,10 @@ export class Class {
     }
     const s = GetSubClassOf(value);
     if (s) {
+      // DataType subclasses rdfs:Class (since it too is a 'meta' type).
+      // We don't represent this well right now, but we want to skip it.
+      if (IsClassType(s.subClassOf)) return false;
+
       const parentClass = classMap.get(s.subClassOf.toString());
       if (parentClass) {
         this.parents.push(parentClass);
@@ -193,6 +204,7 @@ export class Class {
   }
 
   private skipBase(): boolean {
+    if (this.inheritsDataType()) return true;
     return this.parents.length === 1 && this._props.size === 0;
   }
 
@@ -209,29 +221,25 @@ export class Class {
     );
     const parentNode =
       parentTypes.length === 0
-        ? null
+        ? createTypeReferenceNode('Partial', [
+            createTypeReferenceNode(IdReferenceName, /*typeArguments=*/ []),
+          ])
         : parentTypes.length === 1
         ? parentTypes[0]
         : createParenthesizedType(createIntersectionTypeNode(parentTypes));
 
-    const isRoot = parentNode === null;
-
     // Properties part.
     const propLiteral = createTypeLiteralNode([
-      // Add an '@id' property for the root.
-      ...(isRoot ? [IdPropertyNode()] : []),
       // ... then everything else.
       ...this.properties()
         .filter(property => !property.deprecated || !skipDeprecatedProperties)
         .map(prop => prop.toNode(context)),
     ]);
 
-    if (parentNode && propLiteral.members.length > 0) {
+    if (propLiteral.members.length > 0) {
       return createIntersectionTypeNode([parentNode, propLiteral]);
-    } else if (parentNode) {
-      return parentNode;
     } else {
-      return propLiteral;
+      return parentNode;
     }
   }
 
@@ -285,7 +293,7 @@ export class Class {
     );
   }
 
-  private nonEnumType(skipDeprecated: boolean): TypeNode[] {
+  protected nonEnumType(skipDeprecated: boolean): TypeNode[] {
     this.children.sort((a, b) => CompareKeys(a.subject, b.subject));
     const children = this.children
       .filter(child => !(child.deprecated && skipDeprecated))
@@ -311,12 +319,12 @@ export class Class {
     return [leafTypeReference, ...children];
   }
 
-  private totalType(skipDeprecated: boolean): TypeNode {
+  private totalType(context: Context, skipDeprecated: boolean): TypeNode {
     const isEnum = this._enums.size > 0;
 
     if (isEnum) {
       return createUnionTypeNode([
-        ...this.enums().map(e => e.toTypeLiteral()),
+        ...this.enums().flatMap(e => e.toTypeLiteral(context)),
         ...this.nonEnumType(skipDeprecated),
       ]);
     } else {
@@ -347,7 +355,7 @@ export class Class {
   }
 
   toNode(context: Context, skipDeprecated: boolean): readonly Statement[] {
-    const typeValue: TypeNode = this.totalType(skipDeprecated);
+    const typeValue: TypeNode = this.totalType(context, skipDeprecated);
     const declaration = withComments(
       this.comment,
       createTypeAliasDeclaration(
@@ -389,108 +397,37 @@ export class Class {
 }
 
 /**
- * Represents a DataType. A "Native" Schema.org object that is best represented
+ * Represents a DataType.
+ */
+export class Builtin extends Class {}
+
+/**
+ * A "Native" Schema.org object that is best represented
  * in JSON-LD and JavaScript as a typedef to a native type.
  */
-export class Builtin extends Class {
-  constructor(
-    url: string,
-    private readonly equivTo: string,
-    protected readonly doc: string
-  ) {
+export class AliasBuiltin extends Builtin {
+  constructor(url: string, private readonly equivTo: string) {
     super(UrlNode.Parse(url), false);
   }
 
-  toNode(): readonly Statement[] {
-    return [
-      withComments(
-        this.doc,
-        createTypeAliasDeclaration(
-          /*decorators=*/ [],
-          createModifiersFromModifierFlags(ModifierFlags.Export),
-          this.subject.name,
-          /*typeParameters=*/ [],
-          createTypeReferenceNode(this.equivTo, [])
-        )
-      ),
-    ];
+  nonEnumType(): TypeNode[] {
+    return [createTypeReferenceNode(this.equivTo, [])];
   }
 
   protected baseName() {
     return this.subject.name;
   }
 }
-export class BooleanEnum extends Builtin {
-  constructor(
-    url: string,
-    private trueUrl: string,
-    private falseUrl: string,
-    doc: string
-  ) {
-    super(url, '', doc);
-  }
-
-  toNode(): readonly Statement[] {
-    return [
-      withComments(
-        this.doc,
-        createTypeAliasDeclaration(
-          /*decotrators=*/ [],
-          createModifiersFromModifierFlags(ModifierFlags.Export),
-          this.subject.name,
-          /*typeParameters=*/ [],
-          createUnionTypeNode([
-            createTypeReferenceNode('true', /*typeArgs=*/ []),
-            createTypeReferenceNode('false', /*typeArgs=*/ []),
-            createLiteralTypeNode(createStringLiteral(this.trueUrl)),
-            createLiteralTypeNode(createStringLiteral(this.falseUrl)),
-          ])
-        )
-      ),
-      createVariableStatement(
-        createModifiersFromModifierFlags(ModifierFlags.Export),
-        createVariableDeclarationList(
-          [
-            createVariableDeclaration(
-              this.subject.name,
-              /*type=*/ undefined,
-              createObjectLiteral(
-                [
-                  createPropertyAssignment(
-                    'True',
-                    createAsExpression(
-                      createStringLiteral(this.trueUrl),
-                      createTypeReferenceNode('const', undefined)
-                    )
-                  ),
-                  createPropertyAssignment(
-                    'False',
-                    createAsExpression(
-                      createStringLiteral(this.falseUrl),
-                      createTypeReferenceNode('const', undefined)
-                    )
-                  ),
-                ],
-                true
-              )
-            ),
-          ],
-          NodeFlags.Const
-        )
-      ),
-    ];
-  }
-}
 
 export class DataTypeUnion extends Builtin {
-  constructor(url: string, private readonly wk: Builtin[], doc: string) {
-    super(url, '', doc);
+  constructor(url: string, readonly wk: Builtin[]) {
+    super(UrlNode.Parse(url), false);
   }
 
   toNode(): DeclarationStatement[] {
     return [
       withComments(
-        this.doc,
+        this.comment,
         createTypeAliasDeclaration(
           /*decorators=*/ [],
           createModifiersFromModifierFlags(ModifierFlags.Export),

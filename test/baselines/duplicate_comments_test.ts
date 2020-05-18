@@ -36,6 +36,8 @@ test(`baseine_${basename(__filename)}`, async () => {
 <http://schema.org/Gadget> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Thing> .
 <http://schema.org/Gadget> <http://www.w3.org/2000/01/rdf-schema#comment> "Simple!" .
 <http://schema.org/Gadget> <http://www.w3.org/2000/01/rdf-schema#comment> "Complex!" .
+<http://schema.org/Text> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/DataType> .
+<http://schema.org/Text> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
 `,
     ['--ontology', `https://fake.com/${basename(__filename)}.nt`, `--verbose`]
   );
@@ -47,35 +49,14 @@ test(`baseine_${basename(__filename)}`, async () => {
     };
 
     type SchemaValue<T> = T | readonly T[];
-
-    /** Boolean: True or False. */
-    export type Boolean = true | false | \\"https://schema.org/True\\" | \\"https://schema.org/False\\";
-    export const Boolean = {
-        True: (\\"https://schema.org/True\\" as const),
-        False: (\\"https://schema.org/False\\" as const)
+    type IdReference = {
+        /** IRI identifying the canonical address of this object. */
+        \\"@id\\": string;
     };
 
-    /** A date value in {@link http://en.wikipedia.org/wiki/ISO_8601 ISO 8601 date format}. */
-    export type Date = string;
-
-    /** A combination of date and time of day in the form [-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] (see Chapter 5.4 of ISO 8601). */
-    export type DateTime = string;
-
-    /** Data type: Number. */
-    export type Number = number;
-
-    /** Data type: Text. */
     export type Text = string;
 
-    /** DateTime represented in string, e.g. 2017-01-04T17:10:00-05:00. */
-    export type Time = string;
-
-    /** The basic data types such as Integers, Strings, etc. */
-    export type DataType = Text | Number | Time | Date | DateTime | Boolean;
-
-    type ThingBase = {
-        /** IRI identifying the canonical address of this object. */
-        \\"@id\\"?: string;
+    type ThingBase = Partial<IdReference> & {
         /** Names are great! {@link X Y} */
         \\"name\\"?: SchemaValue<Text>;
     };
@@ -89,7 +70,7 @@ test(`baseine_${basename(__filename)}`, async () => {
      * - Bar
      * - _Baz_, and __Bat__
      */
-    export type Thing = \\"http://schema.org/Gadget\\" | \\"http://schema.org/Widget\\" | ThingLeaf;
+    export type Thing = \\"http://schema.org/Gadget\\" | \\"https://schema.org/Gadget\\" | \\"Gadget\\" | \\"http://schema.org/Widget\\" | \\"https://schema.org/Widget\\" | \\"Widget\\" | ThingLeaf;
     export const Thing = {
         /** Complex! */
         Gadget: (\\"http://schema.org/Gadget\\" as const),

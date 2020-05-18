@@ -28,6 +28,8 @@ test(`baseine_${basename(__filename)}`, async () => {
 <http://schema.org/a> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Thing> .
 <http://schema.org/c> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Thing> .
 <http://schema.org/d> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Thing> .
+<https://schema.org/e> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Thing> .
+<http://google.com/f> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Thing> .
 <http://schema.org/c> <http://www.w3.org/2000/01/rdf-schema#comment> "A letter!" .
 <http://schema.org/c> <http://schema.org/category> "issue-1156" .
 <http://schema.org/Thing> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
@@ -43,47 +45,25 @@ test(`baseine_${basename(__filename)}`, async () => {
     };
 
     type SchemaValue<T> = T | readonly T[];
-
-    /** Boolean: True or False. */
-    export type Boolean = true | false | \\"https://schema.org/True\\" | \\"https://schema.org/False\\";
-    export const Boolean = {
-        True: (\\"https://schema.org/True\\" as const),
-        False: (\\"https://schema.org/False\\" as const)
-    };
-
-    /** A date value in {@link http://en.wikipedia.org/wiki/ISO_8601 ISO 8601 date format}. */
-    export type Date = string;
-
-    /** A combination of date and time of day in the form [-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] (see Chapter 5.4 of ISO 8601). */
-    export type DateTime = string;
-
-    /** Data type: Number. */
-    export type Number = number;
-
-    /** Data type: Text. */
-    export type Text = string;
-
-    /** DateTime represented in string, e.g. 2017-01-04T17:10:00-05:00. */
-    export type Time = string;
-
-    /** The basic data types such as Integers, Strings, etc. */
-    export type DataType = Text | Number | Time | Date | DateTime | Boolean;
-
-    type ThingBase = {
+    type IdReference = {
         /** IRI identifying the canonical address of this object. */
-        \\"@id\\"?: string;
+        \\"@id\\": string;
     };
+
+    type ThingBase = Partial<IdReference>;
     type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
     } & ThingBase;
     /** A Thing! */
-    export type Thing = \\"http://schema.org/a\\" | \\"http://schema.org/b\\" | \\"http://schema.org/c\\" | \\"http://schema.org/d\\" | ThingLeaf;
+    export type Thing = \\"http://schema.org/a\\" | \\"https://schema.org/a\\" | \\"a\\" | \\"http://schema.org/b\\" | \\"https://schema.org/b\\" | \\"b\\" | \\"http://schema.org/c\\" | \\"https://schema.org/c\\" | \\"c\\" | \\"http://schema.org/d\\" | \\"https://schema.org/d\\" | \\"d\\" | \\"https://schema.org/e\\" | \\"e\\" | \\"http://google.com/f\\" | \\"https://google.com/f\\" | ThingLeaf;
     export const Thing = {
         a: (\\"http://schema.org/a\\" as const),
         b: (\\"http://schema.org/b\\" as const),
         /** A letter! */
         c: (\\"http://schema.org/c\\" as const),
-        d: (\\"http://schema.org/d\\" as const)
+        d: (\\"http://schema.org/d\\" as const),
+        e: (\\"https://schema.org/e\\" as const),
+        f: (\\"http://google.com/f\\" as const)
     };
 
     "
