@@ -120,7 +120,7 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"@type\\": \\"MedicalProcedureType\\";
     } & ThingBase;
     /** An enumeration that describes different types of medical procedures. */
-    export type MedicalProcedureType = \\"http://schema.org/NoninvasiveProcedure\\" | \\"http://schema.org/PercutaneousProcedure\\" | MedicalProcedureTypeLeaf;
+    export type MedicalProcedureType = \\"http://schema.org/NoninvasiveProcedure\\" | \\"http://schema.org/PercutaneousProcedure\\" | \\"NoninvasiveProcedure\\" | \\"PercutaneousProcedure\\" | MedicalProcedureTypeLeaf;
     export const MedicalProcedureType = {
         NoninvasiveProcedure: (\\"http://schema.org/NoninvasiveProcedure\\" as const),
         PercutaneousProcedure: (\\"http://schema.org/PercutaneousProcedure\\" as const)
@@ -141,7 +141,7 @@ test(`baseine_${basename(__filename)}`, async () => {
     type PhysicalExamLeaf = {
         \\"@type\\": \\"PhysicalExam\\";
     } & PhysicalExamBase;
-    export type PhysicalExam = \\"http://schema.org/Head\\" | \\"http://schema.org/Neuro\\" | PhysicalExamLeaf;
+    export type PhysicalExam = \\"http://schema.org/Head\\" | \\"http://schema.org/Neuro\\" | \\"Head\\" | \\"Neuro\\" | PhysicalExamLeaf;
     export const PhysicalExam = {
         Head: (\\"http://schema.org/Head\\" as const),
         Neuro: (\\"http://schema.org/Neuro\\" as const)
