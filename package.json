@@ -17,6 +17,7 @@
   "bin": "./dist/gen/cli/cli.js",
   "devDependencies": {
     "@types/argparse": "^1.0.38",
+    "@types/array.prototype.flatmap": "^1.2.1",
     "@types/diff": "^4.0.2",
     "@types/jest": "^25.2.2",
     "@types/node": "^14.0.1",
@@ -39,6 +40,7 @@
   },
   "dependencies": {
     "argparse": "^1.0.10",
+    "array.prototype.flatmap": "^1.2.3",
     "htmlparser2": "^4.1.0",
     "rxjs": "^6.5.5"
   },
@@ -87,8 +89,8 @@
   "license": "Apache-2.0",
   "scripts": {
     "clean": "del-cli built dist/gen dist/schema/**/* !dist/schema/package.json !dist/schema/README.md",
-    "lint": "eslint */**/*.{js,ts} && prettier --check src/ && prettier --check test/",
-    "fix": "eslint --fix */**/*.{js,ts} && prettier --write src/ && prettier --write test/",
+    "lint": "eslint src/**/*.ts test/**/*.ts *.js && prettier --check src/ && prettier --check test/",
+    "fix": "eslint --fix src/**/*.ts test/**/*.ts *.js && prettier --write src/ && prettier --write test/",
     "test": "npm run lint && jest --coverage",
     "coverage_on_travis": "cat ./coverage/lcov.info | coveralls",
     "build": "tsc -b",
