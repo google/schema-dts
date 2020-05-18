@@ -18,13 +18,7 @@ import {Log} from '../logging';
 import {ObjectPredicate, Topic, TypedTopic} from '../triples/triple';
 import {UrlNode} from '../triples/types';
 import {IsNamedClass, IsWellKnown, IsDataType} from '../triples/wellKnown';
-import {
-  BooleanEnum,
-  AliasBuiltin,
-  Class,
-  ClassMap,
-  DataTypeUnion,
-} from '../ts/class';
+import {AliasBuiltin, Class, ClassMap, DataTypeUnion} from '../ts/class';
 import {assert} from '../util/assert';
 
 function toClass(cls: Class, topic: Topic, map: ClassMap): Class {
@@ -50,11 +44,7 @@ const wellKnownTypes = [
   new AliasBuiltin('http://schema.org/Time', 'string'),
   new AliasBuiltin('http://schema.org/Date', 'string'),
   new AliasBuiltin('http://schema.org/DateTime', 'string'),
-  new BooleanEnum(
-    'http://schema.org/Boolean',
-    'https://schema.org/True',
-    'https://schema.org/False'
-  ),
+  new AliasBuiltin('http://schema.org/Boolean', 'boolean'),
 ];
 
 // Should we allow 'string' to be a valid type for all values of this type?

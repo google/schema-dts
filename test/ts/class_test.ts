@@ -25,11 +25,11 @@ import {
 
 import {SchemaString, UrlNode} from '../../src/triples/types';
 import {
-  BooleanEnum,
   AliasBuiltin,
   Class,
   DataTypeUnion,
   Sort,
+  Builtin,
 } from '../../src/ts/class';
 import {Context} from '../../src/ts/context';
 import {makeClass, makeClassMap} from '../helpers/make_class';
@@ -343,14 +343,10 @@ describe('Sort(Class, Class)', () => {
         )
       ).toBe(-1);
 
-      // Can be same as more specific builtins.
+      // Can be same as less specific builtins.
       expect(
         Sort(
-          new BooleanEnum(
-            'https://schema.org/Boo',
-            'https://schema.org/B',
-            'https://schema.org/C'
-          ),
+          new Builtin(UrlNode.Parse('https://schema.org/Boo'), false),
           new AliasBuiltin('https://schema.org/Boo', 'Text')
         )
       ).toBe(0);
@@ -362,31 +358,11 @@ describe('Sort(Class, Class)', () => {
           new AliasBuiltin('https://schema.org/B', 'string')
         )
       ).toBe(-1);
-      expect(
-        Sort(
-          new AliasBuiltin('https://schema.org/A', 'string'),
-          new BooleanEnum(
-            'https://schema.org/B',
-            'https://schema.org/B',
-            'https://schema.org/C'
-          )
-        )
-      ).toBe(-1);
 
       expect(
         Sort(
           new AliasBuiltin('https://schema.org/B', 'string'),
           new AliasBuiltin('https://schema.org/A', 'string')
-        )
-      ).toBe(+1);
-      expect(
-        Sort(
-          new AliasBuiltin('https://schema.org/B', 'string'),
-          new BooleanEnum(
-            'https://schema.org/A',
-            'https://schema.org/B',
-            'https://schema.org/C'
-          )
         )
       ).toBe(+1);
 
@@ -445,18 +421,6 @@ describe('Sort(Class, Class)', () => {
           new DataTypeUnion('https://schema.org/DataType', [])
         )
       ).toBe(+1);
-
-      // After specific builtins.
-      expect(
-        Sort(
-          new BooleanEnum(
-            'https://schema.org/A',
-            'https://schema.org/B',
-            'https://schema.org/C'
-          ),
-          new DataTypeUnion('https://schema.org/DataType', [])
-        )
-      ).toBe(-1);
     });
 
     it('DataType union is equal', () => {

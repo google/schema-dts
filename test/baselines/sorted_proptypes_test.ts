@@ -45,6 +45,8 @@ test(`baseine_${basename(__filename)}`, async () => {
 <http://schema.org/Boolean> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
 <http://schema.org/Time> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/DataType> .
 <http://schema.org/Time> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
+<http://schema.org/True> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Boolean> .
+<http://schema.org/False> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Boolean> .
       `,
     ['--ontology', `https://fake.com/${basename(__filename)}.nt`]
   );

@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 import {
-  createAsExpression,
   createIntersectionTypeNode,
   createLiteralTypeNode,
   createModifiersFromModifierFlags,
   createObjectLiteral,
   createParenthesizedType,
-  createPropertyAssignment,
   createStringLiteral,
   createTypeAliasDeclaration,
   createTypeLiteralNode,
@@ -208,6 +206,7 @@ export class Class {
   }
 
   private skipBase(): boolean {
+    if (this.inheritsDataType()) return true;
     return this.parents.length === 1 && this._props.size === 0;
   }
 
@@ -296,7 +295,7 @@ export class Class {
     );
   }
 
-  private nonEnumType(skipDeprecated: boolean): TypeNode[] {
+  protected nonEnumType(skipDeprecated: boolean): TypeNode[] {
     this.children.sort((a, b) => CompareKeys(a.subject, b.subject));
     const children = this.children
       .filter(child => !(child.deprecated && skipDeprecated))
@@ -419,79 +418,12 @@ export class AliasBuiltin extends Builtin {
     super(UrlNode.Parse(url), false);
   }
 
-  toNode(): readonly Statement[] {
-    return [
-      withComments(
-        this.comment,
-        createTypeAliasDeclaration(
-          /*decorators=*/ [],
-          createModifiersFromModifierFlags(ModifierFlags.Export),
-          this.subject.name,
-          /*typeParameters=*/ [],
-          createTypeReferenceNode(this.equivTo, [])
-        )
-      ),
-    ];
+  nonEnumType(): TypeNode[] {
+    return [createTypeReferenceNode(this.equivTo, [])];
   }
 
   protected baseName() {
     return this.subject.name;
-  }
-}
-export class BooleanEnum extends Builtin {
-  constructor(url: string, private trueUrl: string, private falseUrl: string) {
-    super(UrlNode.Parse(url), false);
-  }
-
-  toNode(): readonly Statement[] {
-    return [
-      withComments(
-        this.comment,
-        createTypeAliasDeclaration(
-          /*decotrators=*/ [],
-          createModifiersFromModifierFlags(ModifierFlags.Export),
-          this.subject.name,
-          /*typeParameters=*/ [],
-          createUnionTypeNode([
-            createTypeReferenceNode('true', /*typeArgs=*/ []),
-            createTypeReferenceNode('false', /*typeArgs=*/ []),
-            createLiteralTypeNode(createStringLiteral(this.trueUrl)),
-            createLiteralTypeNode(createStringLiteral(this.falseUrl)),
-          ])
-        )
-      ),
-      createVariableStatement(
-        createModifiersFromModifierFlags(ModifierFlags.Export),
-        createVariableDeclarationList(
-          [
-            createVariableDeclaration(
-              this.subject.name,
-              /*type=*/ undefined,
-              createObjectLiteral(
-                [
-                  createPropertyAssignment(
-                    'True',
-                    createAsExpression(
-                      createStringLiteral(this.trueUrl),
-                      createTypeReferenceNode('const', undefined)
-                    )
-                  ),
-                  createPropertyAssignment(
-                    'False',
-                    createAsExpression(
-                      createStringLiteral(this.falseUrl),
-                      createTypeReferenceNode('const', undefined)
-                    )
-                  ),
-                ],
-                true
-              )
-            ),
-          ],
-          NodeFlags.Const
-        )
-      ),
-    ];
   }
 }
 
