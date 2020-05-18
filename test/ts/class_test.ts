@@ -76,10 +76,7 @@ describe('Class', () => {
       const ctx = new Context();
       ctx.setUrlContext('https://schema.org/');
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
-        "type PersonBase = {
-            /** IRI identifying the canonical address of this object. */
-            \\"@id\\"?: string;
-        };
+        "type PersonBase = Partial<IdReference>;
         type PersonLeaf = {
             \\"@type\\": \\"Person\\";
         } & PersonBase;

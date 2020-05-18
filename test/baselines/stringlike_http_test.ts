@@ -66,6 +66,10 @@ test(`baseine_${basename(__filename)}`, async () => {
     };
 
     type SchemaValue<T> = T | readonly T[];
+    type IdReference = {
+        /** IRI identifying the canonical address of this object. */
+        \\"@id\\": string;
+    };
 
     /** Boolean: True or False. */
     export type Boolean = true | false | \\"https://schema.org/True\\" | \\"https://schema.org/False\\";
@@ -98,8 +102,8 @@ test(`baseine_${basename(__filename)}`, async () => {
     export type EntryPoint = EntryPointLeaf | string;
 
     type OrganizationBase = ThingBase & {
-        \\"locatedIn\\"?: SchemaValue<Place>;
-        \\"owner\\"?: SchemaValue<Person>;
+        \\"locatedIn\\"?: SchemaValue<Place | IdReference>;
+        \\"owner\\"?: SchemaValue<Person | IdReference>;
         \\"urlTemplate\\"?: SchemaValue<URL>;
     };
     type OrganizationLeaf = {
@@ -108,8 +112,8 @@ test(`baseine_${basename(__filename)}`, async () => {
     export type Organization = OrganizationLeaf | string;
 
     type PersonBase = ThingBase & {
-        \\"height\\"?: SchemaValue<Quantity>;
-        \\"locatedIn\\"?: SchemaValue<Place>;
+        \\"height\\"?: SchemaValue<Quantity | IdReference>;
+        \\"locatedIn\\"?: SchemaValue<Place | IdReference>;
     };
     type PersonLeaf = {
         \\"@type\\": \\"Person\\";
@@ -126,15 +130,15 @@ test(`baseine_${basename(__filename)}`, async () => {
     } & ThingBase;
     export type Quantity = QuantityLeaf | string;
 
-    type ThingBase = {
-        /** IRI identifying the canonical address of this object. */
-        \\"@id\\"?: string;
+    type ThingBase = Partial<IdReference> & {
         \\"name\\"?: SchemaValue<Text>;
     };
     type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
     } & ThingBase;
     export type Thing = ThingLeaf | EntryPoint | Organization | Person | Place | Quantity;
+
+    export type URL = Text;
 
     "
   `);

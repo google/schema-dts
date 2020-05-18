@@ -80,6 +80,10 @@ test(`baseine_${basename(__filename)}`, async () => {
     };
 
     type SchemaValue<T> = T | readonly T[];
+    type IdReference = {
+        /** IRI identifying the canonical address of this object. */
+        \\"@id\\": string;
+    };
 
     /** Boolean: True or False. */
     export type Boolean = true | false | \\"https://schema.org/True\\" | \\"https://schema.org/False\\";
@@ -179,10 +183,8 @@ test(`baseine_${basename(__filename)}`, async () => {
     } & ThingBase;
     export type TherapeuticProcedure = TherapeuticProcedureLeaf | MedicalTherapy;
 
-    type ThingBase = {
-        /** IRI identifying the canonical address of this object. */
-        \\"@id\\"?: string;
-        \\"procedureType\\"?: SchemaValue<MedicalProcedureType>;
+    type ThingBase = Partial<IdReference> & {
+        \\"procedureType\\"?: SchemaValue<MedicalProcedureType | IdReference>;
     };
     type ThingLeaf = {
         \\"@type\\": \\"Thing\\";

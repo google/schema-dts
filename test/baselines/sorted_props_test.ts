@@ -48,6 +48,10 @@ test(`baseine_${basename(__filename)}`, async () => {
     };
 
     type SchemaValue<T> = T | readonly T[];
+    type IdReference = {
+        /** IRI identifying the canonical address of this object. */
+        \\"@id\\": string;
+    };
 
     /** Boolean: True or False. */
     export type Boolean = true | false | \\"https://schema.org/True\\" | \\"https://schema.org/False\\";
@@ -74,9 +78,7 @@ test(`baseine_${basename(__filename)}`, async () => {
     /** The basic data types such as Integers, Strings, etc. */
     export type DataType = Text | Number | Time | Date | DateTime | Boolean;
 
-    type ThingBase = {
-        /** IRI identifying the canonical address of this object. */
-        \\"@id\\"?: string;
+    type ThingBase = Partial<IdReference> & {
         \\"a\\"?: SchemaValue<Text>;
         \\"b\\"?: SchemaValue<Text>;
         \\"c\\"?: SchemaValue<Text>;
