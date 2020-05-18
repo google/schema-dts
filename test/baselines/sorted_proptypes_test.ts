@@ -63,10 +63,10 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"@id\\": string;
     };
 
-    export type Boolean = true | false | \\"https://schema.org/True\\" | \\"https://schema.org/False\\";
+    export type Boolean = \\"http://schema.org/False\\" | \\"https://schema.org/False\\" | \\"False\\" | \\"http://schema.org/True\\" | \\"https://schema.org/True\\" | \\"True\\" | boolean;
     export const Boolean = {
-        True: (\\"https://schema.org/True\\" as const),
-        False: (\\"https://schema.org/False\\" as const)
+        False: (\\"http://schema.org/False\\" as const),
+        True: (\\"http://schema.org/True\\" as const)
     };
 
     export type Date = string;

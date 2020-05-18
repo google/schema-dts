@@ -70,7 +70,7 @@ test(`baseine_${basename(__filename)}`, async () => {
      * - Bar
      * - _Baz_, and __Bat__
      */
-    export type Thing = \\"http://schema.org/Gadget\\" | \\"http://schema.org/Widget\\" | \\"Gadget\\" | \\"Widget\\" | ThingLeaf;
+    export type Thing = \\"http://schema.org/Gadget\\" | \\"https://schema.org/Gadget\\" | \\"Gadget\\" | \\"http://schema.org/Widget\\" | \\"https://schema.org/Widget\\" | \\"Widget\\" | ThingLeaf;
     export const Thing = {
         /** Complex! */
         Gadget: (\\"http://schema.org/Gadget\\" as const),
