@@ -83,9 +83,6 @@ test(`baseine_${basename(__filename)}`, async () => {
     /** DateTime represented in string, e.g. 2017-01-04T17:10:00-05:00. */
     export type Time = string;
 
-    /** The basic data types such as Integers, Strings, etc. */
-    export type DataType = Text | Number | Time | Date | DateTime | Boolean;
-
     type ThingBase = Partial<IdReference> & {
         \\"a\\"?: SchemaValue<Boolean | Date | DateTime | Number | Text | Time>;
     };

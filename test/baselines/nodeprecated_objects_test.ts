@@ -76,30 +76,11 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"@id\\": string;
     };
 
-    /** Boolean: True or False. */
-    export type Boolean = true | false | \\"https://schema.org/True\\" | \\"https://schema.org/False\\";
-    export const Boolean = {
-        True: (\\"https://schema.org/True\\" as const),
-        False: (\\"https://schema.org/False\\" as const)
-    };
-
-    /** A date value in {@link http://en.wikipedia.org/wiki/ISO_8601 ISO 8601 date format}. */
-    export type Date = string;
-
-    /** A combination of date and time of day in the form [-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] (see Chapter 5.4 of ISO 8601). */
-    export type DateTime = string;
-
     /** Data type: Number. */
     export type Number = number;
 
     /** Data type: Text. */
     export type Text = string;
-
-    /** DateTime represented in string, e.g. 2017-01-04T17:10:00-05:00. */
-    export type Time = string;
-
-    /** The basic data types such as Integers, Strings, etc. */
-    export type DataType = Text | Number | Time | Date | DateTime | Boolean;
 
     type CarBase = ThingBase & {
         \\"doorNumber\\"?: SchemaValue<Number>;
