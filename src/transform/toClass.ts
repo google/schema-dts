@@ -17,7 +17,7 @@
 import {Log} from '../logging';
 import {ObjectPredicate, Topic, TypedTopic} from '../triples/triple';
 import {UrlNode} from '../triples/types';
-import {IsClass, IsWellKnown, IsDataType} from '../triples/wellKnown';
+import {IsNamedClass, IsWellKnown, IsDataType} from '../triples/wellKnown';
 import {
   BooleanEnum,
   Builtin,
@@ -109,7 +109,7 @@ function ForwardDeclareClasses(topics: readonly TypedTopic[]): ClassMap {
       classes.set(topic.Subject.toString(), wk);
       dataType.wk.push(wk);
       continue;
-    } else if (!IsClass(topic)) continue;
+    } else if (!IsNamedClass(topic)) continue;
 
     const allowString = wellKnownStrings.some(wks =>
       wks.equivTo(topic.Subject)
@@ -125,7 +125,7 @@ function ForwardDeclareClasses(topics: readonly TypedTopic[]): ClassMap {
 
 function BuildClasses(topics: readonly TypedTopic[], classes: ClassMap) {
   for (const topic of topics) {
-    if (!IsClass(topic)) continue;
+    if (!IsNamedClass(topic)) continue;
 
     const cls = classes.get(topic.Subject.toString());
     assert(cls);

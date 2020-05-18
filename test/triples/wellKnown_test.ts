@@ -19,7 +19,7 @@ import {
   GetSubClassOf,
   GetType,
   GetTypes,
-  IsClass,
+  IsNamedClass,
 } from '../../src/triples/wellKnown';
 
 describe('wellKnown', () => {
@@ -259,32 +259,32 @@ describe('wellKnown', () => {
     });
   });
 
-  describe('IsClass', () => {
+  describe('IsNamedClass', () => {
     const cls = UrlNode.Parse('http://www.w3.org/2000/01/rdf-schema#Class');
     const dataType = UrlNode.Parse('http://schema.org/DataType');
     const bool = UrlNode.Parse('http://schema.org/Boolean');
 
-    it('a data type is not a class', () => {
+    it('a data type is a named class', () => {
       expect(
-        IsClass({
+        IsNamedClass({
           Subject: UrlNode.Parse('https://schema.org/Text'),
           types: [cls, dataType],
           values: [],
         })
-      ).toBe(false);
+      ).toBe(true);
 
       expect(
-        IsClass({
+        IsNamedClass({
           Subject: UrlNode.Parse('https://schema.org/Text'),
           types: [dataType, cls],
           values: [],
         })
-      ).toBe(false);
+      ).toBe(true);
     });
 
     it('an only-enum is not a class', () => {
       expect(
-        IsClass({
+        IsNamedClass({
           Subject: UrlNode.Parse('https://schema.org/True'),
           types: [bool],
           values: [],
@@ -294,7 +294,7 @@ describe('wellKnown', () => {
 
     it('an enum can still be a class', () => {
       expect(
-        IsClass({
+        IsNamedClass({
           Subject: UrlNode.Parse('https://schema.org/ItsComplicated'),
           types: [bool, cls],
           values: [],
@@ -302,9 +302,9 @@ describe('wellKnown', () => {
       ).toBe(true);
     });
 
-    it('the DataType union is not a class', () => {
+    it('the DataType union is a class', () => {
       expect(
-        IsClass({
+        IsNamedClass({
           Subject: UrlNode.Parse('https://schema.org/DataType'),
           types: [cls],
           values: [
@@ -318,7 +318,7 @@ describe('wellKnown', () => {
             },
           ],
         })
-      ).toBe(false);
+      ).toBe(true);
     });
   });
 });

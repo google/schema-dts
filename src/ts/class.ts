@@ -41,7 +41,12 @@ import {
 import {Log} from '../logging';
 import {TObject, TPredicate, TSubject} from '../triples/triple';
 import {UrlNode} from '../triples/types';
-import {GetComment, GetSubClassOf, IsSupersededBy} from '../triples/wellKnown';
+import {
+  GetComment,
+  GetSubClassOf,
+  IsSupersededBy,
+  IsClassType,
+} from '../triples/wellKnown';
 
 import {Context} from './context';
 import {EnumValue} from './enum';
@@ -162,6 +167,10 @@ export class Class {
     }
     const s = GetSubClassOf(value);
     if (s) {
+      // DataType subclasses rdfs:Class (since it too is a 'meta' type).
+      // We don't represent this well right now, but we want to skip it.
+      if (IsClassType(s.subClassOf)) return false;
+
       const parentClass = classMap.get(s.subClassOf.toString());
       if (parentClass) {
         this.parents.push(parentClass);
