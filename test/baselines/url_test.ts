@@ -46,10 +46,10 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"@id\\": string;
     };
 
-    export type Text = string;
+    export type Text = URL | string;
 
     /** Data type: URL. */
-    export type URL = Text;
+    export type URL = string;
 
     "
   `);

@@ -69,24 +69,27 @@ export type ClassMap = Map<string, Class>;
  */
 export class Class {
   private _comment?: string;
+  private _typedef?: string;
   private readonly children: Class[] = [];
-  private readonly parents: Class[] = [];
+  private readonly _parents: Class[] = [];
   private readonly _props: Set<Property> = new Set();
   private readonly _enums: Set<EnumValue> = new Set();
   private readonly _supersededBy: Set<Class> = new Set();
 
-  private inheritsDataType(): boolean {
-    if (this instanceof Builtin) return true;
-    for (const parent of this.parents) {
-      if (parent instanceof Builtin || parent.inheritsDataType()) {
-        return true;
-      }
-    }
-    return false;
+  private allParents(): readonly Class[] {
+    return this._parents;
+  }
+  private namedParents(): readonly string[] {
+    return this._parents
+      .map(p => p.baseName())
+      .filter((name): name is string => !!name);
   }
 
   isNodeType(): boolean {
-    return !this.inheritsDataType();
+    if (this instanceof Builtin) return false;
+    if (this._props.size > 0) return true;
+
+    return this.allParents().every(n => n.isNodeType());
   }
 
   get deprecated() {
@@ -99,6 +102,13 @@ export class Class {
       .map(c => c.className())
       .join(' or ')} instead.`;
     return this._comment ? `${this._comment}\n${deprecated}` : deprecated;
+  }
+
+  protected get typedefs(): string[] {
+    const parents = this.allParents().flatMap(p => p.typedefs);
+    return Array.from(
+      new Set(this._typedef ? [this._typedef, ...parents] : parents)
+    ).sort();
   }
 
   private properties() {
@@ -119,23 +129,24 @@ export class Class {
     );
   }
 
-  private get allowString(): boolean {
-    return (
-      this._allowStringType || this.parents.some(parent => parent.allowString)
-    );
-  }
-
-  protected baseName(): string {
+  private baseName(): string | undefined {
     // If Skip Base, we use the parent type instead.
     if (this.skipBase()) {
-      assert(this.parents.length === 1);
-      return this.parents[0].baseName();
+      if (this.namedParents().length === 0) return undefined;
+      assert(this.namedParents().length === 1);
+      return this.namedParents()[0];
     }
 
     return toClassName(this.subject) + 'Base';
   }
 
-  protected leafName() {
+  private leafName(): string | undefined {
+    // If the leaf has no node type and doesn't refer to any parent,
+    // skip defining it.
+    if (!this.isNodeType() && this.namedParents().length === 0) {
+      return undefined;
+    }
+
     return toClassName(this.subject) + 'Leaf';
   }
 
@@ -143,10 +154,7 @@ export class Class {
     return toClassName(this.subject);
   }
 
-  constructor(
-    readonly subject: TSubject,
-    private readonly _allowStringType: boolean
-  ) {}
+  constructor(readonly subject: TSubject) {}
   add(
     value: {Predicate: TPredicate; Object: TObject},
     classMap: ClassMap
@@ -169,7 +177,7 @@ export class Class {
 
       const parentClass = classMap.get(s.subClassOf.toString());
       if (parentClass) {
-        this.parents.push(parentClass);
+        this._parents.push(parentClass);
         parentClass.children.push(this);
       } else {
         throw new Error(
@@ -196,6 +204,16 @@ export class Class {
 
     return false;
   }
+
+  addTypedef(typedef: string) {
+    if (this._typedef) {
+      throw new Error(
+        `Class ${this.subject.href} already has typedef ${this._typedef} but we're also adding ${typedef}`
+      );
+    }
+    this._typedef = typedef;
+  }
+
   addProp(p: Property) {
     this._props.add(p);
   }
@@ -204,8 +222,8 @@ export class Class {
   }
 
   private skipBase(): boolean {
-    if (this.inheritsDataType()) return true;
-    return this.parents.length === 1 && this._props.size === 0;
+    if (!this.isNodeType()) return true;
+    return this.namedParents().length === 1 && this._props.size === 0;
   }
 
   private baseNode(
@@ -216,8 +234,8 @@ export class Class {
       return undefined;
     }
 
-    const parentTypes = this.parents.map(parent =>
-      createTypeReferenceNode(parent.baseName(), [])
+    const parentTypes = this.namedParents().map(p =>
+      createTypeReferenceNode(p, [])
     );
     const parentNode =
       parentTypes.length === 0
@@ -250,32 +268,30 @@ export class Class {
     const baseNode = this.baseNode(skipDeprecatedProperties, context);
 
     if (!baseNode) return undefined;
+    const baseName = this.baseName();
+    assert(baseName, 'If a baseNode is defined, baseName must be defined.');
 
     return createTypeAliasDeclaration(
       /*decorators=*/ [],
       /*modifiers=*/ [],
-      this.baseName(),
+      baseName,
       /*typeParameters=*/ [],
       baseNode
     );
   }
 
-  private leafDecl(context: Context): TypeAliasDeclaration | undefined {
-    // If we inherit from a DataType (~= a Built In), then the type is _not_
-    // represented as a node. Skip the leaf type.
-    //
-    // TODO: This should probably be modeled differently given the advent of 'PronounceableText'.
-    //
-    //       That is, 'PronounceableText' inherits 'Text', but does not _extend_ string per se;
-    //       string, in Text, is a leaf.
-    //
-    //       This breaks down because, e.g. 'URL' also inherits 'Text', but is string as well.
-    if (this.inheritsDataType()) {
-      return undefined;
-    }
+  protected leafDecl(context: Context): TypeAliasDeclaration | undefined {
+    const leafName = this.leafName();
+    if (!leafName) return undefined;
 
+    const baseName = this.baseName();
+    // Leaf is missing if !isNodeType || namedParents.length == 0
+    // Base is missing if !isNodeType && namedParents.length == 0 && numProps == 0
+    //
+    // so when "Leaf" is present, Base will always be present.
+    assert(baseName, 'Expect baseName to exist when leafName exists.');
     const baseTypeReference = createTypeReferenceNode(
-      this.baseName(),
+      baseName,
       /*typeArguments=*/ []
     );
 
@@ -287,7 +303,7 @@ export class Class {
     return createTypeAliasDeclaration(
       /*decorators=*/ [],
       /*modifiers=*/ [],
-      this.leafName(),
+      leafName,
       /*typeParameters=*/ [],
       thisType
     );
@@ -301,22 +317,15 @@ export class Class {
         createTypeReferenceNode(child.className(), /*typeArguments=*/ [])
       );
 
-    // 'String' is a valid Type sometimes, add that as a Child if so.
-    if (this.allowString) {
-      children.push(createTypeReferenceNode('string', /*typeArguments=*/ []));
-    }
-
-    const leafTypeReference = createTypeReferenceNode(
-      // If we inherit from a DataType (~= a Built In), then the type is _not_
-      // represented as a node. Skip the leaf type.
-      //
-      // TODO: This should probably be modeled differently given the advent of 'PronounceableText'.
-      //       See the note in 'leafDecl' for more details.
-      this.inheritsDataType() ? this.baseName() : this.leafName(),
-      /*typeArguments=*/ []
+    // A type can have a valid typedef, add that if so.
+    children.push(
+      ...this.typedefs.map(t => createTypeReferenceNode(t, /*typeArgs=*/ []))
     );
 
-    return [leafTypeReference, ...children];
+    const upRef = this.leafName() || this.baseName();
+    return upRef
+      ? [createTypeReferenceNode(upRef, /*typeArgs=*/ []), ...children]
+      : children;
   }
 
   private totalType(context: Context, skipDeprecated: boolean): TypeNode {
@@ -406,22 +415,15 @@ export class Builtin extends Class {}
  * in JSON-LD and JavaScript as a typedef to a native type.
  */
 export class AliasBuiltin extends Builtin {
-  constructor(url: string, private readonly equivTo: string) {
-    super(UrlNode.Parse(url), false);
-  }
-
-  nonEnumType(): TypeNode[] {
-    return [createTypeReferenceNode(this.equivTo, [])];
-  }
-
-  protected baseName() {
-    return this.subject.name;
+  constructor(url: string, equivTo: string) {
+    super(UrlNode.Parse(url));
+    this.addTypedef(equivTo);
   }
 }
 
 export class DataTypeUnion extends Builtin {
   constructor(url: string, readonly wk: Builtin[]) {
-    super(UrlNode.Parse(url), false);
+    super(UrlNode.Parse(url));
   }
 
   toNode(): DeclarationStatement[] {

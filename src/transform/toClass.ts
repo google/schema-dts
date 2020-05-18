@@ -81,13 +81,13 @@ function ForwardDeclareClasses(topics: readonly TypedTopic[]): ClassMap {
       continue;
     } else if (!IsNamedClass(topic)) continue;
 
+    const cls = new Class(topic.Subject);
     const allowString = wellKnownStrings.some(wks =>
       wks.equivTo(topic.Subject)
     );
-    classes.set(
-      topic.Subject.toString(),
-      new Class(topic.Subject, allowString)
-    );
+    if (allowString) cls.addTypedef('string');
+
+    classes.set(topic.Subject.toString(), cls);
   }
 
   return classes;
