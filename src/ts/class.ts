@@ -53,6 +53,9 @@ import {toClassName} from './util/names';
 import {assert} from '../util/assert';
 import {IdReferenceName} from './helper_types';
 
+import {shim as shimFlatMap} from 'array.prototype.flatmap';
+shimFlatMap();
+
 /** Maps fully qualified IDs of each Class to the class itself. */
 export type ClassMap = Map<string, Class>;
 
