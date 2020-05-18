@@ -72,10 +72,8 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"@id\\": string;
     };
 
-    /** Data type: Number. */
     export type Number = number;
 
-    /** Data type: Text. */
     export type Text = string;
 
     type CarBase = ThingBase & {

@@ -54,10 +54,8 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"@id\\": string;
     };
 
-    /** Data type: Number. */
     export type Number = number;
 
-    /** Data type: Text. */
     export type Text = string;
 
     /** The basic data types such as Integers, Strings, etc. */

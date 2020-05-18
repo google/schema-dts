@@ -55,7 +55,6 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"@id\\": string;
     };
 
-    /** Data type: Text. */
     export type Text = string;
 
     type ThingBase = Partial<IdReference> & {
