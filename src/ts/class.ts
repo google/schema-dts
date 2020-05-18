@@ -45,11 +45,12 @@ import {GetComment, GetSubClassOf, IsSupersededBy} from '../triples/wellKnown';
 
 import {Context} from './context';
 import {EnumValue} from './enum';
-import {IdPropertyNode, Property, TypeProperty} from './property';
+import {Property, TypeProperty} from './property';
 import {arrayOf} from './util/arrayof';
 import {withComments} from './util/comments';
 import {toClassName} from './util/names';
 import {assert} from '../util/assert';
+import {IdReferenceName} from './helper_types';
 
 /** Maps fully qualified IDs of each Class to the class itself. */
 export type ClassMap = Map<string, Class>;
@@ -74,12 +75,17 @@ export class Class {
   private readonly _supersededBy: Set<Class> = new Set();
 
   private inheritsDataType(): boolean {
+    if (this instanceof Builtin) return true;
     for (const parent of this.parents) {
       if (parent instanceof Builtin || parent.inheritsDataType()) {
         return true;
       }
     }
     return false;
+  }
+
+  isNodeType(): boolean {
+    return !this.inheritsDataType();
   }
 
   get deprecated() {
@@ -132,7 +138,7 @@ export class Class {
     return toClassName(this.subject) + 'Leaf';
   }
 
-  private className() {
+  className() {
     return toClassName(this.subject);
   }
 
@@ -209,29 +215,25 @@ export class Class {
     );
     const parentNode =
       parentTypes.length === 0
-        ? null
+        ? createTypeReferenceNode('Partial', [
+            createTypeReferenceNode(IdReferenceName, /*typeArguments=*/ []),
+          ])
         : parentTypes.length === 1
         ? parentTypes[0]
         : createParenthesizedType(createIntersectionTypeNode(parentTypes));
 
-    const isRoot = parentNode === null;
-
     // Properties part.
     const propLiteral = createTypeLiteralNode([
-      // Add an '@id' property for the root.
-      ...(isRoot ? [IdPropertyNode()] : []),
       // ... then everything else.
       ...this.properties()
         .filter(property => !property.deprecated || !skipDeprecatedProperties)
         .map(prop => prop.toNode(context)),
     ]);
 
-    if (parentNode && propLiteral.members.length > 0) {
+    if (propLiteral.members.length > 0) {
       return createIntersectionTypeNode([parentNode, propLiteral]);
-    } else if (parentNode) {
-      return parentNode;
     } else {
-      return propLiteral;
+      return parentNode;
     }
   }
 

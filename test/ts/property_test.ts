@@ -54,6 +54,18 @@ describe('PropertyType', () => {
         ).toThrowError('Type expected to be a UrlNode');
       });
 
+      it("type rangeIncludes object fails when class doesn't exist", () => {
+        expect(() =>
+          prop.add(
+            {
+              Predicate: rangeIncludes(),
+              Object: UrlNode.Parse('https://schema.org/Thing'),
+            },
+            new Map()
+          )
+        ).toThrowError('Could not find class for https://schema.org/Thing');
+      });
+
       it('type rangeIncludes object succeeds', () => {
         expect(
           prop.add(
@@ -61,7 +73,7 @@ describe('PropertyType', () => {
               Predicate: rangeIncludes(),
               Object: UrlNode.Parse('https://schema.org/Thing'),
             },
-            new Map()
+            makeClassMap(makeClass('https://schema.org/Thing'))
           )
         ).toBe(true);
       });

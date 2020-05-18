@@ -50,6 +50,10 @@ test(`baseine_${basename(__filename)}`, async () => {
 <https://schema.org/EntryPoint> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <https://schema.org/Thing> .
 <https://schema.org/urlTemplate> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
 <https://schema.org/urlTemplate> <https://schema.org/rangeIncludes> <https://schema.org/URL> .
+<https://schema.org/URL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
+<https://schema.org/URL> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://schema.org/Text> .
+<https://schema.org/Text> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/DataType> .
+<https://schema.org/Text> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
 <https://schema.org/urlTemplate> <https://schema.org/domainIncludes> <https://schema.org/Organization> .
       `,
     ['--ontology', `https://fake.com/${basename(__filename)}.nt`]

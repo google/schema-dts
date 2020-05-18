@@ -1,32 +1,58 @@
 import {
   createTypeAliasDeclaration,
-  createIdentifier,
   createTypeParameterDeclaration,
   createUnionTypeNode,
   createTypeReferenceNode,
   createTypeOperatorNode,
   createArrayTypeNode,
   SyntaxKind,
+  createTypeLiteralNode,
+  createPropertySignature,
+  createStringLiteral,
 } from 'typescript';
 
+import {withComments} from './util/comments';
+
+function IdPropertyNode() {
+  return withComments(
+    'IRI identifying the canonical address of this object.',
+    createPropertySignature(
+      /* modifiers= */ [],
+      createStringLiteral('@id'),
+      /* questionToken= */ undefined,
+      /* typeNode= */
+      createTypeReferenceNode('string', /*typeArguments=*/ []),
+      /* initializer= */ undefined
+    )
+  );
+}
+
 export const SchemaValueName = 'SchemaValue';
+export const IdReferenceName = 'IdReference';
 
 export function HelperTypes() {
   return [
     createTypeAliasDeclaration(
-      undefined,
-      undefined,
-      createIdentifier(SchemaValueName),
-      [createTypeParameterDeclaration(createIdentifier('T'))],
+      /*decorators=*/ [],
+      /*modifiers=*/ [],
+      SchemaValueName,
+      [createTypeParameterDeclaration('T')],
       createUnionTypeNode([
-        createTypeReferenceNode(createIdentifier('T'), undefined),
+        createTypeReferenceNode('T', /*typeArguments=*/ []),
         createTypeOperatorNode(
           SyntaxKind.ReadonlyKeyword,
           createArrayTypeNode(
-            createTypeReferenceNode(createIdentifier('T'), undefined)
+            createTypeReferenceNode('T', /*typeArguments=*/ [])
           )
         ),
       ])
+    ),
+    createTypeAliasDeclaration(
+      /*decorators=*/ [],
+      /*modifiers=*/ [],
+      IdReferenceName,
+      /*typeParameters=*/ [],
+      createTypeLiteralNode([IdPropertyNode()])
     ),
   ];
 }
