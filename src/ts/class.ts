@@ -406,10 +406,15 @@ export class Class {
 }
 
 /**
- * Represents a DataType. A "Native" Schema.org object that is best represented
+ * Represents a DataType.
+ */
+export class Builtin extends Class {}
+
+/**
+ * A "Native" Schema.org object that is best represented
  * in JSON-LD and JavaScript as a typedef to a native type.
  */
-export class Builtin extends Class {
+export class AliasBuiltin extends Builtin {
   constructor(url: string, private readonly equivTo: string) {
     super(UrlNode.Parse(url), false);
   }
@@ -435,7 +440,7 @@ export class Builtin extends Class {
 }
 export class BooleanEnum extends Builtin {
   constructor(url: string, private trueUrl: string, private falseUrl: string) {
-    super(url, '');
+    super(UrlNode.Parse(url), false);
   }
 
   toNode(): readonly Statement[] {
@@ -492,7 +497,7 @@ export class BooleanEnum extends Builtin {
 
 export class DataTypeUnion extends Builtin {
   constructor(url: string, readonly wk: Builtin[]) {
-    super(url, '');
+    super(UrlNode.Parse(url), false);
   }
 
   toNode(): DeclarationStatement[] {

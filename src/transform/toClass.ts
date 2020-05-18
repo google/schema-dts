@@ -20,7 +20,7 @@ import {UrlNode} from '../triples/types';
 import {IsNamedClass, IsWellKnown, IsDataType} from '../triples/wellKnown';
 import {
   BooleanEnum,
-  Builtin,
+  AliasBuiltin,
   Class,
   ClassMap,
   DataTypeUnion,
@@ -45,11 +45,11 @@ function toClass(cls: Class, topic: Topic, map: ClassMap): Class {
 }
 
 const wellKnownTypes = [
-  new Builtin('http://schema.org/Text', 'string'),
-  new Builtin('http://schema.org/Number', 'number'),
-  new Builtin('http://schema.org/Time', 'string'),
-  new Builtin('http://schema.org/Date', 'string'),
-  new Builtin('http://schema.org/DateTime', 'string'),
+  new AliasBuiltin('http://schema.org/Text', 'string'),
+  new AliasBuiltin('http://schema.org/Number', 'number'),
+  new AliasBuiltin('http://schema.org/Time', 'string'),
+  new AliasBuiltin('http://schema.org/Date', 'string'),
+  new AliasBuiltin('http://schema.org/DateTime', 'string'),
   new BooleanEnum(
     'http://schema.org/Boolean',
     'https://schema.org/True',

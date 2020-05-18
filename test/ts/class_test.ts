@@ -26,7 +26,7 @@ import {
 import {SchemaString, UrlNode} from '../../src/triples/types';
 import {
   BooleanEnum,
-  Builtin,
+  AliasBuiltin,
   Class,
   DataTypeUnion,
   Sort,
@@ -298,28 +298,28 @@ describe('Sort(Class, Class)', () => {
       // Before regular classes.
       expect(
         Sort(
-          new Builtin('https://schema.org/Text', 'string'),
+          new AliasBuiltin('https://schema.org/Text', 'string'),
           makeClass('https://schema.org/A')
         )
       ).toBe(-1);
       expect(
         Sort(
           makeClass('https://schema.org/A'),
-          new Builtin('https://schema.org/Text', 'string')
+          new AliasBuiltin('https://schema.org/Text', 'string')
         )
       ).toBe(+1);
 
       // Before regular classes with different domains.
       expect(
         Sort(
-          new Builtin('https://schema.org/Text', 'string'),
+          new AliasBuiltin('https://schema.org/Text', 'string'),
           makeClass('https://a.org/DataType')
         )
       ).toBe(-1);
       expect(
         Sort(
           makeClass('https://a.org/DataType'),
-          new Builtin('https://schema.org/Text', 'string')
+          new AliasBuiltin('https://schema.org/Text', 'string')
         )
       ).toBe(+1);
 
@@ -327,18 +327,18 @@ describe('Sort(Class, Class)', () => {
       expect(
         Sort(
           new DataTypeUnion('https://schema.org/DataType', []),
-          new Builtin('https://schema.org/A', 'string')
+          new AliasBuiltin('https://schema.org/A', 'string')
         )
       ).toBe(+1);
       expect(
         Sort(
-          new Builtin('https://schema.org/A', 'string'),
+          new AliasBuiltin('https://schema.org/A', 'string'),
           new DataTypeUnion('https://schema.org/DataType', [])
         )
       ).toBe(-1);
       expect(
         Sort(
-          new Builtin('https://schema.org/Z', 'string'),
+          new AliasBuiltin('https://schema.org/Z', 'string'),
           new DataTypeUnion('https://schema.org/DataType', [])
         )
       ).toBe(-1);
@@ -351,20 +351,20 @@ describe('Sort(Class, Class)', () => {
             'https://schema.org/B',
             'https://schema.org/C'
           ),
-          new Builtin('https://schema.org/Boo', 'Text')
+          new AliasBuiltin('https://schema.org/Boo', 'Text')
         )
       ).toBe(0);
 
       // Sorts within Builtins
       expect(
         Sort(
-          new Builtin('https://schema.org/A', 'string'),
-          new Builtin('https://schema.org/B', 'string')
+          new AliasBuiltin('https://schema.org/A', 'string'),
+          new AliasBuiltin('https://schema.org/B', 'string')
         )
       ).toBe(-1);
       expect(
         Sort(
-          new Builtin('https://schema.org/A', 'string'),
+          new AliasBuiltin('https://schema.org/A', 'string'),
           new BooleanEnum(
             'https://schema.org/B',
             'https://schema.org/B',
@@ -375,13 +375,13 @@ describe('Sort(Class, Class)', () => {
 
       expect(
         Sort(
-          new Builtin('https://schema.org/B', 'string'),
-          new Builtin('https://schema.org/A', 'string')
+          new AliasBuiltin('https://schema.org/B', 'string'),
+          new AliasBuiltin('https://schema.org/A', 'string')
         )
       ).toBe(+1);
       expect(
         Sort(
-          new Builtin('https://schema.org/B', 'string'),
+          new AliasBuiltin('https://schema.org/B', 'string'),
           new BooleanEnum(
             'https://schema.org/A',
             'https://schema.org/B',
@@ -392,27 +392,27 @@ describe('Sort(Class, Class)', () => {
 
       expect(
         Sort(
-          new Builtin('https://schema.org/C', 'string'),
-          new Builtin('https://schema.org/C', 'string')
+          new AliasBuiltin('https://schema.org/C', 'string'),
+          new AliasBuiltin('https://schema.org/C', 'string')
         )
       ).toBe(0);
 
       expect(
         Sort(
-          new Builtin('https://schema.org/A#Z', 'string'),
-          new Builtin('https://schema.org/C', 'string')
+          new AliasBuiltin('https://schema.org/A#Z', 'string'),
+          new AliasBuiltin('https://schema.org/C', 'string')
         )
       ).toBe(+1);
       expect(
         Sort(
-          new Builtin('https://z.org/C', 'string'),
-          new Builtin('https://schema.org/C', 'string')
+          new AliasBuiltin('https://z.org/C', 'string'),
+          new AliasBuiltin('https://schema.org/C', 'string')
         )
       ).toBe(+1);
       expect(
         Sort(
-          new Builtin('https://z.org/Z#A', 'string'),
-          new Builtin('https://schema.org/C', 'string')
+          new AliasBuiltin('https://z.org/Z#A', 'string'),
+          new AliasBuiltin('https://schema.org/C', 'string')
         )
       ).toBe(-1);
     });
