@@ -425,6 +425,8 @@ export class DataTypeUnion extends Builtin {
   }
 
   toNode(): DeclarationStatement[] {
+    this.wk.sort(Sort);
+
     return [
       withComments(
         this.comment,
