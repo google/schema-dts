@@ -17,7 +17,7 @@
 import {Log} from '../logging';
 import {ObjectPredicate, Topic, TypedTopic} from '../triples/triple';
 import {UrlNode} from '../triples/types';
-import {IsClass, IsWellKnown} from '../triples/wellKnown';
+import {IsClass, IsWellKnown, IsDataType} from '../triples/wellKnown';
 import {
   BooleanEnum,
   Builtin,
@@ -87,30 +87,29 @@ const wellKnownStrings = [
   UrlNode.Parse('https://schema.org/Place'),
 ];
 
-const dataType = new DataTypeUnion(
-  'http://schema.org/DataType',
-  wellKnownTypes,
-  'The basic data types such as Integers, Strings, etc.'
-);
-
 function ForwardDeclareClasses(topics: readonly TypedTopic[]): ClassMap {
   const classes = new Map<string, Class>();
+  const dataType = new DataTypeUnion(
+    'http://schema.org/DataType',
+    [],
+    'The basic data types such as Integers, Strings, etc.'
+  );
 
   for (const topic of topics) {
-    if (IsWellKnown(topic)) {
-      const wk = [...wellKnownTypes, dataType].find(wk =>
-        wk.subject.equivTo(topic.Subject)
-      );
+    if (IsDataType(topic.Subject)) {
+      classes.set(topic.Subject.toString(), dataType);
+      continue;
+    } else if (IsWellKnown(topic)) {
+      const wk = wellKnownTypes.find(wk => wk.subject.equivTo(topic.Subject));
       if (!wk) {
         throw new Error(
           `Non-Object type ${topic.Subject.toString()} has no corresponding well-known type.`
         );
       }
-
       classes.set(topic.Subject.toString(), wk);
+      dataType.wk.push(wk);
       continue;
-    }
-    if (!IsClass(topic)) continue;
+    } else if (!IsClass(topic)) continue;
 
     const allowString = wellKnownStrings.some(wks =>
       wks.equivTo(topic.Subject)

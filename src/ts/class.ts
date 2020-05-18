@@ -485,7 +485,7 @@ export class BooleanEnum extends Builtin {
 }
 
 export class DataTypeUnion extends Builtin {
-  constructor(url: string, private readonly wk: Builtin[], doc: string) {
+  constructor(url: string, readonly wk: Builtin[], doc: string) {
     super(url, '', doc);
   }
 
