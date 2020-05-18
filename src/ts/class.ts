@@ -97,7 +97,7 @@ export class Class {
     return this._supersededBy.size > 0;
   }
 
-  private get comment() {
+  protected get comment() {
     if (!this.deprecated) return this._comment;
     const deprecated = `@deprecated Use ${this.supersededBy()
       .map(c => c.className())
@@ -410,18 +410,14 @@ export class Class {
  * in JSON-LD and JavaScript as a typedef to a native type.
  */
 export class Builtin extends Class {
-  constructor(
-    url: string,
-    private readonly equivTo: string,
-    protected readonly doc: string
-  ) {
+  constructor(url: string, private readonly equivTo: string) {
     super(UrlNode.Parse(url), false);
   }
 
   toNode(): readonly Statement[] {
     return [
       withComments(
-        this.doc,
+        this.comment,
         createTypeAliasDeclaration(
           /*decorators=*/ [],
           createModifiersFromModifierFlags(ModifierFlags.Export),
@@ -438,19 +434,14 @@ export class Builtin extends Class {
   }
 }
 export class BooleanEnum extends Builtin {
-  constructor(
-    url: string,
-    private trueUrl: string,
-    private falseUrl: string,
-    doc: string
-  ) {
-    super(url, '', doc);
+  constructor(url: string, private trueUrl: string, private falseUrl: string) {
+    super(url, '');
   }
 
   toNode(): readonly Statement[] {
     return [
       withComments(
-        this.doc,
+        this.comment,
         createTypeAliasDeclaration(
           /*decotrators=*/ [],
           createModifiersFromModifierFlags(ModifierFlags.Export),
@@ -500,14 +491,14 @@ export class BooleanEnum extends Builtin {
 }
 
 export class DataTypeUnion extends Builtin {
-  constructor(url: string, readonly wk: Builtin[], doc: string) {
-    super(url, '', doc);
+  constructor(url: string, readonly wk: Builtin[]) {
+    super(url, '');
   }
 
   toNode(): DeclarationStatement[] {
     return [
       withComments(
-        this.doc,
+        this.comment,
         createTypeAliasDeclaration(
           /*decorators=*/ [],
           createModifiersFromModifierFlags(ModifierFlags.Export),

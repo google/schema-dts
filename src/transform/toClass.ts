@@ -45,31 +45,15 @@ function toClass(cls: Class, topic: Topic, map: ClassMap): Class {
 }
 
 const wellKnownTypes = [
-  new Builtin('http://schema.org/Text', 'string', 'Data type: Text.'),
-  new Builtin('http://schema.org/Number', 'number', 'Data type: Number.'),
-  new Builtin(
-    'http://schema.org/Time',
-    'string',
-    'DateTime represented in string, e.g. 2017-01-04T17:10:00-05:00.'
-  ),
-  new Builtin(
-    'http://schema.org/Date',
-    'string',
-    'A date value in <a href="http://en.wikipedia.org/wiki/ISO_8601">' +
-      'ISO 8601 date format</a>.'
-  ),
-  new Builtin(
-    'http://schema.org/DateTime',
-    'string',
-    'A combination of date and time of day in the form ' +
-      '[-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] ' +
-      '(see Chapter 5.4 of ISO 8601).'
-  ),
+  new Builtin('http://schema.org/Text', 'string'),
+  new Builtin('http://schema.org/Number', 'number'),
+  new Builtin('http://schema.org/Time', 'string'),
+  new Builtin('http://schema.org/Date', 'string'),
+  new Builtin('http://schema.org/DateTime', 'string'),
   new BooleanEnum(
     'http://schema.org/Boolean',
     'https://schema.org/True',
-    'https://schema.org/False',
-    'Boolean: True or False.'
+    'https://schema.org/False'
   ),
 ];
 
@@ -89,11 +73,7 @@ const wellKnownStrings = [
 
 function ForwardDeclareClasses(topics: readonly TypedTopic[]): ClassMap {
   const classes = new Map<string, Class>();
-  const dataType = new DataTypeUnion(
-    'http://schema.org/DataType',
-    [],
-    'The basic data types such as Integers, Strings, etc.'
-  );
+  const dataType = new DataTypeUnion('http://schema.org/DataType', []);
 
   for (const topic of topics) {
     if (IsDataType(topic.Subject)) {
