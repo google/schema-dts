@@ -15,11 +15,9 @@
  */
 import {
   createIntersectionTypeNode,
-  createLiteralTypeNode,
   createModifiersFromModifierFlags,
   createObjectLiteral,
   createParenthesizedType,
-  createStringLiteral,
   createTypeAliasDeclaration,
   createTypeLiteralNode,
   createTypeReferenceNode,
