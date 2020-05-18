@@ -322,12 +322,18 @@ export class Class {
     return [leafTypeReference, ...children];
   }
 
-  private totalType(skipDeprecated: boolean): TypeNode {
+  private totalType(context: Context, skipDeprecated: boolean): TypeNode {
     const isEnum = this._enums.size > 0;
 
     if (isEnum) {
       return createUnionTypeNode([
         ...this.enums().map(e => e.toTypeLiteral()),
+        ...this.enums()
+          .map(e => [context.getScopedName(e.value), e.value.href])
+          .filter(([scoped, href]) => scoped !== href)
+          .map(([scoped]) =>
+            createLiteralTypeNode(createStringLiteral(scoped))
+          ),
         ...this.nonEnumType(skipDeprecated),
       ]);
     } else {
@@ -358,7 +364,7 @@ export class Class {
   }
 
   toNode(context: Context, skipDeprecated: boolean): readonly Statement[] {
-    const typeValue: TypeNode = this.totalType(skipDeprecated);
+    const typeValue: TypeNode = this.totalType(context, skipDeprecated);
     const declaration = withComments(
       this.comment,
       createTypeAliasDeclaration(
