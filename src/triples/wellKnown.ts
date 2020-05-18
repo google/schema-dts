@@ -86,7 +86,6 @@ export function IsDataType(t: TTypeName): boolean {
 /** Returns true iff a Topic represents a DataType. */
 export function IsWellKnown(topic: TypedTopic): boolean {
   if (topic.types.some(IsDataType)) return true;
-  if (IsDataType(topic.Subject)) return true;
   return false;
 }
 
