@@ -34,6 +34,8 @@ test(`baseine_${basename(__filename)}`, async () => {
 <http://schema.org/Distillery> <http://schema.org/category> "issue-743" .
 <http://schema.org/Distillery> <http://www.w3.org/2000/01/rdf-schema#label> "Distillery" .
 <http://schema.org/Distillery> <http://www.w3.org/2000/01/rdf-schema#comment> "A distillery." .
+<http://schema.org/Text> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/DataType> .
+<http://schema.org/Text> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
 `,
     ['--ontology', `https://fake.com/${basename(__filename)}.nt`, '--verbose']
   );
