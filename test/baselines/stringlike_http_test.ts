@@ -71,7 +71,7 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"@id\\": string;
     };
 
-    export type Text = string;
+    export type Text = URL | string;
 
     type EntryPointLeaf = {
         \\"@type\\": \\"EntryPoint\\";
@@ -115,7 +115,7 @@ test(`baseine_${basename(__filename)}`, async () => {
     } & ThingBase;
     export type Thing = ThingLeaf | EntryPoint | Organization | Person | Place | Quantity;
 
-    export type URL = Text;
+    export type URL = string;
 
     "
   `);

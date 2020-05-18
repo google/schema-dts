@@ -16,8 +16,8 @@
 import {UrlNode} from '../../src/triples/types';
 import {Class, ClassMap} from '../../src/ts/class';
 
-export function makeClass(url: string, allowString = false): Class {
-  return new Class(UrlNode.Parse(url), allowString);
+export function makeClass(url: string): Class {
+  return new Class(UrlNode.Parse(url));
 }
 
 export function makeClassMap(...classes: Class[]): ClassMap {

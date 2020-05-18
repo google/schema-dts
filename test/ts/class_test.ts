@@ -70,6 +70,14 @@ describe('Class', () => {
     });
   });
 
+  it("can't add typedef twice", () => {
+    const cls = makeClass('https://schema.org/Person');
+    cls.addTypedef('string');
+    expect(() => cls.addTypedef('Foo')).toThrowError(
+      'already has typedef string'
+    );
+  });
+
   describe('toNode', () => {
     it('by default (no parent)', () => {
       // A class with no parent has a top-level "@id"
@@ -346,7 +354,7 @@ describe('Sort(Class, Class)', () => {
       // Can be same as less specific builtins.
       expect(
         Sort(
-          new Builtin(UrlNode.Parse('https://schema.org/Boo'), false),
+          new Builtin(UrlNode.Parse('https://schema.org/Boo')),
           new AliasBuiltin('https://schema.org/Boo', 'Text')
         )
       ).toBe(0);
