@@ -59,7 +59,7 @@ test(`baseine_${basename(__filename)}`, async () => {
     export type Text = string;
 
     /** The basic data types such as Integers, Strings, etc. */
-    export type DataType = Text | Number;
+    export type DataType = Number | Text;
 
     type ThingBase = Partial<IdReference> & {
         \\"age\\"?: SchemaValue<Number>;
