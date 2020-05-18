@@ -28,6 +28,8 @@ test(`baseine_${basename(__filename)}`, async () => {
 <http://schema.org/a> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Thing> .
 <http://schema.org/c> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Thing> .
 <http://schema.org/d> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Thing> .
+<https://schema.org/e> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Thing> .
+<http://google.com/f> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Thing> .
 <http://schema.org/c> <http://www.w3.org/2000/01/rdf-schema#comment> "A letter!" .
 <http://schema.org/c> <http://schema.org/category> "issue-1156" .
 <http://schema.org/Thing> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
@@ -53,13 +55,15 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"@type\\": \\"Thing\\";
     } & ThingBase;
     /** A Thing! */
-    export type Thing = \\"http://schema.org/a\\" | \\"https://schema.org/a\\" | \\"a\\" | \\"http://schema.org/b\\" | \\"https://schema.org/b\\" | \\"b\\" | \\"http://schema.org/c\\" | \\"https://schema.org/c\\" | \\"c\\" | \\"http://schema.org/d\\" | \\"https://schema.org/d\\" | \\"d\\" | ThingLeaf;
+    export type Thing = \\"http://schema.org/a\\" | \\"https://schema.org/a\\" | \\"a\\" | \\"http://schema.org/b\\" | \\"https://schema.org/b\\" | \\"b\\" | \\"http://schema.org/c\\" | \\"https://schema.org/c\\" | \\"c\\" | \\"http://schema.org/d\\" | \\"https://schema.org/d\\" | \\"d\\" | \\"https://schema.org/e\\" | \\"e\\" | \\"http://google.com/f\\" | \\"https://google.com/f\\" | ThingLeaf;
     export const Thing = {
         a: (\\"http://schema.org/a\\" as const),
         b: (\\"http://schema.org/b\\" as const),
         /** A letter! */
         c: (\\"http://schema.org/c\\" as const),
-        d: (\\"http://schema.org/d\\" as const)
+        d: (\\"http://schema.org/d\\" as const),
+        e: (\\"https://schema.org/e\\" as const),
+        f: (\\"http://google.com/f\\" as const)
     };
 
     "
