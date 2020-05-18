@@ -17,7 +17,7 @@
 import {Log} from '../logging';
 import {ObjectPredicate, Topic, TypedTopic} from '../triples/triple';
 import {UrlNode} from '../triples/types';
-import {IsClass} from '../triples/wellKnown';
+import {IsClass, IsWellKnown} from '../triples/wellKnown';
 import {
   BooleanEnum,
   Builtin,
@@ -95,14 +95,26 @@ const dataType = new DataTypeUnion(
 
 function ForwardDeclareClasses(topics: readonly TypedTopic[]): ClassMap {
   const classes = new Map<string, Class>();
-  for (const wk of wellKnownTypes) {
-    classes.set(wk.subject.toString(), wk);
-  }
-  classes.set(dataType.subject.toString(), dataType);
+
   for (const topic of topics) {
+    if (IsWellKnown(topic)) {
+      const wk = [...wellKnownTypes, dataType].find(wk =>
+        wk.subject.equivTo(topic.Subject)
+      );
+      if (!wk) {
+        throw new Error(
+          `Non-Object type ${topic.Subject.toString()} has no corresponding well-known type.`
+        );
+      }
+
+      classes.set(topic.Subject.toString(), wk);
+      continue;
+    }
     if (!IsClass(topic)) continue;
 
-    const allowString = wellKnownStrings.some(wks => wks.equals(topic.Subject));
+    const allowString = wellKnownStrings.some(wks =>
+      wks.equivTo(topic.Subject)
+    );
     classes.set(
       topic.Subject.toString(),
       new Class(topic.Subject, allowString)

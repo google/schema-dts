@@ -59,8 +59,9 @@ export class UrlNode {
     return this.href;
   }
 
-  matchesContext(contextString: string): boolean {
-    const context = fromString(contextString);
+  matchesContext(contextIn: string | ReadonlyUrl): boolean {
+    const context =
+      typeof contextIn === 'string' ? fromString(contextIn) : contextIn;
     if (this.context.protocol !== context.protocol) {
       // Schema.org schema uses 'http:' as protocol, but increasingly Schema.org
       // recommends using https: instead.
@@ -81,8 +82,11 @@ export class UrlNode {
     );
   }
 
-  equals(other: UrlNode): boolean {
-    return this.href === other.href;
+  equivTo(other: UrlNode): boolean {
+    return (
+      this.href === other.href ||
+      (this.matchesContext(other.context) && this.name === other.name)
+    );
   }
 
   static Parse(urlString: string): UrlNode {
