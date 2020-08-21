@@ -141,7 +141,7 @@ export function* process(triples: string[][]): Iterable<Triple> {
     //  Predicate:  <http://www.w3.org/2000/01/rdf-schema#comment>
     //  Object:     "A test comment.")
     // We skip it manually.
-    if (match[0] === 'http://meta.schema.org/') {
+    if (/http[s]?:\/\/meta.schema.org\//.test(match[0])) {
       continue;
     }
 
@@ -157,7 +157,7 @@ export function* process(triples: string[][]): Iterable<Triple> {
       continue;
     }
 
-    if (match[1] === 'http://schema.org/isPartOf') {
+    if (/http[s]?:\/\/schema.org\/isPartOf/.test(match[1])) {
       // When isPartOf is used as a predicate, is a higher-order
       // property describing if a Property or Class is part of a
       // specific schema layer. We don't use that information yet,
