@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 
-import {
-  CustomOntology,
-  IsCustom,
-  ParseFlags,
-  StandardOntology,
-} from '../../src/cli/args';
+import {ParseFlags} from '../../src/cli/args';
+import {ArgumentParser} from 'argparse';
 
 describe('ParseFlags', () => {
   it('defaults', () => {
@@ -28,19 +24,39 @@ describe('ParseFlags', () => {
     expect(options.context).toBe('https://schema.org');
     expect(options.deprecated).toBe(true);
     expect(options.verbose).toBe(false);
-    expect(IsCustom(options)).toBe(false);
 
-    const standard = options as StandardOntology;
-    expect(standard.layer).toBe('all-layers');
-    expect(standard.schema).toBe('latest');
+    expect(options.ontology).toBe(
+      'https://schema.org/version/latest/schemaorg-current-https.nt'
+    );
   });
 
   it('custom ontology', () => {
     const options = ParseFlags(['--ontology', 'https://google.com/foo'])!;
     expect(options).not.toBeUndefined();
-    expect(IsCustom(options)).toBe(true);
 
-    const custom = options as CustomOntology;
-    expect(custom.ontology).toBe('https://google.com/foo');
+    expect(options.ontology).toBe('https://google.com/foo');
+  });
+
+  describe('deprecated fields', () => {
+    let mockExit: jest.MockInstance<
+      ReturnType<typeof ArgumentParser.prototype.exit>,
+      Parameters<typeof ArgumentParser.prototype.exit>
+    >;
+
+    beforeEach(() => {
+      mockExit = jest
+        .spyOn(ArgumentParser.prototype, 'exit')
+        .mockImplementation(e => {
+          throw new Error(`${e}`);
+        });
+    });
+
+    it('--layer', () => {
+      expect(() => ParseFlags(['--layer', 'foo'])).toThrow();
+    });
+
+    it('--schema', () => {
+      expect(() => ParseFlags(['--schema', 'bar'])).toThrow();
+    });
   });
 });

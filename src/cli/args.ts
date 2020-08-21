@@ -15,16 +15,13 @@
  */
 import {ArgumentParser} from 'argparse';
 
-export interface CustomOntology {
+export interface Options {
   /** HTTPS URL to an .nt file defining a custom ontology. */
   ontology: string;
-}
-
-export type Options = CustomOntology & {
   verbose: boolean;
   deprecated: boolean;
   context: string;
-};
+}
 
 export function ParseFlags(args?: string[]): Options {
   const parser = new ArgumentParser({
