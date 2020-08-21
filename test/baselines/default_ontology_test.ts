@@ -50,7 +50,7 @@ test(`baseine_${basename(__filename)}`, async () => {
     "
   `);
   expect(actualLogs).toMatchInlineSnapshot(`
-    "Loading Ontology from URL: https://schema.org/version/latest/all-layers.nt
+    "Loading Ontology from URL: https://schema.org/version/latest/schemaorg-current-https.nt
     Got Response 200: Ok.
     "
   `);

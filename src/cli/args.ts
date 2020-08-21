@@ -15,43 +15,12 @@
  */
 import {ArgumentParser} from 'argparse';
 
-export interface StandardOntology {
-  /**
-   * The version of the schema to use, formatted as a string.
-   *
-   * @example
-   * "3.4"
-   * @example
-   * "latest"
-   */
-  schema: string;
-
-  /**
-   * The "layer" of the schema to use.
-   *
-   * @example <caption>The "Standard" approved schema</caption>
-   * "schema"
-   * @example <caption> Standard and pending schema, and extensions available
-   * on Schema.org</caption>
-   * "all-layers"
-   */
-  layer: string;
-}
-export interface CustomOntology {
+export interface Options {
   /** HTTPS URL to an .nt file defining a custom ontology. */
   ontology: string;
-}
-
-export type Options = (StandardOntology | CustomOntology) & {
   verbose: boolean;
   deprecated: boolean;
   context: string;
-};
-
-export function IsCustom(
-  options: StandardOntology | CustomOntology
-): options is CustomOntology {
-  return typeof (options as Partial<CustomOntology>).ontology === 'string';
 }
 
 export function ParseFlags(args?: string[]): Options {
@@ -70,18 +39,18 @@ export function ParseFlags(args?: string[]): Options {
   verbose.addArgument('--noverbose', {action: 'storeFalse', dest: 'verbose'});
 
   parser.addArgument('--schema', {
-    defaultValue: 'latest',
-    help:
-      "The version of the schema to load. Use 'latest' for the most " +
-      'recent version publsihed on Schema.org.',
+    defaultValue: undefined,
+    help: 'Deprecated. Please use --ontology instead.',
     metavar: 'version',
     dest: 'schema',
+    type: DeprecatedValue,
   });
   parser.addArgument('--layer', {
-    defaultValue: 'all-layers',
-    help: 'Which layer of the schema to load? E.g. schema or all-layers.',
+    defaultValue: undefined,
+    help: 'Deprecated. Please use --ontology instead.',
     metavar: 'name_of_file',
     dest: 'layer',
+    type: DeprecatedValue,
   });
   parser.addArgument('--context', {
     defaultValue: 'https://schema.org',
@@ -97,7 +66,8 @@ export function ParseFlags(args?: string[]): Options {
     dest: 'context',
   });
   parser.addArgument('--ontology', {
-    defaultValue: undefined,
+    defaultValue:
+      'https://schema.org/version/latest/schemaorg-current-https.nt',
     help:
       'HTTPS URL to a custom .nt file defining an entirely self-' +
       'sufficient schema. The schema must still be described in terms of ' +
@@ -120,4 +90,8 @@ export function ParseFlags(args?: string[]): Options {
     dest: 'deprecated',
   });
   return parser.parseArgs(args);
+}
+
+function DeprecatedValue(item: unknown) {
+  throw new Error('This command line argument is deprecated.');
 }
