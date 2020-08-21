@@ -93,7 +93,5 @@ export function ParseFlags(args?: string[]): Options {
 }
 
 function DeprecatedValue(item: unknown) {
-  if (item === undefined || item === null) return;
-
   throw new Error('This command line argument is deprecated.');
 }
