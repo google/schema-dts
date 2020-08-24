@@ -65,7 +65,7 @@ describe('load', () => {
       const triples$ = load('https://schema.org/');
       get.mockImplementationOnce((_, cb) => {
         // Unfortunately, we use another overload that doesn't appear here.
-        const callback = (cb as {}) as (inc: IncomingMessage) => void;
+        const callback = (cb as unknown) as (inc: IncomingMessage) => void;
         fakeResponse = makeFakeResponse(callback);
 
         return passThrough();
@@ -336,7 +336,7 @@ describe('load', () => {
         // on second call:
         get.mockImplementationOnce((_, cb) => {
           // Unfortunately, we use another overload that doesn't appear here.
-          const callback = (cb as {}) as (inc: IncomingMessage) => void;
+          const callback = (cb as unknown) as (inc: IncomingMessage) => void;
           fakeResponse2 = makeFakeResponse(callback);
 
           return passThrough();
@@ -451,7 +451,7 @@ type Headers =
       location: string;
     }
   | {'content-location': string}
-  | {};
+  | undefined;
 
 type FakeResponseFunc = (
   statusCode: number,
@@ -462,7 +462,7 @@ type FakeResponseFunc = (
 function makeFakeResponse(
   callback: (inc: IncomingMessage) => void
 ): FakeResponseFunc {
-  return (statusCode: number, statusMessage: string, headers: Headers = {}) => {
+  return (statusCode: number, statusMessage: string, headers?: Headers) => {
     interface CBs {
       data: (b: Buffer) => void;
       end: () => void;
@@ -473,8 +473,8 @@ function makeFakeResponse(
     const message = {
       statusCode,
       statusMessage,
-      headers,
-      on(event: string, cb: (...args: Array<{}>) => void): void {
+      headers: headers || {},
+      on(event: string, cb: (...args: unknown[]) => void): void {
         if (event === 'data') cbs['data'] = cb;
         if (event === 'end') cbs['end'] = cb;
         if (event === 'error') cbs['error'] = cb;

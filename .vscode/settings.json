@@ -2,6 +2,9 @@
   "editor.formatOnSave": true,
   "editor.tabSize": 2,
   "eslint.enable": true,
+  "eslint.options": {
+    "configFile": "./.eslintrc.js"
+  },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "typescript.tsdk": "node_modules/typescript/lib"
 }

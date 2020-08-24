@@ -37,7 +37,39 @@ module.exports = {
         },
       },
     ],
-    '@typescript-eslint/class-name-casing': 'error',
+    '@typescript-eslint/naming-convention': [
+      'error',
+      {
+        selector: 'default',
+        format: ['camelCase'],
+        leadingUnderscore: 'allow',
+        trailingUnderscore: 'allow',
+      },
+      {
+        selector: 'variable',
+        format: ['PascalCase', 'camelCase', 'UPPER_CASE'],
+        modifiers: ['const'],
+      },
+      {
+        selector: 'variableLike',
+        format: ['PascalCase', 'camelCase'],
+        filter: {regex: '^_$', match: false},
+      },
+      {
+        selector: 'memberLike',
+        format: ['camelCase', 'PascalCase'],
+      },
+      {
+        selector: 'memberLike',
+        modifiers: ['private'],
+        format: ['camelCase', 'PascalCase'],
+        leadingUnderscore: 'allow',
+      },
+      {
+        selector: 'typeLike',
+        format: ['PascalCase'],
+      },
+    ],
     '@typescript-eslint/consistent-type-assertions': 'error',
     '@typescript-eslint/consistent-type-definitions': 'error',
     '@typescript-eslint/explicit-member-accessibility': [
@@ -46,7 +78,6 @@ module.exports = {
         accessibility: 'no-public',
       },
     ],
-    '@typescript-eslint/interface-name-prefix': 'error',
     '@typescript-eslint/member-delimiter-style': [
       'error',
       {
