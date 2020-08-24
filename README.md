@@ -40,16 +40,16 @@ Then you can use it by importing `"schema-dts"`.
 You will usually want your top-level item to include a `@context`, like `https://schema.org`. In order for your object type to accept this property, you can augment it with `WithContext`, e.g.:
 
 ```ts
-import { Person, WithContext } from "schema-dts";
+import {Person, WithContext} from 'schema-dts';
 
 const p: WithContext<Person> = {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  name: "Eve",
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Eve',
   affiliation: {
-    "@type": "School",
-    name: "Nice School"
-  }
+    '@type': 'School',
+    name: 'Nice School',
+  },
 };
 ```
 
@@ -59,25 +59,17 @@ The Schema Typings Generator is available in the
 [**`schema-dts-gen`**](https://www.npmjs.com/package/schema-dts-gen) package.
 
     npm install schema-dts-gen
-    npx schema-dts-gen --schema=3.4
+    npx schema-dts-gen --ontology=https://schema.org/version/latest/schemaorg-all-https.jsonld
 
 Command line usage:
 
 - **Specify your ontology**
-  - (*Default*) From Schema.org: Specify **`--schema`** and **`--layer`**:
-    Your schema definition will be imported from.
 
-        https://schema.org/version/${schema}/${layer}.nt
-
-    This will be used by default, with `--schema=latest` and
-    `--layer=all-layers`, which includes pending, life sciences, and other
-    schemas.
-
-  - From a custom URL: Specify **`--ontology`**: An HTTPs URL to an .nt NTriple
-    file declaring your ontology.
+  - Specify **`--ontology`**: An HTTPs URL to an .nt NTriple file declaring your
+    ontology.
 
     Must be compatible with Schema.org, including the Schema.org `DataType`s and
-    specifying a top-level `Thign` type.
+    specifying a top-level `Thing` type.
 
 - **`--context`**: Defaults to `https://schema.org`, the value or values to be
   used with the `"@context"` property.
