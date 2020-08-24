@@ -29,21 +29,22 @@ Then you can use it by importing `"schema-dts"`.
 ### Defining Simple Properties
 
 ```ts
-import {Person} from "schema-dts";
+import {Person} from 'schema-dts';
 
 const inventor: Person = {
-    "@type": "Person",
-    "name": "Grace Hopper",
-    "disambiguatingDescription": "American computer scientist",
-    "birthDate": "1906-12-09",
-    "deathDate": "1992-01-01",
-    "awards": [
-        "Presidential Medal of Freedom",
-        "National Medal of Technology and Innovation",
-        "IEEE Emanuel R. Piore Award",
-    ]
+  '@type': 'Person',
+  name: 'Grace Hopper',
+  disambiguatingDescription: 'American computer scientist',
+  birthDate: '1906-12-09',
+  deathDate: '1992-01-01',
+  awards: [
+    'Presidential Medal of Freedom',
+    'National Medal of Technology and Innovation',
+    'IEEE Emanuel R. Piore Award',
+  ],
 };
 ```
+
 ### Using 'Context'
 
 JSON-LD requires a `"@context"` property to be set on the top-level JSON object,
@@ -51,17 +52,17 @@ to describe the URIs represeting the types and properties being referenced.
 schema-dts provides the `WithContext<T>` type to facilitate this.
 
 ```ts
-import {Organization, Thing, WithContext} from "schema-dts";
+import {Organization, Thing, WithContext} from 'schema-dts';
 
-export function JsonLd<T extends Thing>(json: T): string {
-    return `<script type="application/ld+json">
+export function JsonLd<T extends Thing>(json: WithContext<T>): string {
+  return `<script type="application/ld+json">
 ${JSON.stringify(json)}
 </script>`;
 }
 
 export const MY_ORG = JsonLd<Organization>({
-    "@context": "https://schema.org",
-    "@type": "Corporation",
-    "name": "Google LLC"
+  '@context': 'https://schema.org',
+  '@type': 'Corporation',
+  name: 'Google LLC',
 });
 ```
