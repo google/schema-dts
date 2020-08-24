@@ -59,7 +59,7 @@ The Schema Typings Generator is available in the
 [**`schema-dts-gen`**](https://www.npmjs.com/package/schema-dts-gen) package.
 
     npm install schema-dts-gen
-    npx schema-dts-gen --ontology=https://schema.org/version/latest/schemaorg-all-https.jsonld
+    npx schema-dts-gen --ontology=https://schema.org/version/latest/schemaorg-all-https.nt
 
 Command line usage:
 
