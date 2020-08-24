@@ -66,7 +66,7 @@ export async function inlineCli(
           if (event === 'end') innerOnEnd = listener;
         },
       } as IncomingMessage);
-      return ({on: () => {}} as {}) as ClientRequest;
+      return ({on: () => {}} as unknown) as ClientRequest;
     }) as typeof https.get;
 
     // Outputs
