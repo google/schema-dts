@@ -1,6 +1,6 @@
 {
   "name": "schema-dts-gen",
-  "version": "0.7.1",
+  "version": "0.7.3",
   "displayName": "schema-dts Generator",
   "description": "Generate TypeScript Definitions for Schema.org Schema",
   "authors": [
@@ -95,7 +95,7 @@
     "build": "tsc -b",
     "build-gen": "tsc -p src",
     "build-schema": "mkdirp built/ts-schema && node built/src/cli/cli.js > built/ts-schema/schema.ts",
-    "pkg-gen": "cpy built/src/ dist/gen",
+    "pkg-gen": "cpy --parents --cwd=built/src . ../../dist/gen/",
     "pkg-schema": "cpy LICENSE dist/schema/ && tsc built/ts-schema/schema.ts --declaration --noImplicitAny --outDir dist/schema/",
     "pkg": "npm run clean && npm run build-gen && npm run build-schema && npm run pkg-gen && npm run pkg-schema"
   }
