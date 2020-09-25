@@ -16,7 +16,7 @@
   "main": "./dist/gen/index.js",
   "bin": "./dist/gen/cli/cli.js",
   "devDependencies": {
-    "@types/argparse": "^1.0.38",
+    "@types/argparse": "^2.0.0",
     "@types/array.prototype.flatmap": "^1.2.2",
     "@types/diff": "^4.0.2",
     "@types/jest": "^26.0.14",
@@ -38,7 +38,7 @@
     "typescript": "^3.9.7"
   },
   "dependencies": {
-    "argparse": "^1.0.10",
+    "argparse": "^2.0.1",
     "array.prototype.flatmap": "^1.2.3",
     "htmlparser2": "^4.1.0",
     "rxjs": "^6.6.2"
