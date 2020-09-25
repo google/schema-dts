@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import {ArgumentParser} from 'argparse';
 
 export interface Options {
@@ -23,37 +24,39 @@ export interface Options {
   context: string;
 }
 
+// argparse forces snake_case on us.
+/* eslint @typescript-eslint/naming-convention: 0 */
+/* eslint camelcase: 0 */
 export function ParseFlags(args?: string[]): Options {
   const parser = new ArgumentParser({
-    version: '0.0.1',
-    addHelp: true,
+    add_help: true,
     description: 'schema-dts generator',
   });
 
-  const verbose = parser.addMutuallyExclusiveGroup({required: false});
-  verbose.addArgument('--verbose', {
-    defaultValue: false,
+  const verbose = parser.add_mutually_exclusive_group({required: false});
+  verbose.add_argument('--verbose', {
+    default: false,
     action: 'storeTrue',
     dest: 'verbose',
   });
-  verbose.addArgument('--noverbose', {action: 'storeFalse', dest: 'verbose'});
+  verbose.add_argument('--noverbose', {action: 'storeFalse', dest: 'verbose'});
 
-  parser.addArgument('--schema', {
-    defaultValue: undefined,
+  parser.add_argument('--schema', {
+    default: undefined,
     help: 'Deprecated. Please use --ontology instead.',
     metavar: 'version',
     dest: 'schema',
     type: DeprecatedValue,
   });
-  parser.addArgument('--layer', {
-    defaultValue: undefined,
+  parser.add_argument('--layer', {
+    default: undefined,
     help: 'Deprecated. Please use --ontology instead.',
     metavar: 'name_of_file',
     dest: 'layer',
     type: DeprecatedValue,
   });
-  parser.addArgument('--context', {
-    defaultValue: 'https://schema.org',
+  parser.add_argument('--context', {
+    default: 'https://schema.org',
     help:
       'Single URL or comma-separated key:value pairs defining the ' +
       "intended '@context' for the generated JSON-LD typings. " +
@@ -65,9 +68,8 @@ export function ParseFlags(args?: string[]): Options {
     metavar: 'key1:url,key2:url,...',
     dest: 'context',
   });
-  parser.addArgument('--ontology', {
-    defaultValue:
-      'https://schema.org/version/latest/schemaorg-current-https.nt',
+  parser.add_argument('--ontology', {
+    default: 'https://schema.org/version/latest/schemaorg-current-https.nt',
     help:
       'HTTPS URL to a custom .nt file defining an entirely self-' +
       'sufficient schema. The schema must still be described in terms of ' +
@@ -77,19 +79,19 @@ export function ParseFlags(args?: string[]): Options {
     dest: 'ontology',
   });
 
-  const deprecated = parser.addMutuallyExclusiveGroup({required: false});
-  deprecated.addArgument('--deprecated', {
-    defaultValue: true,
+  const deprecated = parser.add_mutually_exclusive_group({required: false});
+  deprecated.add_argument('--deprecated', {
+    default: true,
     help: 'Include deprecated Classes and Properties.',
     action: 'storeTrue',
     dest: 'deprecated',
   });
-  deprecated.addArgument('--nodeprecated', {
+  deprecated.add_argument('--nodeprecated', {
     help: 'Skip deprecated Classes and Properties.',
     action: 'storeFalse',
     dest: 'deprecated',
   });
-  return parser.parseArgs(args);
+  return parser.parse_args(args);
 }
 
 function DeprecatedValue(item: unknown) {
