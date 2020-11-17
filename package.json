@@ -15,6 +15,7 @@
   "types": "./dist/gen/index.d.ts",
   "main": "./dist/gen/index.js",
   "bin": "./dist/gen/cli/cli.js",
+  "sideEffects": false,
   "devDependencies": {
     "@types/argparse": "^2.0.0",
     "@types/array.prototype.flatmap": "^1.2.2",
