@@ -67,18 +67,6 @@ test(`baseine_${basename(__filename)}`, async () => {
     };
 
     export type Boolean = \\"http://schema.org/False\\" | \\"https://schema.org/False\\" | \\"False\\" | \\"http://schema.org/True\\" | \\"https://schema.org/True\\" | \\"True\\" | boolean;
-    export const Boolean = {
-        /**
-         * undefined
-         * @deprecated Please use the literal string \\"False\\" instead.
-         */
-        False: (\\"http://schema.org/False\\" as const),
-        /**
-         * undefined
-         * @deprecated Please use the literal string \\"True\\" instead.
-         */
-        True: (\\"http://schema.org/True\\" as const)
-    };
 
     export type Date = string;
 

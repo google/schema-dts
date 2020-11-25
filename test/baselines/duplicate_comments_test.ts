@@ -74,18 +74,6 @@ test(`baseine_${basename(__filename)}`, async () => {
      * - _Baz_, and __Bat__
      */
     export type Thing = \\"http://schema.org/Gadget\\" | \\"https://schema.org/Gadget\\" | \\"Gadget\\" | \\"http://schema.org/Widget\\" | \\"https://schema.org/Widget\\" | \\"Widget\\" | ThingLeaf;
-    export const Thing = {
-        /**
-         * Complex!
-         * @deprecated Please use the literal string \\"Gadget\\" instead.
-         */
-        Gadget: (\\"http://schema.org/Gadget\\" as const),
-        /**
-         * undefined
-         * @deprecated Please use the literal string \\"Widget\\" instead.
-         */
-        Widget: (\\"http://schema.org/Widget\\" as const)
-    };
 
     "
   `);
