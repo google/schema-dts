@@ -68,10 +68,7 @@ export async function WriteDeclarations(
   );
   const printer = createPrinter({newLine: NewLineKind.LineFeed});
 
-  write(printer.printNode(EmitHint.Unspecified, context.toNode(), source));
-  write('\n\n');
-
-  for (const helperType of HelperTypes()) {
+  for (const helperType of HelperTypes(context)) {
     write(printer.printNode(EmitHint.Unspecified, helperType, source));
     write('\n');
   }

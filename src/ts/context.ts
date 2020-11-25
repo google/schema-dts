@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-import {factory, ModifierFlags} from 'typescript';
+import {factory, PropertySignature} from 'typescript';
 
 import {TSubject} from '../triples/triple';
-
-import {withComments} from './util/comments';
 
 export class Context {
   private readonly context: Array<readonly [string, string]> = [];
@@ -85,37 +83,13 @@ export class Context {
     );
   }
 
-  toNode() {
-    // export type WithContent<T extends Thing> = T & { "@context": TYPE_NODE }
-    return withComments(
-      'Used at the top-level node to indicate the context for the JSON-LD ' +
-        'objects used. The context provided in this type is compatible ' +
-        'with the keys and URLs in the rest of this generated file.',
-      factory.createTypeAliasDeclaration(
-        /*decorators=*/ [],
-        factory.createModifiersFromModifierFlags(ModifierFlags.Export),
-        'WithContext',
-        [
-          factory.createTypeParameterDeclaration(
-            'T' /*constraint=*/,
-            factory.createTypeReferenceNode(
-              'Thing',
-              /*typeArguments=*/ undefined
-            )
-          ),
-        ],
-        factory.createIntersectionTypeNode([
-          factory.createTypeReferenceNode('T', /*typeArguments=*/ undefined),
-          factory.createTypeLiteralNode([
-            factory.createPropertySignature(
-              /*modifiers=*/ [],
-              factory.createStringLiteral('@context'),
-              /*questionToken=*/ undefined,
-              this.typeNode()
-            ),
-          ]),
-        ])
-      )
+  /** Creates the full property signature for "@context" given the configured context. */
+  contextProperty(): PropertySignature {
+    return factory.createPropertySignature(
+      /*modifiers=*/ [],
+      factory.createStringLiteral('@context'),
+      /*questionToken=*/ undefined,
+      this.typeNode()
     );
   }
 
