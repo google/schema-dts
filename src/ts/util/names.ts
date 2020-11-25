@@ -33,7 +33,3 @@ export function toClassName(subject: TTypeName): string {
 
   return sanitizedName;
 }
-
-export function toEnumName(subject: TSubject): string {
-  return subject.name.replace(/[^A-Za-z0-9_]/g, '_');
-}
