@@ -32,20 +32,57 @@ function WithContextType(context: Context) {
           factory.createTypeReferenceNode('Thing', /*typeArguments=*/ undefined)
         ),
       ],
-      factory.createIntersectionTypeNode([
-        factory.createTypeReferenceNode('T', /*typeArguments=*/ undefined),
-        factory.createTypeLiteralNode([context.contextProperty()]),
+      factory.createUnionTypeNode([
+        factory.createTypeReferenceNode(GraphTypeName),
+        factory.createParenthesizedType(
+          factory.createIntersectionTypeNode([
+            factory.createTypeReferenceNode('T', /*typeArguments=*/ undefined),
+            factory.createTypeLiteralNode([context.contextProperty()]),
+          ])
+        ),
       ])
+    )
+  );
+}
+
+function GraphType(context: Context) {
+  return withComments(
+    '',
+    factory.createInterfaceDeclaration(
+      /*decorators=*/ [],
+      factory.createModifiersFromModifierFlags(ModifierFlags.Export),
+      GraphTypeName,
+      /*typeParameters=*/ undefined,
+      /*heritageClauses=*/ undefined,
+      [
+        context.contextProperty(),
+        factory.createPropertySignature(
+          /*modifiers=*/ [],
+          factory.createStringLiteral('@graph'),
+          /*questionToken=*/ undefined,
+          factory.createTypeOperatorNode(
+            SyntaxKind.ReadonlyKeyword,
+            factory.createArrayTypeNode(
+              factory.createTypeReferenceNode(
+                'Thing',
+                /*typeArguments=*/ undefined
+              )
+            )
+          )
+        ),
+      ]
     )
   );
 }
 
 export const SchemaValueName = 'SchemaValue';
 export const IdReferenceName = 'IdReference';
+export const GraphTypeName = 'Graph';
 
 export function HelperTypes(context: Context) {
   return [
     WithContextType(context),
+    GraphType(context),
     factory.createTypeAliasDeclaration(
       /*decorators=*/ [],
       /*modifiers=*/ [],
