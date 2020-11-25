@@ -14,17 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  createKeywordTypeNode,
-  createPropertySignature,
-  createStringLiteral,
-  createToken,
-  createTypeReferenceNode,
-  createUnionTypeNode,
-  PropertySignature,
-  SyntaxKind,
-  createIdentifier,
-} from 'typescript';
+import {factory, PropertySignature, SyntaxKind} from 'typescript';
 
 import {Log} from '../logging';
 import {Format, ObjectPredicate, TObject, TSubject} from '../triples/triple';
@@ -118,16 +108,16 @@ export class PropertyType {
     }
 
     const typeNodes = typeNames.map(type =>
-      createTypeReferenceNode(type, /*typeArguments=*/ [])
+      factory.createTypeReferenceNode(type, /*typeArguments=*/ [])
     );
 
     switch (typeNodes.length) {
       case 0:
-        return createKeywordTypeNode(SyntaxKind.NeverKeyword);
+        return factory.createKeywordTypeNode(SyntaxKind.NeverKeyword);
       case 1:
         return typeNodes[0];
       default:
-        return createUnionTypeNode(typeNodes);
+        return factory.createUnionTypeNode(typeNodes);
     }
   }
 }
@@ -143,8 +133,8 @@ export class Property {
   }
 
   private typeNode() {
-    return createTypeReferenceNode(
-      createIdentifier(SchemaValueName),
+    return factory.createTypeReferenceNode(
+      factory.createIdentifier(SchemaValueName),
       /* typeArguments = */ [this.type.scalarTypeNode()]
     );
   }
@@ -152,12 +142,11 @@ export class Property {
   toNode(context: Context): PropertySignature {
     return withComments(
       this.type.comment,
-      createPropertySignature(
+      factory.createPropertySignature(
         /* modifiers= */ [],
-        createStringLiteral(context.getScopedName(this.key)),
-        createToken(SyntaxKind.QuestionToken),
-        /*typeNode=*/ this.typeNode(),
-        /*initializer=*/ undefined
+        factory.createStringLiteral(context.getScopedName(this.key)),
+        factory.createToken(SyntaxKind.QuestionToken),
+        /*typeNode=*/ this.typeNode()
       )
     );
   }
@@ -167,16 +156,15 @@ export class TypeProperty {
   constructor(private readonly className: TSubject) {}
 
   toNode(context: Context) {
-    return createPropertySignature(
+    return factory.createPropertySignature(
       /* modifiers= */ [],
-      createStringLiteral('@type'),
+      factory.createStringLiteral('@type'),
       /* questionToken= */ undefined,
       /* typeNode= */
-      createTypeReferenceNode(
+      factory.createTypeReferenceNode(
         `"${context.getScopedName(this.className)}"`,
         /*typeArguments=*/ undefined
-      ),
-      /* initializer= */ undefined
+      )
     );
   }
 

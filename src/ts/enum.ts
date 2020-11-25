@@ -13,14 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {
-  createAsExpression,
-  createLiteralTypeNode,
-  createPropertyAssignment,
-  createStringLiteral,
-  createTypeReferenceNode,
-  TypeNode,
-} from 'typescript';
+import {factory, TypeNode} from 'typescript';
 
 import {Log} from '../logging';
 import {ObjectPredicate, TSubject, TTypeName} from '../triples/triple';
@@ -100,11 +93,11 @@ export class EnumValue {
         `\n@deprecated Please use the literal string "${toEnumName(
           this.value
         )}" instead.`,
-      createPropertyAssignment(
+      factory.createPropertyAssignment(
         toEnumName(this.value),
-        createAsExpression(
-          createStringLiteral(this.value.toString()),
-          createTypeReferenceNode('const', undefined)
+        factory.createAsExpression(
+          factory.createStringLiteral(this.value.toString()),
+          factory.createTypeReferenceNode('const', undefined)
         )
       )
     );
@@ -112,19 +105,25 @@ export class EnumValue {
 
   toTypeLiteral(context: Context): TypeNode[] {
     const types = [
-      createLiteralTypeNode(createStringLiteral(this.value.toString())),
+      factory.createLiteralTypeNode(
+        factory.createStringLiteral(this.value.toString())
+      ),
     ];
     if (this.value.context.protocol === 'http:') {
       types.push(
-        createLiteralTypeNode(
-          createStringLiteral(this.value.toString().replace(/^http:/, 'https:'))
+        factory.createLiteralTypeNode(
+          factory.createStringLiteral(
+            this.value.toString().replace(/^http:/, 'https:')
+          )
         )
       );
     }
 
     const scoped = context.getScopedName(this.value);
     if (scoped !== this.value.href) {
-      types.push(createLiteralTypeNode(createStringLiteral(scoped)));
+      types.push(
+        factory.createLiteralTypeNode(factory.createStringLiteral(scoped))
+      );
     }
 
     return types;
