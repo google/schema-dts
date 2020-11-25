@@ -14,17 +14,7 @@
  * limitations under the License.
  */
 import {
-  createIntersectionTypeNode,
-  createModifiersFromModifierFlags,
-  createObjectLiteral,
-  createParenthesizedType,
-  createTypeAliasDeclaration,
-  createTypeLiteralNode,
-  createTypeReferenceNode,
-  createUnionTypeNode,
-  createVariableDeclaration,
-  createVariableDeclarationList,
-  createVariableStatement,
+  factory,
   DeclarationStatement,
   ModifierFlags,
   NodeFlags,
@@ -238,19 +228,24 @@ export class Class {
     }
 
     const parentTypes = this.namedParents().map(p =>
-      createTypeReferenceNode(p, [])
+      factory.createTypeReferenceNode(p, [])
     );
     const parentNode =
       parentTypes.length === 0
-        ? createTypeReferenceNode('Partial', [
-            createTypeReferenceNode(IdReferenceName, /*typeArguments=*/ []),
+        ? factory.createTypeReferenceNode('Partial', [
+            factory.createTypeReferenceNode(
+              IdReferenceName,
+              /*typeArguments=*/ []
+            ),
           ])
         : parentTypes.length === 1
         ? parentTypes[0]
-        : createParenthesizedType(createIntersectionTypeNode(parentTypes));
+        : factory.createParenthesizedType(
+            factory.createIntersectionTypeNode(parentTypes)
+          );
 
     // Properties part.
-    const propLiteral = createTypeLiteralNode([
+    const propLiteral = factory.createTypeLiteralNode([
       // ... then everything else.
       ...this.properties()
         .filter(property => !property.deprecated || !skipDeprecatedProperties)
@@ -258,7 +253,7 @@ export class Class {
     ]);
 
     if (propLiteral.members.length > 0) {
-      return createIntersectionTypeNode([parentNode, propLiteral]);
+      return factory.createIntersectionTypeNode([parentNode, propLiteral]);
     } else {
       return parentNode;
     }
@@ -274,7 +269,7 @@ export class Class {
     const baseName = this.baseName();
     assert(baseName, 'If a baseNode is defined, baseName must be defined.');
 
-    return createTypeAliasDeclaration(
+    return factory.createTypeAliasDeclaration(
       /*decorators=*/ [],
       /*modifiers=*/ [],
       baseName,
@@ -293,17 +288,19 @@ export class Class {
     //
     // so when "Leaf" is present, Base will always be present.
     assert(baseName, 'Expect baseName to exist when leafName exists.');
-    const baseTypeReference = createTypeReferenceNode(
+    const baseTypeReference = factory.createTypeReferenceNode(
       baseName,
       /*typeArguments=*/ []
     );
 
-    const thisType = createIntersectionTypeNode([
-      createTypeLiteralNode([new TypeProperty(this.subject).toNode(context)]),
+    const thisType = factory.createIntersectionTypeNode([
+      factory.createTypeLiteralNode([
+        new TypeProperty(this.subject).toNode(context),
+      ]),
       baseTypeReference,
     ]);
 
-    return createTypeAliasDeclaration(
+    return factory.createTypeAliasDeclaration(
       /*decorators=*/ [],
       /*modifiers=*/ [],
       leafName,
@@ -317,17 +314,22 @@ export class Class {
     const children = this.children
       .filter(child => !(child.deprecated && skipDeprecated))
       .map(child =>
-        createTypeReferenceNode(child.className(), /*typeArguments=*/ [])
+        factory.createTypeReferenceNode(
+          child.className(),
+          /*typeArguments=*/ []
+        )
       );
 
     // A type can have a valid typedef, add that if so.
     children.push(
-      ...this.typedefs.map(t => createTypeReferenceNode(t, /*typeArgs=*/ []))
+      ...this.typedefs.map(t =>
+        factory.createTypeReferenceNode(t, /*typeArgs=*/ [])
+      )
     );
 
     const upRef = this.leafName() || this.baseName();
     return upRef
-      ? [createTypeReferenceNode(upRef, /*typeArgs=*/ []), ...children]
+      ? [factory.createTypeReferenceNode(upRef, /*typeArgs=*/ []), ...children]
       : children;
   }
 
@@ -335,12 +337,12 @@ export class Class {
     const isEnum = this._enums.size > 0;
 
     if (isEnum) {
-      return createUnionTypeNode([
+      return factory.createUnionTypeNode([
         ...this.enums().flatMap(e => e.toTypeLiteral(context)),
         ...this.nonEnumType(skipDeprecated),
       ]);
     } else {
-      return createUnionTypeNode(this.nonEnumType(skipDeprecated));
+      return factory.createUnionTypeNode(this.nonEnumType(skipDeprecated));
     }
   }
 
@@ -348,14 +350,15 @@ export class Class {
     if (this._enums.size === 0) return undefined;
     const enums = this.enums();
 
-    return createVariableStatement(
-      createModifiersFromModifierFlags(ModifierFlags.Export),
-      createVariableDeclarationList(
+    return factory.createVariableStatement(
+      factory.createModifiersFromModifierFlags(ModifierFlags.Export),
+      factory.createVariableDeclarationList(
         [
-          createVariableDeclaration(
+          factory.createVariableDeclaration(
             this.className(),
+            /*exclamationToken=*/ undefined,
             /*type=*/ undefined,
-            createObjectLiteral(
+            factory.createObjectLiteralExpression(
               enums.map(e => e.toNode()),
               /*multiLine=*/ true
             )
@@ -370,9 +373,9 @@ export class Class {
     const typeValue: TypeNode = this.totalType(context, skipDeprecated);
     const declaration = withComments(
       this.comment,
-      createTypeAliasDeclaration(
+      factory.createTypeAliasDeclaration(
         /* decorators = */ [],
-        createModifiersFromModifierFlags(ModifierFlags.Export),
+        factory.createModifiersFromModifierFlags(ModifierFlags.Export),
         this.className(),
         [],
         typeValue
@@ -435,14 +438,17 @@ export class DataTypeUnion extends Builtin {
     return [
       withComments(
         this.comment,
-        createTypeAliasDeclaration(
+        factory.createTypeAliasDeclaration(
           /*decorators=*/ [],
-          createModifiersFromModifierFlags(ModifierFlags.Export),
+          factory.createModifiersFromModifierFlags(ModifierFlags.Export),
           this.subject.name,
           /*typeParameters=*/ [],
-          createUnionTypeNode(
+          factory.createUnionTypeNode(
             this.wk.map(wk =>
-              createTypeReferenceNode(wk.subject.name, /*typeArguments=*/ [])
+              factory.createTypeReferenceNode(
+                wk.subject.name,
+                /*typeArguments=*/ []
+              )
             )
           )
         )

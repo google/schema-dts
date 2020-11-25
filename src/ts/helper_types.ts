@@ -1,28 +1,16 @@
-import {
-  createTypeAliasDeclaration,
-  createTypeParameterDeclaration,
-  createUnionTypeNode,
-  createTypeReferenceNode,
-  createTypeOperatorNode,
-  createArrayTypeNode,
-  SyntaxKind,
-  createTypeLiteralNode,
-  createPropertySignature,
-  createStringLiteral,
-} from 'typescript';
+import {factory, SyntaxKind} from 'typescript';
 
 import {withComments} from './util/comments';
 
 function IdPropertyNode() {
   return withComments(
     'IRI identifying the canonical address of this object.',
-    createPropertySignature(
+    factory.createPropertySignature(
       /* modifiers= */ [],
-      createStringLiteral('@id'),
+      factory.createStringLiteral('@id'),
       /* questionToken= */ undefined,
       /* typeNode= */
-      createTypeReferenceNode('string', /*typeArguments=*/ []),
-      /* initializer= */ undefined
+      factory.createTypeReferenceNode('string', /*typeArguments=*/ [])
     )
   );
 }
@@ -32,27 +20,27 @@ export const IdReferenceName = 'IdReference';
 
 export function HelperTypes() {
   return [
-    createTypeAliasDeclaration(
+    factory.createTypeAliasDeclaration(
       /*decorators=*/ [],
       /*modifiers=*/ [],
       SchemaValueName,
-      [createTypeParameterDeclaration('T')],
-      createUnionTypeNode([
-        createTypeReferenceNode('T', /*typeArguments=*/ []),
-        createTypeOperatorNode(
+      [factory.createTypeParameterDeclaration('T')],
+      factory.createUnionTypeNode([
+        factory.createTypeReferenceNode('T', /*typeArguments=*/ []),
+        factory.createTypeOperatorNode(
           SyntaxKind.ReadonlyKeyword,
-          createArrayTypeNode(
-            createTypeReferenceNode('T', /*typeArguments=*/ [])
+          factory.createArrayTypeNode(
+            factory.createTypeReferenceNode('T', /*typeArguments=*/ [])
           )
         ),
       ])
     ),
-    createTypeAliasDeclaration(
+    factory.createTypeAliasDeclaration(
       /*decorators=*/ [],
       /*modifiers=*/ [],
       IdReferenceName,
       /*typeParameters=*/ [],
-      createTypeLiteralNode([IdPropertyNode()])
+      factory.createTypeLiteralNode([IdPropertyNode()])
     ),
   ];
 }

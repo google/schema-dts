@@ -14,18 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  createIntersectionTypeNode,
-  createLiteralTypeNode,
-  createModifiersFromModifierFlags,
-  createPropertySignature,
-  createStringLiteral,
-  createTypeAliasDeclaration,
-  createTypeLiteralNode,
-  createTypeParameterDeclaration,
-  createTypeReferenceNode,
-  ModifierFlags,
-} from 'typescript';
+import {factory, ModifierFlags} from 'typescript';
 
 import {TSubject} from '../triples/triple';
 
@@ -78,18 +67,19 @@ export class Context {
     // Either:
     // "@context": "https://schema.org" or similar:
     if (this.context.length === 1 && this.context[0][0] === '') {
-      return createLiteralTypeNode(createStringLiteral(this.context[0][1]));
+      return factory.createLiteralTypeNode(
+        factory.createStringLiteral(this.context[0][1])
+      );
     }
 
     // or "@context" is a literal object type of key-values of URLs:
-    return createTypeLiteralNode(
+    return factory.createTypeLiteralNode(
       /*members=*/ this.context.map(([name, url]) =>
-        createPropertySignature(
+        factory.createPropertySignature(
           /*modifiers=*/ [],
-          createStringLiteral(name),
+          factory.createStringLiteral(name),
           /*questionToken=*/ undefined,
-          createLiteralTypeNode(createStringLiteral(url)),
-          /*initializer=*/ undefined
+          factory.createLiteralTypeNode(factory.createStringLiteral(url))
         )
       )
     );
@@ -101,25 +91,27 @@ export class Context {
       'Used at the top-level node to indicate the context for the JSON-LD ' +
         'objects used. The context provided in this type is compatible ' +
         'with the keys and URLs in the rest of this generated file.',
-      createTypeAliasDeclaration(
+      factory.createTypeAliasDeclaration(
         /*decorators=*/ [],
-        createModifiersFromModifierFlags(ModifierFlags.Export),
+        factory.createModifiersFromModifierFlags(ModifierFlags.Export),
         'WithContext',
         [
-          createTypeParameterDeclaration(
+          factory.createTypeParameterDeclaration(
             'T' /*constraint=*/,
-            createTypeReferenceNode('Thing', /*typeArguments=*/ undefined)
+            factory.createTypeReferenceNode(
+              'Thing',
+              /*typeArguments=*/ undefined
+            )
           ),
         ],
-        createIntersectionTypeNode([
-          createTypeReferenceNode('T', /*typeArguments=*/ undefined),
-          createTypeLiteralNode([
-            createPropertySignature(
+        factory.createIntersectionTypeNode([
+          factory.createTypeReferenceNode('T', /*typeArguments=*/ undefined),
+          factory.createTypeLiteralNode([
+            factory.createPropertySignature(
               /*modifiers=*/ [],
-              createStringLiteral('@context'),
+              factory.createStringLiteral('@context'),
               /*questionToken=*/ undefined,
-              this.typeNode(),
-              /*initializer=*/ undefined
+              this.typeNode()
             ),
           ]),
         ])
