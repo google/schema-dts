@@ -45,7 +45,6 @@ test(`baseine_${basename(__filename)}`, async () => {
     export type WithContext<T extends Thing> = T & {
         \\"@context\\": \\"https://schema.org\\";
     };
-
     type SchemaValue<T> = T | readonly T[];
     type IdReference = {
         /** IRI identifying the canonical address of this object. */
