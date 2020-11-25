@@ -44,11 +44,8 @@ describe('WithContext generation', () => {
     const ctx = new Context();
     ctx.setUrlContext('https://foo.com');
 
-    expect(asString(ctx.toNode())).toBe(
-      `/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
-export type WithContext<T extends Thing> = T & {
-    "@context": "https://foo.com";
-};`
+    expect(asString(ctx.contextProperty())).toBe(
+      `"@context": "https://foo.com";`
     );
   });
 
@@ -57,13 +54,10 @@ export type WithContext<T extends Thing> = T & {
     ctx.addNamedContext('a', 'https://foo.com');
     ctx.addNamedContext('b', 'https://bar.com');
 
-    expect(asString(ctx.toNode())).toBe(
-      `/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
-export type WithContext<T extends Thing> = T & {
-    "@context": {
-        "a": "https://foo.com";
-        "b": "https://bar.com";
-    };
+    expect(asString(ctx.contextProperty())).toBe(
+      `"@context": {
+    "a": "https://foo.com";
+    "b": "https://bar.com";
 };`
     );
   });
