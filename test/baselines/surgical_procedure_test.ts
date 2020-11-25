@@ -122,7 +122,15 @@ test(`baseine_${basename(__filename)}`, async () => {
     /** An enumeration that describes different types of medical procedures. */
     export type MedicalProcedureType = \\"http://schema.org/NoninvasiveProcedure\\" | \\"https://schema.org/NoninvasiveProcedure\\" | \\"NoninvasiveProcedure\\" | \\"http://schema.org/PercutaneousProcedure\\" | \\"https://schema.org/PercutaneousProcedure\\" | \\"PercutaneousProcedure\\" | MedicalProcedureTypeLeaf;
     export const MedicalProcedureType = {
+        /**
+         * undefined
+         * @deprecated Please use the literal string \\"NoninvasiveProcedure\\" instead.
+         */
         NoninvasiveProcedure: (\\"http://schema.org/NoninvasiveProcedure\\" as const),
+        /**
+         * undefined
+         * @deprecated Please use the literal string \\"PercutaneousProcedure\\" instead.
+         */
         PercutaneousProcedure: (\\"http://schema.org/PercutaneousProcedure\\" as const)
     };
 
@@ -143,7 +151,15 @@ test(`baseine_${basename(__filename)}`, async () => {
     } & PhysicalExamBase;
     export type PhysicalExam = \\"http://schema.org/Head\\" | \\"https://schema.org/Head\\" | \\"Head\\" | \\"http://schema.org/Neuro\\" | \\"https://schema.org/Neuro\\" | \\"Neuro\\" | PhysicalExamLeaf;
     export const PhysicalExam = {
+        /**
+         * undefined
+         * @deprecated Please use the literal string \\"Head\\" instead.
+         */
         Head: (\\"http://schema.org/Head\\" as const),
+        /**
+         * undefined
+         * @deprecated Please use the literal string \\"Neuro\\" instead.
+         */
         Neuro: (\\"http://schema.org/Neuro\\" as const)
     };
 

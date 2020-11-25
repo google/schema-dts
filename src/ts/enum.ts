@@ -93,9 +93,13 @@ export class EnumValue {
     return false;
   }
 
+  /** @deprecated Generating Property Assignment nodes for Enums will go away in 0.8.0. */
   toNode() {
     return withComments(
-      this.comment,
+      this.comment +
+        `\n@deprecated Please use the literal string "${toEnumName(
+          this.value
+        )}" instead.`,
       createPropertyAssignment(
         toEnumName(this.value),
         createAsExpression(
