@@ -1,4 +1,5 @@
-import {factory, SyntaxKind} from 'typescript';
+import {factory, ModifierFlags, SyntaxKind} from 'typescript';
+import {Context} from './context';
 
 import {withComments} from './util/comments';
 
@@ -15,11 +16,36 @@ function IdPropertyNode() {
   );
 }
 
+function WithContextType(context: Context) {
+  // export type WithContent<T extends Thing> = T & { "@context": TYPE_NODE }
+  return withComments(
+    'Used at the top-level node to indicate the context for the JSON-LD ' +
+      'objects used. The context provided in this type is compatible ' +
+      'with the keys and URLs in the rest of this generated file.',
+    factory.createTypeAliasDeclaration(
+      /*decorators=*/ [],
+      factory.createModifiersFromModifierFlags(ModifierFlags.Export),
+      'WithContext',
+      [
+        factory.createTypeParameterDeclaration(
+          'T' /*constraint=*/,
+          factory.createTypeReferenceNode('Thing', /*typeArguments=*/ undefined)
+        ),
+      ],
+      factory.createIntersectionTypeNode([
+        factory.createTypeReferenceNode('T', /*typeArguments=*/ undefined),
+        factory.createTypeLiteralNode([context.contextProperty()]),
+      ])
+    )
+  );
+}
+
 export const SchemaValueName = 'SchemaValue';
 export const IdReferenceName = 'IdReference';
 
-export function HelperTypes() {
+export function HelperTypes(context: Context) {
   return [
+    WithContextType(context),
     factory.createTypeAliasDeclaration(
       /*decorators=*/ [],
       /*modifiers=*/ [],
