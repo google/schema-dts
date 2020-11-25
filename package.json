@@ -14,7 +14,9 @@
   ],
   "types": "./dist/gen/index.d.ts",
   "main": "./dist/gen/index.js",
-  "bin": "./dist/gen/cli/cli.js",
+  "bin": {
+    "schema-dts-gen": "dist/gen/cli/cli.js"
+  },
   "sideEffects": false,
   "devDependencies": {
     "@types/argparse": "^2.0.0",
