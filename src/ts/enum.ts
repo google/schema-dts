@@ -20,8 +20,6 @@ import {ObjectPredicate, TSubject, TTypeName} from '../triples/triple';
 import {GetComment, IsClassType, IsDataType} from '../triples/wellKnown';
 
 import {ClassMap} from './class';
-import {withComments} from './util/comments';
-import {toEnumName} from './util/names';
 import {Context} from './context';
 
 /**
@@ -84,23 +82,6 @@ export class EnumValue {
     }
 
     return false;
-  }
-
-  /** @deprecated Generating Property Assignment nodes for Enums will go away in 0.8.0. */
-  toNode() {
-    return withComments(
-      this.comment +
-        `\n@deprecated Please use the literal string "${toEnumName(
-          this.value
-        )}" instead.`,
-      factory.createPropertyAssignment(
-        toEnumName(this.value),
-        factory.createAsExpression(
-          factory.createStringLiteral(this.value.toString()),
-          factory.createTypeReferenceNode('const', undefined)
-        )
-      )
-    );
   }
 
   toTypeLiteral(context: Context): TypeNode[] {

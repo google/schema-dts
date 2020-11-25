@@ -87,13 +87,6 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"@type\\": \\"MedicalProcedureType\\";
     } & ThingBase;
     export type MedicalProcedureType = \\"http://schema.org/SurgicalProcedure\\" | \\"https://schema.org/SurgicalProcedure\\" | \\"SurgicalProcedure\\" | MedicalProcedureTypeLeaf;
-    export const MedicalProcedureType = {
-        /**
-         * A type of medical procedure that involves invasive surgical techniques.
-         * @deprecated Please use the literal string \\"SurgicalProcedure\\" instead.
-         */
-        SurgicalProcedure: (\\"http://schema.org/SurgicalProcedure\\" as const)
-    };
 
     type SurgicalProcedureLeaf = {
         \\"@type\\": \\"SurgicalProcedure\\";

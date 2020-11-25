@@ -346,29 +346,6 @@ export class Class {
     }
   }
 
-  private enumDecl(): VariableStatement | undefined {
-    if (this._enums.size === 0) return undefined;
-    const enums = this.enums();
-
-    return factory.createVariableStatement(
-      factory.createModifiersFromModifierFlags(ModifierFlags.Export),
-      factory.createVariableDeclarationList(
-        [
-          factory.createVariableDeclaration(
-            this.className(),
-            /*exclamationToken=*/ undefined,
-            /*type=*/ undefined,
-            factory.createObjectLiteralExpression(
-              enums.map(e => e.toNode()),
-              /*multiLine=*/ true
-            )
-          ),
-        ],
-        NodeFlags.Const
-      )
-    );
-  }
-
   toNode(context: Context, skipDeprecated: boolean): readonly Statement[] {
     const typeValue: TypeNode = this.totalType(context, skipDeprecated);
     const declaration = withComments(
@@ -395,18 +372,11 @@ export class Class {
     // export type Xyz = "Enum1"|"Enum2"|...        // Enum Piece: Optional.
     //                  |XyzLeaf                    // 'Leaf' Piece.
     //                  |Child1|Child2|...          // Child Piece: Optional.
-    // // Enum Values: Optional --------------------//
-    // export const Xyz = {
-    //   Enum1 = "Enum1" as const,
-    //   Enum2 = "Enum2" as const,
-    //   ...
-    // }
     // //-------------------------------------------//
     return arrayOf<Statement>(
       this.baseDecl(skipDeprecated, context),
       this.leafDecl(context),
-      declaration,
-      this.enumDecl()
+      declaration
     );
   }
 }

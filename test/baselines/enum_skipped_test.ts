@@ -59,38 +59,6 @@ test(`baseine_${basename(__filename)}`, async () => {
     } & ThingBase;
     /** A Thing! */
     export type Thing = \\"http://schema.org/a\\" | \\"https://schema.org/a\\" | \\"a\\" | \\"http://schema.org/b\\" | \\"https://schema.org/b\\" | \\"b\\" | \\"http://schema.org/c\\" | \\"https://schema.org/c\\" | \\"c\\" | \\"http://schema.org/d\\" | \\"https://schema.org/d\\" | \\"d\\" | \\"https://schema.org/e\\" | \\"e\\" | \\"http://google.com/f\\" | \\"https://google.com/f\\" | ThingLeaf;
-    export const Thing = {
-        /**
-         * undefined
-         * @deprecated Please use the literal string \\"a\\" instead.
-         */
-        a: (\\"http://schema.org/a\\" as const),
-        /**
-         * undefined
-         * @deprecated Please use the literal string \\"b\\" instead.
-         */
-        b: (\\"http://schema.org/b\\" as const),
-        /**
-         * A letter!
-         * @deprecated Please use the literal string \\"c\\" instead.
-         */
-        c: (\\"http://schema.org/c\\" as const),
-        /**
-         * undefined
-         * @deprecated Please use the literal string \\"d\\" instead.
-         */
-        d: (\\"http://schema.org/d\\" as const),
-        /**
-         * undefined
-         * @deprecated Please use the literal string \\"e\\" instead.
-         */
-        e: (\\"https://schema.org/e\\" as const),
-        /**
-         * undefined
-         * @deprecated Please use the literal string \\"f\\" instead.
-         */
-        f: (\\"http://google.com/f\\" as const)
-    };
 
     "
   `);
