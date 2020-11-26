@@ -17,11 +17,11 @@ import {
   factory,
   DeclarationStatement,
   ModifierFlags,
-  NodeFlags,
   Statement,
   TypeAliasDeclaration,
   TypeNode,
-  VariableStatement,
+  SyntaxKind,
+  InterfaceDeclaration,
 } from 'typescript';
 
 import {Log} from '../logging';
@@ -219,62 +219,49 @@ export class Class {
     return this.namedParents().length === 1 && this._props.size === 0;
   }
 
-  private baseNode(
+  private baseDecl(
     skipDeprecatedProperties: boolean,
     context: Context
-  ): TypeNode | undefined {
+  ): InterfaceDeclaration | undefined {
     if (this.skipBase()) {
       return undefined;
     }
 
-    const parentTypes = this.namedParents().map(p =>
-      factory.createTypeReferenceNode(p, [])
-    );
-    const parentNode =
-      parentTypes.length === 0
-        ? factory.createTypeReferenceNode('Partial', [
-            factory.createTypeReferenceNode(
-              IdReferenceName,
-              /*typeArguments=*/ []
-            ),
-          ])
-        : parentTypes.length === 1
-        ? parentTypes[0]
-        : factory.createParenthesizedType(
-            factory.createIntersectionTypeNode(parentTypes)
-          );
-
-    // Properties part.
-    const propLiteral = factory.createTypeLiteralNode([
-      // ... then everything else.
-      ...this.properties()
-        .filter(property => !property.deprecated || !skipDeprecatedProperties)
-        .map(prop => prop.toNode(context)),
-    ]);
-
-    if (propLiteral.members.length > 0) {
-      return factory.createIntersectionTypeNode([parentNode, propLiteral]);
-    } else {
-      return parentNode;
-    }
-  }
-
-  private baseDecl(
-    skipDeprecatedProperties: boolean,
-    context: Context
-  ): TypeAliasDeclaration | undefined {
-    const baseNode = this.baseNode(skipDeprecatedProperties, context);
-
-    if (!baseNode) return undefined;
     const baseName = this.baseName();
     assert(baseName, 'If a baseNode is defined, baseName must be defined.');
 
-    return factory.createTypeAliasDeclaration(
+    const parentTypes = this.namedParents().map(p =>
+      factory.createExpressionWithTypeArguments(factory.createIdentifier(p), [])
+    );
+
+    const heritage = factory.createHeritageClause(
+      SyntaxKind.ExtendsKeyword,
+      parentTypes.length === 0
+        ? [
+            factory.createExpressionWithTypeArguments(
+              factory.createIdentifier('Partial'),
+              /*typeArguments=*/ [
+                factory.createTypeReferenceNode(
+                  IdReferenceName,
+                  /*typeArguments=*/ []
+                ),
+              ]
+            ),
+          ]
+        : parentTypes
+    );
+
+    const members = this.properties()
+      .filter(property => !property.deprecated || !skipDeprecatedProperties)
+      .map(prop => prop.toNode(context));
+
+    return factory.createInterfaceDeclaration(
       /*decorators=*/ [],
       /*modifiers=*/ [],
       baseName,
       /*typeParameters=*/ [],
-      baseNode
+      /*heritageClause=*/ [heritage],
+      /*members=*/ members
     );
   }
 
