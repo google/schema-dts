@@ -83,28 +83,28 @@ test(`baseine_${basename(__filename)}`, async () => {
 
     export type Text = string;
 
-    type CarBase = ThingBase & {
+    interface CarBase extends ThingBase {
         \\"doorNumber\\"?: SchemaValue<Number>;
-    };
-    type CarLeaf = {
+    }
+    interface CarLeaf extends CarBase {
         \\"@type\\": \\"Car\\";
-    } & CarBase;
+    }
     export type Car = CarLeaf;
 
-    type PersonLikeBase = ThingBase & {
+    interface PersonLikeBase extends ThingBase {
         \\"height\\"?: SchemaValue<Number>;
-    };
-    type PersonLikeLeaf = {
+    }
+    interface PersonLikeLeaf extends PersonLikeBase {
         \\"@type\\": \\"PersonLike\\";
-    } & PersonLikeBase;
+    }
     export type PersonLike = PersonLikeLeaf;
 
-    type ThingBase = Partial<IdReference> & {
+    interface ThingBase extends Partial<IdReference> {
         \\"name\\"?: SchemaValue<Text>;
-    };
-    type ThingLeaf = {
+    }
+    interface ThingLeaf extends ThingBase {
         \\"@type\\": \\"Thing\\";
-    } & ThingBase;
+    }
     export type Thing = ThingLeaf | Car | PersonLike;
 
     "

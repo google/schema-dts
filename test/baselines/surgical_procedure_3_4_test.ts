@@ -63,41 +63,42 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"@id\\": string;
     };
 
-    type EnumerationLeaf = {
+    interface EnumerationLeaf extends ThingBase {
         \\"@type\\": \\"Enumeration\\";
-    } & ThingBase;
+    }
     export type Enumeration = EnumerationLeaf | MedicalEnumeration;
 
-    type IntangibleLeaf = {
+    interface IntangibleLeaf extends ThingBase {
         \\"@type\\": \\"Intangible\\";
-    } & ThingBase;
+    }
     export type Intangible = IntangibleLeaf | Enumeration;
 
-    type MedicalEnumerationLeaf = {
+    interface MedicalEnumerationLeaf extends ThingBase {
         \\"@type\\": \\"MedicalEnumeration\\";
-    } & ThingBase;
+    }
     export type MedicalEnumeration = MedicalEnumerationLeaf | MedicalProcedureType;
 
-    type MedicalProcedureLeaf = {
+    interface MedicalProcedureLeaf extends ThingBase {
         \\"@type\\": \\"MedicalProcedure\\";
-    } & ThingBase;
+    }
     export type MedicalProcedure = MedicalProcedureLeaf | SurgicalProcedure;
 
-    type MedicalProcedureTypeLeaf = {
+    interface MedicalProcedureTypeLeaf extends ThingBase {
         \\"@type\\": \\"MedicalProcedureType\\";
-    } & ThingBase;
+    }
     export type MedicalProcedureType = \\"http://schema.org/SurgicalProcedure\\" | \\"https://schema.org/SurgicalProcedure\\" | \\"SurgicalProcedure\\" | MedicalProcedureTypeLeaf;
 
-    type SurgicalProcedureLeaf = {
+    interface SurgicalProcedureLeaf extends ThingBase {
         \\"@type\\": \\"SurgicalProcedure\\";
-    } & ThingBase;
+    }
     /** A type of medical procedure that involves invasive surgical techniques. */
     export type SurgicalProcedure = SurgicalProcedureLeaf;
 
-    type ThingBase = Partial<IdReference>;
-    type ThingLeaf = {
+    interface ThingBase extends Partial<IdReference> {
+    }
+    interface ThingLeaf extends ThingBase {
         \\"@type\\": \\"Thing\\";
-    } & ThingBase;
+    }
     export type Thing = ThingLeaf | Intangible | MedicalProcedure;
 
     "

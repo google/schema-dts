@@ -76,46 +76,46 @@ test(`baseine_${basename(__filename)}`, async () => {
 
     export type Text = URL | string;
 
-    type EntryPointLeaf = {
+    interface EntryPointLeaf extends ThingBase {
         \\"@type\\": \\"EntryPoint\\";
-    } & ThingBase;
+    }
     export type EntryPoint = EntryPointLeaf | string;
 
-    type OrganizationBase = ThingBase & {
+    interface OrganizationBase extends ThingBase {
         \\"locatedIn\\"?: SchemaValue<Place | IdReference>;
         \\"owner\\"?: SchemaValue<Person | IdReference>;
         \\"urlTemplate\\"?: SchemaValue<URL>;
-    };
-    type OrganizationLeaf = {
+    }
+    interface OrganizationLeaf extends OrganizationBase {
         \\"@type\\": \\"Organization\\";
-    } & OrganizationBase;
+    }
     export type Organization = OrganizationLeaf | string;
 
-    type PersonBase = ThingBase & {
+    interface PersonBase extends ThingBase {
         \\"height\\"?: SchemaValue<Quantity | IdReference>;
         \\"locatedIn\\"?: SchemaValue<Place | IdReference>;
-    };
-    type PersonLeaf = {
+    }
+    interface PersonLeaf extends PersonBase {
         \\"@type\\": \\"Person\\";
-    } & PersonBase;
+    }
     export type Person = PersonLeaf | string;
 
-    type PlaceLeaf = {
+    interface PlaceLeaf extends ThingBase {
         \\"@type\\": \\"Place\\";
-    } & ThingBase;
+    }
     export type Place = PlaceLeaf | string;
 
-    type QuantityLeaf = {
+    interface QuantityLeaf extends ThingBase {
         \\"@type\\": \\"Quantity\\";
-    } & ThingBase;
+    }
     export type Quantity = QuantityLeaf | string;
 
-    type ThingBase = Partial<IdReference> & {
+    interface ThingBase extends Partial<IdReference> {
         \\"name\\"?: SchemaValue<Text>;
-    };
-    type ThingLeaf = {
+    }
+    interface ThingLeaf extends ThingBase {
         \\"@type\\": \\"Thing\\";
-    } & ThingBase;
+    }
     export type Thing = ThingLeaf | EntryPoint | Organization | Person | Place | Quantity;
 
     export type URL = string;

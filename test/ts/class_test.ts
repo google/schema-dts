@@ -84,10 +84,11 @@ describe('Class', () => {
       const ctx = new Context();
       ctx.setUrlContext('https://schema.org/');
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
-        "type PersonBase = Partial<IdReference>;
-        type PersonLeaf = {
+        "interface PersonBase extends Partial<IdReference> {
+        }
+        interface PersonLeaf extends PersonBase {
             \\"@type\\": \\"Person\\";
-        } & PersonBase;
+        }
         export type Person = PersonLeaf;"
       `);
     });
@@ -98,9 +99,9 @@ describe('Class', () => {
       addParent(cls, 'https://schema.org/Thing');
 
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
-        "type PersonLeaf = {
+        "interface PersonLeaf extends ThingBase {
             \\"@type\\": \\"Person\\";
-        } & ThingBase;
+        }
         export type Person = PersonLeaf;"
       `);
     });
@@ -112,10 +113,11 @@ describe('Class', () => {
       addParent(cls, 'https://schema.org/Thing2');
 
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
-        "type PersonBase = (Thing1Base & Thing2Base);
-        type PersonLeaf = {
+        "interface PersonBase extends Thing1Base, Thing2Base {
+        }
+        interface PersonLeaf extends PersonBase {
             \\"@type\\": \\"Person\\";
-        } & PersonBase;
+        }
         export type Person = PersonLeaf;"
       `);
     });
@@ -136,9 +138,9 @@ describe('Class', () => {
       ).toBe(true);
 
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
-        "type PersonLeaf = {
+        "interface PersonLeaf extends ThingBase {
             \\"@type\\": \\"Person\\";
-        } & ThingBase;
+        }
         /** @deprecated Use CoolPerson instead. */
         export type Person = PersonLeaf;"
       `);
@@ -176,9 +178,9 @@ describe('Class', () => {
       ).toBe(true);
 
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
-        "type PersonLeaf = {
+        "interface PersonLeaf extends ThingBase {
             \\"@type\\": \\"Person\\";
-        } & ThingBase;
+        }
         /** @deprecated Use APerson or CoolPerson instead. */
         export type Person = PersonLeaf;"
       `);
@@ -209,9 +211,9 @@ describe('Class', () => {
       ).toBe(true);
 
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
-        "type PersonLeaf = {
+        "interface PersonLeaf extends ThingBase {
             \\"@type\\": \\"Person\\";
-        } & ThingBase;
+        }
         /**
          * Fantastic
          * @deprecated Use CoolPerson instead.

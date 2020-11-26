@@ -79,43 +79,43 @@ test(`baseine_${basename(__filename)}`, async () => {
 
     export type Text = string;
 
-    type CarBase = ThingBase & {
+    interface CarBase extends ThingBase {
         \\"doorNumber\\"?: SchemaValue<Number>;
-    };
-    type CarLeaf = {
+    }
+    interface CarLeaf extends CarBase {
         \\"@type\\": \\"Car\\";
-    } & CarBase;
+    }
     export type Car = CarLeaf;
 
-    type PersonLikeBase = ThingBase & {
+    interface PersonLikeBase extends ThingBase {
         \\"height\\"?: SchemaValue<Number>;
-    };
-    type PersonLikeLeaf = {
+    }
+    interface PersonLikeLeaf extends PersonLikeBase {
         \\"@type\\": \\"PersonLike\\";
-    } & PersonLikeBase;
+    }
     export type PersonLike = PersonLikeLeaf;
 
-    type ThingBase = Partial<IdReference> & {
+    interface ThingBase extends Partial<IdReference> {
         \\"name\\"?: SchemaValue<Text>;
         /**
          * Names are great! {@link X Y}
          * @deprecated Consider using http://schema.org/name or http://schema.org/height instead.
          */
         \\"names\\"?: SchemaValue<Text>;
-    };
-    type ThingLeaf = {
+    }
+    interface ThingLeaf extends ThingBase {
         \\"@type\\": \\"Thing\\";
-    } & ThingBase;
+    }
     export type Thing = ThingLeaf | Car | PersonLike | Vehicle;
 
-    type VehicleBase = ThingBase & {
+    interface VehicleBase extends ThingBase {
         \\"doorNumber\\"?: SchemaValue<Number>;
         /** @deprecated Consider using http://schema.org/doorNumber instead. */
         \\"doors\\"?: SchemaValue<Number>;
-    };
-    type VehicleLeaf = {
+    }
+    interface VehicleLeaf extends VehicleBase {
         \\"@type\\": \\"Vehicle\\";
-    } & VehicleBase;
+    }
     /** @deprecated Use Car instead. */
     export type Vehicle = VehicleLeaf;
 

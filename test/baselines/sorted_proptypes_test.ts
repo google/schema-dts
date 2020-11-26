@@ -78,12 +78,12 @@ test(`baseine_${basename(__filename)}`, async () => {
 
     export type Time = string;
 
-    type ThingBase = Partial<IdReference> & {
+    interface ThingBase extends Partial<IdReference> {
         \\"a\\"?: SchemaValue<Boolean | Date | DateTime | Number | Text | Time>;
-    };
-    type ThingLeaf = {
+    }
+    interface ThingLeaf extends ThingBase {
         \\"@type\\": \\"Thing\\";
-    } & ThingBase;
+    }
     export type Thing = ThingLeaf;
 
     "

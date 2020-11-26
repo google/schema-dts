@@ -73,37 +73,37 @@ test(`baseine_${basename(__filename)}`, async () => {
 
     export type Text = PronounceableText | URL | string;
 
-    type ArabicTextBase = PronounceableTextBase & {
+    interface ArabicTextBase extends PronounceableTextBase {
         \\"arabicPhoneticText\\"?: SchemaValue<Text>;
-    };
-    type ArabicTextLeaf = {
+    }
+    interface ArabicTextLeaf extends ArabicTextBase {
         \\"@type\\": \\"ArabicText\\";
-    } & ArabicTextBase;
+    }
     export type ArabicText = ArabicTextLeaf | string;
 
-    type EnglishTextLeaf = {
+    interface EnglishTextLeaf extends PronounceableTextBase {
         \\"@type\\": \\"EnglishText\\";
-    } & PronounceableTextBase;
+    }
     export type EnglishText = EnglishTextLeaf | string;
 
     export type FancyURL = string;
 
-    type PronounceableTextBase = Partial<IdReference> & {
+    interface PronounceableTextBase extends Partial<IdReference> {
         \\"phoneticText\\"?: SchemaValue<Text>;
-    };
-    type PronounceableTextLeaf = {
+    }
+    interface PronounceableTextLeaf extends PronounceableTextBase {
         \\"@type\\": \\"PronounceableText\\";
-    } & PronounceableTextBase;
+    }
     export type PronounceableText = PronounceableTextLeaf | ArabicText | EnglishText | string;
 
-    type ThingBase = Partial<IdReference> & {
+    interface ThingBase extends Partial<IdReference> {
         \\"name\\"?: SchemaValue<Text>;
         \\"pronunciation\\"?: SchemaValue<PronounceableText | IdReference>;
         \\"website\\"?: SchemaValue<URL>;
-    };
-    type ThingLeaf = {
+    }
+    interface ThingLeaf extends ThingBase {
         \\"@type\\": \\"Thing\\";
-    } & ThingBase;
+    }
     export type Thing = ThingLeaf;
 
     export type URL = FancyURL | string;
