@@ -86,9 +86,9 @@ describe('Class', () => {
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
         "interface PersonBase extends Partial<IdReference> {
         }
-        type PersonLeaf = {
+        interface PersonLeaf extends PersonBase {
             \\"@type\\": \\"Person\\";
-        } & PersonBase;
+        }
         export type Person = PersonLeaf;"
       `);
     });
@@ -99,9 +99,9 @@ describe('Class', () => {
       addParent(cls, 'https://schema.org/Thing');
 
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
-        "type PersonLeaf = {
+        "interface PersonLeaf extends ThingBase {
             \\"@type\\": \\"Person\\";
-        } & ThingBase;
+        }
         export type Person = PersonLeaf;"
       `);
     });
@@ -115,9 +115,9 @@ describe('Class', () => {
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
         "interface PersonBase extends Thing1Base, Thing2Base {
         }
-        type PersonLeaf = {
+        interface PersonLeaf extends PersonBase {
             \\"@type\\": \\"Person\\";
-        } & PersonBase;
+        }
         export type Person = PersonLeaf;"
       `);
     });
@@ -138,9 +138,9 @@ describe('Class', () => {
       ).toBe(true);
 
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
-        "type PersonLeaf = {
+        "interface PersonLeaf extends ThingBase {
             \\"@type\\": \\"Person\\";
-        } & ThingBase;
+        }
         /** @deprecated Use CoolPerson instead. */
         export type Person = PersonLeaf;"
       `);
@@ -178,9 +178,9 @@ describe('Class', () => {
       ).toBe(true);
 
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
-        "type PersonLeaf = {
+        "interface PersonLeaf extends ThingBase {
             \\"@type\\": \\"Person\\";
-        } & ThingBase;
+        }
         /** @deprecated Use APerson or CoolPerson instead. */
         export type Person = PersonLeaf;"
       `);
@@ -211,9 +211,9 @@ describe('Class', () => {
       ).toBe(true);
 
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
-        "type PersonLeaf = {
+        "interface PersonLeaf extends ThingBase {
             \\"@type\\": \\"Person\\";
-        } & ThingBase;
+        }
         /**
          * Fantastic
          * @deprecated Use CoolPerson instead.

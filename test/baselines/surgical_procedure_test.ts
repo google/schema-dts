@@ -88,79 +88,79 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"@id\\": string;
     };
 
-    type DiagnosticProcedureLeaf = {
+    interface DiagnosticProcedureLeaf extends ThingBase {
         \\"@type\\": \\"DiagnosticProcedure\\";
-    } & ThingBase;
+    }
     export type DiagnosticProcedure = DiagnosticProcedureLeaf;
 
-    type EnumerationLeaf = {
+    interface EnumerationLeaf extends ThingBase {
         \\"@type\\": \\"Enumeration\\";
-    } & ThingBase;
+    }
     export type Enumeration = EnumerationLeaf | MedicalEnumeration;
 
-    type IntangibleLeaf = {
+    interface IntangibleLeaf extends ThingBase {
         \\"@type\\": \\"Intangible\\";
-    } & ThingBase;
+    }
     export type Intangible = IntangibleLeaf | Enumeration;
 
-    type MedicalEntityLeaf = {
+    interface MedicalEntityLeaf extends ThingBase {
         \\"@type\\": \\"MedicalEntity\\";
-    } & ThingBase;
+    }
     export type MedicalEntity = MedicalEntityLeaf | MedicalProcedure;
 
-    type MedicalEnumerationLeaf = {
+    interface MedicalEnumerationLeaf extends ThingBase {
         \\"@type\\": \\"MedicalEnumeration\\";
-    } & ThingBase;
+    }
     export type MedicalEnumeration = MedicalEnumerationLeaf | MedicalProcedureType | PhysicalExam;
 
-    type MedicalProcedureLeaf = {
+    interface MedicalProcedureLeaf extends ThingBase {
         \\"@type\\": \\"MedicalProcedure\\";
-    } & ThingBase;
+    }
     /** A process of care used in either a diagnostic, therapeutic, preventive or palliative capacity that relies on invasive (surgical), non-invasive, or other techniques. */
     export type MedicalProcedure = MedicalProcedureLeaf | DiagnosticProcedure | PalliativeProcedure | PhysicalExam | SurgicalProcedure | TherapeuticProcedure;
 
-    type MedicalProcedureTypeLeaf = {
+    interface MedicalProcedureTypeLeaf extends ThingBase {
         \\"@type\\": \\"MedicalProcedureType\\";
-    } & ThingBase;
+    }
     /** An enumeration that describes different types of medical procedures. */
     export type MedicalProcedureType = \\"http://schema.org/NoninvasiveProcedure\\" | \\"https://schema.org/NoninvasiveProcedure\\" | \\"NoninvasiveProcedure\\" | \\"http://schema.org/PercutaneousProcedure\\" | \\"https://schema.org/PercutaneousProcedure\\" | \\"PercutaneousProcedure\\" | MedicalProcedureTypeLeaf;
 
-    type MedicalTherapyLeaf = {
+    interface MedicalTherapyLeaf extends ThingBase {
         \\"@type\\": \\"MedicalTherapy\\";
-    } & ThingBase;
+    }
     export type MedicalTherapy = MedicalTherapyLeaf | PalliativeProcedure;
 
     interface PalliativeProcedureBase extends ThingBase, ThingBase {
     }
-    type PalliativeProcedureLeaf = {
+    interface PalliativeProcedureLeaf extends PalliativeProcedureBase {
         \\"@type\\": \\"PalliativeProcedure\\";
-    } & PalliativeProcedureBase;
+    }
     export type PalliativeProcedure = PalliativeProcedureLeaf;
 
     interface PhysicalExamBase extends ThingBase, ThingBase {
     }
-    type PhysicalExamLeaf = {
+    interface PhysicalExamLeaf extends PhysicalExamBase {
         \\"@type\\": \\"PhysicalExam\\";
-    } & PhysicalExamBase;
+    }
     export type PhysicalExam = \\"http://schema.org/Head\\" | \\"https://schema.org/Head\\" | \\"Head\\" | \\"http://schema.org/Neuro\\" | \\"https://schema.org/Neuro\\" | \\"Neuro\\" | PhysicalExamLeaf;
 
-    type SurgicalProcedureLeaf = {
+    interface SurgicalProcedureLeaf extends ThingBase {
         \\"@type\\": \\"SurgicalProcedure\\";
-    } & ThingBase;
+    }
     /** A medical procedure involving an incision with instruments; performed for diagnose, or therapeutic purposes. */
     export type SurgicalProcedure = SurgicalProcedureLeaf;
 
-    type TherapeuticProcedureLeaf = {
+    interface TherapeuticProcedureLeaf extends ThingBase {
         \\"@type\\": \\"TherapeuticProcedure\\";
-    } & ThingBase;
+    }
     export type TherapeuticProcedure = TherapeuticProcedureLeaf | MedicalTherapy;
 
     interface ThingBase extends Partial<IdReference> {
         \\"procedureType\\"?: SchemaValue<MedicalProcedureType | IdReference>;
     }
-    type ThingLeaf = {
+    interface ThingLeaf extends ThingBase {
         \\"@type\\": \\"Thing\\";
-    } & ThingBase;
+    }
     export type Thing = ThingLeaf | Intangible | MedicalEntity;
 
     "

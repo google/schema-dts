@@ -52,9 +52,9 @@ test(`baseine_${basename(__filename)}`, async () => {
 
     interface ThingBase extends Partial<IdReference> {
     }
-    type ThingLeaf = {
+    interface ThingLeaf extends ThingBase {
         \\"@type\\": \\"Thing\\";
-    } & ThingBase;
+    }
     /** A Thing! */
     export type Thing = \\"http://schema.org/a\\" | \\"https://schema.org/a\\" | \\"a\\" | \\"http://schema.org/b\\" | \\"https://schema.org/b\\" | \\"b\\" | \\"http://schema.org/c\\" | \\"https://schema.org/c\\" | \\"c\\" | \\"http://schema.org/d\\" | \\"https://schema.org/d\\" | \\"d\\" | ThingLeaf;
 

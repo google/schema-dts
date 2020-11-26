@@ -70,9 +70,9 @@ test(`baseine_${basename(__filename)}`, async () => {
         /** Names are great! {@link X Y} */
         \\"name\\"?: SchemaValue<Text>;
     }
-    type ThingLeaf = {
+    interface ThingLeaf extends ThingBase {
         \\"@type\\": \\"Thing\\";
-    } & ThingBase;
+    }
     /**
      * Things are amazing!
      *

@@ -46,9 +46,9 @@ test(`baseine_${basename(__filename)}`, async () => {
 
     interface ThingBase extends Partial<IdReference> {
     }
-    type ThingLeaf = {
+    interface ThingLeaf extends ThingBase {
         \\"@type\\": \\"Thing\\";
-    } & ThingBase;
+    }
     export type Thing = ThingLeaf;
 
     "

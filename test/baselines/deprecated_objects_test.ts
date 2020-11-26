@@ -82,17 +82,17 @@ test(`baseine_${basename(__filename)}`, async () => {
     interface CarBase extends ThingBase {
         \\"doorNumber\\"?: SchemaValue<Number>;
     }
-    type CarLeaf = {
+    interface CarLeaf extends CarBase {
         \\"@type\\": \\"Car\\";
-    } & CarBase;
+    }
     export type Car = CarLeaf;
 
     interface PersonLikeBase extends ThingBase {
         \\"height\\"?: SchemaValue<Number>;
     }
-    type PersonLikeLeaf = {
+    interface PersonLikeLeaf extends PersonLikeBase {
         \\"@type\\": \\"PersonLike\\";
-    } & PersonLikeBase;
+    }
     export type PersonLike = PersonLikeLeaf;
 
     interface ThingBase extends Partial<IdReference> {
@@ -103,9 +103,9 @@ test(`baseine_${basename(__filename)}`, async () => {
          */
         \\"names\\"?: SchemaValue<Text>;
     }
-    type ThingLeaf = {
+    interface ThingLeaf extends ThingBase {
         \\"@type\\": \\"Thing\\";
-    } & ThingBase;
+    }
     export type Thing = ThingLeaf | Car | PersonLike | Vehicle;
 
     interface VehicleBase extends ThingBase {
@@ -113,9 +113,9 @@ test(`baseine_${basename(__filename)}`, async () => {
         /** @deprecated Consider using http://schema.org/doorNumber instead. */
         \\"doors\\"?: SchemaValue<Number>;
     }
-    type VehicleLeaf = {
+    interface VehicleLeaf extends VehicleBase {
         \\"@type\\": \\"Vehicle\\";
-    } & VehicleBase;
+    }
     /** @deprecated Use Car instead. */
     export type Vehicle = VehicleLeaf;
 

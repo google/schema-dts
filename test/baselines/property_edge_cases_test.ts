@@ -58,9 +58,9 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"knows\\"?: SchemaValue<never>;
         \\"name\\"?: SchemaValue<Text>;
     }
-    type ThingLeaf = {
+    interface ThingLeaf extends ThingBase {
         \\"@type\\": \\"Thing\\";
-    } & ThingBase;
+    }
     export type Thing = ThingLeaf;
 
     "

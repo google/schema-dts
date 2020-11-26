@@ -63,17 +63,17 @@ test(`baseine_${basename(__filename)}`, async () => {
     interface PersonLikeBase extends ThingBase {
         \\"height\\"?: SchemaValue<Number>;
     }
-    type PersonLikeLeaf = {
+    interface PersonLikeLeaf extends PersonLikeBase {
         \\"@type\\": \\"PersonLike\\";
-    } & PersonLikeBase;
+    }
     export type PersonLike = PersonLikeLeaf;
 
     interface ThingBase extends Partial<IdReference> {
         \\"name\\"?: SchemaValue<Text>;
     }
-    type ThingLeaf = {
+    interface ThingLeaf extends ThingBase {
         \\"@type\\": \\"Thing\\";
-    } & ThingBase;
+    }
     export type Thing = ThingLeaf | PersonLike;
 
     "

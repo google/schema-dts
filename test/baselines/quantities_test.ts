@@ -65,42 +65,42 @@ test(`baseine_${basename(__filename)}`, async () => {
 
     export type Text = string;
 
-    type DistanceLeaf = {
+    interface DistanceLeaf extends ThingBase {
         \\"@type\\": \\"Distance\\";
-    } & ThingBase;
+    }
     export type Distance = DistanceLeaf | string;
 
-    type DurationLeaf = {
+    interface DurationLeaf extends ThingBase {
         \\"@type\\": \\"Duration\\";
-    } & ThingBase;
+    }
     export type Duration = DurationLeaf | string;
 
-    type EnergyLeaf = {
+    interface EnergyLeaf extends ThingBase {
         \\"@type\\": \\"Energy\\";
-    } & ThingBase;
+    }
     export type Energy = EnergyLeaf | string;
 
-    type IntangibleLeaf = {
+    interface IntangibleLeaf extends ThingBase {
         \\"@type\\": \\"Intangible\\";
-    } & ThingBase;
+    }
     export type Intangible = IntangibleLeaf | Quantity;
 
-    type MassLeaf = {
+    interface MassLeaf extends ThingBase {
         \\"@type\\": \\"Mass\\";
-    } & ThingBase;
+    }
     export type Mass = MassLeaf | string;
 
-    type QuantityLeaf = {
+    interface QuantityLeaf extends ThingBase {
         \\"@type\\": \\"Quantity\\";
-    } & ThingBase;
+    }
     export type Quantity = QuantityLeaf | Distance | Duration | Energy | Mass | string;
 
     interface ThingBase extends Partial<IdReference> {
         \\"name\\"?: SchemaValue<Text>;
     }
-    type ThingLeaf = {
+    interface ThingLeaf extends ThingBase {
         \\"@type\\": \\"Thing\\";
-    } & ThingBase;
+    }
     export type Thing = ThingLeaf | Intangible;
 
     "
