@@ -81,20 +81,20 @@ test(`baseine_${basename(__filename)}`, async () => {
     } & ThingBase;
     export type EntryPoint = EntryPointLeaf | string;
 
-    type OrganizationBase = ThingBase & {
+    interface OrganizationBase extends ThingBase {
         \\"locatedIn\\"?: SchemaValue<Place | IdReference>;
         \\"owner\\"?: SchemaValue<Person | IdReference>;
         \\"urlTemplate\\"?: SchemaValue<URL>;
-    };
+    }
     type OrganizationLeaf = {
         \\"@type\\": \\"Organization\\";
     } & OrganizationBase;
     export type Organization = OrganizationLeaf | string;
 
-    type PersonBase = ThingBase & {
+    interface PersonBase extends ThingBase {
         \\"height\\"?: SchemaValue<Quantity | IdReference>;
         \\"locatedIn\\"?: SchemaValue<Place | IdReference>;
-    };
+    }
     type PersonLeaf = {
         \\"@type\\": \\"Person\\";
     } & PersonBase;
@@ -110,9 +110,9 @@ test(`baseine_${basename(__filename)}`, async () => {
     } & ThingBase;
     export type Quantity = QuantityLeaf | string;
 
-    type ThingBase = Partial<IdReference> & {
+    interface ThingBase extends Partial<IdReference> {
         \\"name\\"?: SchemaValue<Text>;
-    };
+    }
     type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
     } & ThingBase;

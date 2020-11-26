@@ -94,7 +94,8 @@ test(`baseine_${basename(__filename)}`, async () => {
     /** A type of medical procedure that involves invasive surgical techniques. */
     export type SurgicalProcedure = SurgicalProcedureLeaf;
 
-    type ThingBase = Partial<IdReference>;
+    interface ThingBase extends Partial<IdReference> {
+    }
     type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
     } & ThingBase;

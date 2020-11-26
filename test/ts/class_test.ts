@@ -84,7 +84,8 @@ describe('Class', () => {
       const ctx = new Context();
       ctx.setUrlContext('https://schema.org/');
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
-        "type PersonBase = Partial<IdReference>;
+        "interface PersonBase extends Partial<IdReference> {
+        }
         type PersonLeaf = {
             \\"@type\\": \\"Person\\";
         } & PersonBase;
@@ -112,7 +113,8 @@ describe('Class', () => {
       addParent(cls, 'https://schema.org/Thing2');
 
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
-        "type PersonBase = (Thing1Base & Thing2Base);
+        "interface PersonBase extends Thing1Base, Thing2Base {
+        }
         type PersonLeaf = {
             \\"@type\\": \\"Person\\";
         } & PersonBase;

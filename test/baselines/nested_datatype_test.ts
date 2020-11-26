@@ -73,9 +73,9 @@ test(`baseine_${basename(__filename)}`, async () => {
 
     export type Text = PronounceableText | URL | string;
 
-    type ArabicTextBase = PronounceableTextBase & {
+    interface ArabicTextBase extends PronounceableTextBase {
         \\"arabicPhoneticText\\"?: SchemaValue<Text>;
-    };
+    }
     type ArabicTextLeaf = {
         \\"@type\\": \\"ArabicText\\";
     } & ArabicTextBase;
@@ -88,19 +88,19 @@ test(`baseine_${basename(__filename)}`, async () => {
 
     export type FancyURL = string;
 
-    type PronounceableTextBase = Partial<IdReference> & {
+    interface PronounceableTextBase extends Partial<IdReference> {
         \\"phoneticText\\"?: SchemaValue<Text>;
-    };
+    }
     type PronounceableTextLeaf = {
         \\"@type\\": \\"PronounceableText\\";
     } & PronounceableTextBase;
     export type PronounceableText = PronounceableTextLeaf | ArabicText | EnglishText | string;
 
-    type ThingBase = Partial<IdReference> & {
+    interface ThingBase extends Partial<IdReference> {
         \\"name\\"?: SchemaValue<Text>;
         \\"pronunciation\\"?: SchemaValue<PronounceableText | IdReference>;
         \\"website\\"?: SchemaValue<URL>;
-    };
+    }
     type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
     } & ThingBase;

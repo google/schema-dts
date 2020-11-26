@@ -60,12 +60,12 @@ test(`baseine_${basename(__filename)}`, async () => {
 
     export type Text = string;
 
-    type ThingBase = Partial<IdReference> & {
+    interface ThingBase extends Partial<IdReference> {
         \\"a\\"?: SchemaValue<Text>;
         \\"b\\"?: SchemaValue<Text>;
         \\"c\\"?: SchemaValue<Text>;
         \\"d\\"?: SchemaValue<Text>;
-    };
+    }
     type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
     } & ThingBase;

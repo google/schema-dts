@@ -64,10 +64,10 @@ test(`baseine_${basename(__filename)}`, async () => {
     /** The basic data types such as Integers, Strings, etc. */
     export type DataType = Number | Text;
 
-    type ThingBase = Partial<IdReference> & {
+    interface ThingBase extends Partial<IdReference> {
         \\"age\\"?: SchemaValue<Number>;
         \\"name\\"?: SchemaValue<Text>;
-    };
+    }
     type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
     } & ThingBase;

@@ -130,13 +130,15 @@ test(`baseine_${basename(__filename)}`, async () => {
     } & ThingBase;
     export type MedicalTherapy = MedicalTherapyLeaf | PalliativeProcedure;
 
-    type PalliativeProcedureBase = (ThingBase & ThingBase);
+    interface PalliativeProcedureBase extends ThingBase, ThingBase {
+    }
     type PalliativeProcedureLeaf = {
         \\"@type\\": \\"PalliativeProcedure\\";
     } & PalliativeProcedureBase;
     export type PalliativeProcedure = PalliativeProcedureLeaf;
 
-    type PhysicalExamBase = (ThingBase & ThingBase);
+    interface PhysicalExamBase extends ThingBase, ThingBase {
+    }
     type PhysicalExamLeaf = {
         \\"@type\\": \\"PhysicalExam\\";
     } & PhysicalExamBase;
@@ -153,9 +155,9 @@ test(`baseine_${basename(__filename)}`, async () => {
     } & ThingBase;
     export type TherapeuticProcedure = TherapeuticProcedureLeaf | MedicalTherapy;
 
-    type ThingBase = Partial<IdReference> & {
+    interface ThingBase extends Partial<IdReference> {
         \\"procedureType\\"?: SchemaValue<MedicalProcedureType | IdReference>;
-    };
+    }
     type ThingLeaf = {
         \\"@type\\": \\"Thing\\";
     } & ThingBase;
