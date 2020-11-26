@@ -36,10 +36,10 @@ export function ParseFlags(args?: string[]): Options {
   const verbose = parser.add_mutually_exclusive_group({required: false});
   verbose.add_argument('--verbose', {
     default: false,
-    action: 'storeTrue',
+    action: 'store_true',
     dest: 'verbose',
   });
-  verbose.add_argument('--noverbose', {action: 'storeFalse', dest: 'verbose'});
+  verbose.add_argument('--noverbose', {action: 'store_false', dest: 'verbose'});
 
   parser.add_argument('--schema', {
     default: undefined,
@@ -83,12 +83,12 @@ export function ParseFlags(args?: string[]): Options {
   deprecated.add_argument('--deprecated', {
     default: true,
     help: 'Include deprecated Classes and Properties.',
-    action: 'storeTrue',
+    action: 'store_true',
     dest: 'deprecated',
   });
   deprecated.add_argument('--nodeprecated', {
     help: 'Skip deprecated Classes and Properties.',
-    action: 'storeFalse',
+    action: 'store_false',
     dest: 'deprecated',
   });
   return parser.parse_args(args);
