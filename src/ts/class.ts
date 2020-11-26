@@ -18,7 +18,6 @@ import {
   DeclarationStatement,
   ModifierFlags,
   Statement,
-  TypeAliasDeclaration,
   TypeNode,
   SyntaxKind,
   InterfaceDeclaration,
@@ -265,7 +264,7 @@ export class Class {
     );
   }
 
-  protected leafDecl(context: Context): TypeAliasDeclaration | undefined {
+  protected leafDecl(context: Context): InterfaceDeclaration | undefined {
     const leafName = this.leafName();
     if (!leafName) return undefined;
 
@@ -280,19 +279,20 @@ export class Class {
       /*typeArguments=*/ []
     );
 
-    const thisType = factory.createIntersectionTypeNode([
-      factory.createTypeLiteralNode([
-        new TypeProperty(this.subject).toNode(context),
-      ]),
-      baseTypeReference,
-    ]);
-
-    return factory.createTypeAliasDeclaration(
+    return factory.createInterfaceDeclaration(
       /*decorators=*/ [],
       /*modifiers=*/ [],
       leafName,
       /*typeParameters=*/ [],
-      thisType
+      /*heritage=*/ [
+        factory.createHeritageClause(SyntaxKind.ExtendsKeyword, [
+          factory.createExpressionWithTypeArguments(
+            factory.createIdentifier(baseName),
+            /*typeArguments=*/ []
+          ),
+        ]),
+      ],
+      /*members=*/ [new TypeProperty(this.subject).toNode(context)]
     );
   }
 
