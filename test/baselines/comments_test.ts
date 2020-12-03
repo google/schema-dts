@@ -33,10 +33,14 @@ test(`baseine_${basename(__filename)}`, async () => {
 <http://schema.org/name3> <http://schema.org/rangeIncludes> <http://schema.org/Text> .
 <http://schema.org/name3> <http://schema.org/domainIncludes> <http://schema.org/Thing> .
 <http://schema.org/name3> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
+<http://schema.org/name4> <http://schema.org/rangeIncludes> <http://schema.org/Text> .
+<http://schema.org/name4> <http://schema.org/domainIncludes> <http://schema.org/Thing> .
+<http://schema.org/name4> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
 <http://schema.org/Thing> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
 <http://schema.org/name> <http://www.w3.org/2000/01/rdf-schema#comment> "Names are great!\\n <a href=\\"X\\">Y</a>" .
 <http://schema.org/name2> <http://www.w3.org/2000/01/rdf-schema#comment> "Names are great!\\n [Y](X)" .
 <http://schema.org/name3> <http://www.w3.org/2000/01/rdf-schema#comment> "[[Link]]s [[URL|Aliased]]" .
+<http://schema.org/name4> <http://www.w3.org/2000/01/rdf-schema#comment> "\n    Some code block\n\nText." .
 <http://schema.org/Thing> <http://www.w3.org/2000/01/rdf-schema#comment> "Things are amazing!\\n\\n<br/><br /><ul><li>Foo</li><li>Bar</li><li><em>Baz</em>, and <strong>Bat</strong></li><ul>" .
 <http://schema.org/knows> <http://www.w3.org/2000/01/rdf-schema#comment> "Reminds me of this quote:\\n\\n<br /><code>Foo\\nBar</code>\\n\\n<br/><br/><pre>Hey!</pre> this." .
 <http://schema.org/knows> <http://schema.org/rangeIncludes> <http://schema.org/Text> .
@@ -103,6 +107,13 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"name\\"?: SchemaValue<Text>;
         /** Names are great! {@link X Y} */
         \\"name2\\"?: SchemaValue<Text>;
+        /** {@link Link}s {@link URL Aliased} */
+        \\"name3\\"?: SchemaValue<Text>;
+        /**
+         * \`\`\`Some code block\`\`\`
+         * Text.
+         */
+        \\"name4\\"?: SchemaValue<Text>;
     }
     interface ThingLeaf extends ThingBase {
         \\"@type\\": \\"Thing\\";
