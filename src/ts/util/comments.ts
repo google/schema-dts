@@ -149,7 +149,7 @@ const strong: OnTag = {
 // Our top-level tag handler.
 const universalHandlers: OnTagBuilder[] = [
   ['root', {}],
-  ['text', {value: v => sanitizeText(v)}],
+  ['text', {value: v => v}],
 ];
 
 const htmlHandlers: OnTagBuilder[] = [
@@ -269,8 +269,4 @@ function unescape(str: string): string {
     str = str.replace(regexp, replacement);
   }
   return str;
-}
-function sanitizeText(str: string): string {
-  return str;
-  // return str.replace(/\s+/g, ' ');
 }
