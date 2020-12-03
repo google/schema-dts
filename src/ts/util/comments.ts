@@ -19,6 +19,7 @@ import markdown from 'remark-parse';
 import html from 'rehype-parse';
 import {Node, setSyntheticLeadingComments, SyntaxKind} from 'typescript';
 import type {Literal, Node as AstNode, Parent} from 'unist';
+import {wikiLinkPlugin} from 'remark-wiki-link';
 
 export function withComments<T extends Node>(
   comment: string | undefined,
@@ -52,7 +53,13 @@ function parseComment(comment: string): string {
 
   const processor = parseAsHtml
     ? unified().use(html, {fragment: true})
-    : unified().use(markdown);
+    : unified()
+        .use(markdown)
+        .use(wikiLinkPlugin, {
+          hrefTemplate: s => s,
+          pageResolver: s => [s],
+          aliasDivider: '|',
+        });
 
   const ast = processor.runSync(processor.parse(unescape(comment)));
 
@@ -109,6 +116,10 @@ interface TagContext {
 interface FriendlyNode {
   properties?: {[attribute: string]: string};
   url?: string;
+  data: {
+    alias?: string;
+    permalink?: string;
+  };
 }
 
 // Some handlers for behaviors that apply to multiple tags:
@@ -158,6 +169,21 @@ const htmlHandlers: OnTagBuilder[] = [
 
 const markdownHandlers: OnTagBuilder[] = [
   ['link', {open: ({node}) => `{@link ${node.url} `, close: () => '}'}],
+  [
+    'wikiLink',
+    {
+      open({node}) {
+        // Use shorthand for something like "[[CreativeWork]]", which can simply
+        // become {@link CreativeWork}.
+        if (node.data.alias && node.data.alias === node.data.permalink) {
+          return `{@link ${node.data.permalink}`;
+        }
+
+        return `{@link ${node.data.permalink} ${node.data.alias}`;
+      },
+      close: () => '}',
+    },
+  ],
   ['emphasis', em],
   ['strong', strong],
   ['inlineCode', code],
