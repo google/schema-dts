@@ -37,7 +37,7 @@ test(`baseine_${basename(__filename)}`, async () => {
 <http://schema.org/name4> <http://schema.org/domainIncludes> <http://schema.org/Thing> .
 <http://schema.org/name4> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
 <http://schema.org/Thing> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
-<http://schema.org/name> <http://www.w3.org/2000/01/rdf-schema#comment> "Names are great!\\n <a href=\\"X\\">Y</a>" .
+<http://schema.org/name> <http://www.w3.org/2000/01/rdf-schema#comment> "Names are great!  <a href=\\"X\\">Y</a>" .
 <http://schema.org/name2> <http://www.w3.org/2000/01/rdf-schema#comment> "Names are great!\\n [Y](X)" .
 <http://schema.org/name3> <http://www.w3.org/2000/01/rdf-schema#comment> "[[Link]]s [[URL|Aliased]]" .
 <http://schema.org/name4> <http://www.w3.org/2000/01/rdf-schema#comment> "\n    Some code block\n\nText." .
@@ -56,6 +56,10 @@ test(`baseine_${basename(__filename)}`, async () => {
 <http://schema.org/encodingFormat> <https://schema.org/rangeIncludes> <http://schema.org/Text> .
 <http://schema.org/encodingFormat> <https://schema.org/domainIncludes> <http://schema.org/Thing> .
 <http://schema.org/encodingFormat> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
+<http://schema.org/openingHours> <https://schema.org/domainIncludes> <http://schema.org/Thing> .
+<http://schema.org/openingHours> <http://www.w3.org/2000/01/rdf-schema#comment> "The general opening hours for a business. Opening hours can be specified as a weekly time range, starting with days, then times per day. Multiple days can be listed with commas ',' separating each day. Day or time ranges are specified using a hyphen '-'.\\n\\n* Days are specified using the following two-letter combinations: \`\`\`Mo\`\`\`, \`\`\`Tu\`\`\`, \`\`\`We\`\`\`, \`\`\`Th\`\`\`, \`\`\`Fr\`\`\`, \`\`\`Sa\`\`\`, \`\`\`Su\`\`\`.\\n* Times are specified using 24:00 format. For example, 3pm is specified as \`\`\`15:00\`\`\`, 10am as \`\`\`10:00\`\`\`. \\n* Here is an example: <code>&lt;time itemprop=\\"openingHours\\" datetime=&quot;Tu,Th 16:00-20:00&quot;&gt;Tuesdays and Thursdays 4-8pm&lt;/time&gt;</code>.\\n* If a business is open 7 days a week, then it can be specified as <code>&lt;time itemprop=&quot;openingHours&quot; datetime=&quot;Mo-Su&quot;&gt;Monday through Sunday, all day&lt;/time&gt;</code>." .
+<http://schema.org/openingHours> <https://schema.org/rangeIncludes> <http://schema.org/Text> .
+<http://schema.org/openingHours> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
       `,
     ['--ontology', `https://fake.com/${basename(__filename)}.nt`]
   );
@@ -91,7 +95,7 @@ test(`baseine_${basename(__filename)}`, async () => {
         /**
          * Media type typically expressed using a MIME format (see {@link http://www.iana.org/assignments/media-types/media-types.xhtml IANA site} and {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types MDN reference}) e.g. application/zip for a SoftwareApplication binary, audio/mpeg for .mp3 etc.).
          *
-         * In cases where a {@link CreativeWork} has several media type representations, {@link encoding} can be used to indicate each {@link MediaObject} alongside particular {@link encodingFormat} information.
+         * In cases where a {@link https://schema.org/CreativeWork CreativeWork} has several media type representations, {@link https://schema.org/encoding encoding} can be used to indicate each {@link https://schema.org/MediaObject MediaObject} alongside particular {@link https://schema.org/encodingFormat encodingFormat} information.
          *
          * Unregistered or niche encoding and file formats can be indicated instead via the most appropriate URL, e.g. defining Web page or a Wikipedia/Wikidata entry.
          */
@@ -100,20 +104,35 @@ test(`baseine_${basename(__filename)}`, async () => {
          * Reminds me of this quote:
          * \`Foo Bar\`
          *
-         * \`Hey!\` this.
+         * \`\`\`
+         * Hey!
+         * \`\`\`
+         * this.
          */
         \\"knows\\"?: SchemaValue<Text>;
         /** Names are great! {@link X Y} */
         \\"name\\"?: SchemaValue<Text>;
         /** Names are great! {@link X Y} */
         \\"name2\\"?: SchemaValue<Text>;
-        /** {@link Link}s {@link URL Aliased} */
+        /** {@link https://schema.org/Link Link}s {@link https://schema.org/URL Aliased} */
         \\"name3\\"?: SchemaValue<Text>;
         /**
-         * \`\`\`Some code block\`\`\`
+         * \`\`\`
+         * Some code block
+         *
+         * \`\`\`
+         *
          * Text.
          */
         \\"name4\\"?: SchemaValue<Text>;
+        /**
+         * The general opening hours for a business. Opening hours can be specified as a weekly time range, starting with days, then times per day. Multiple days can be listed with commas ',' separating each day. Day or time ranges are specified using a hyphen '-'.
+         * - Days are specified using the following two-letter combinations: \`Mo\`, \`Tu\`, \`We\`, \`Th\`, \`Fr\`, \`Sa\`, \`Su\`.
+         * - Times are specified using 24:00 format. For example, 3pm is specified as \`15:00\`, 10am as \`10:00\`.
+         * - Here is an example: \`<time itemprop=\\"openingHours\\" datetime=\\"Tu,Th 16:00-20:00\\">Tuesdays and Thursdays 4-8pm</time>\`.
+         * - If a business is open 7 days a week, then it can be specified as \`<time itemprop=\\"openingHours\\" datetime=\\"Mo-Su\\">Monday through Sunday, all day</time>\`.
+         */
+        \\"openingHours\\"?: SchemaValue<Text>;
     }
     interface ThingLeaf extends ThingBase {
         \\"@type\\": \\"Thing\\";

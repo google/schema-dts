@@ -30,7 +30,7 @@ test(`baseine_${basename(__filename)}`, async () => {
 <http://schema.org/Thing> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
 <http://schema.org/name> <http://www.w3.org/2000/01/rdf-schema#comment> "Simple!" .
 <http://schema.org/Thing> <http://www.w3.org/2000/01/rdf-schema#comment> "Simple!" .
-<http://schema.org/name> <http://www.w3.org/2000/01/rdf-schema#comment> "Names are great!\\n <a href=\\"X\\">Y</a>"@en .
+<http://schema.org/name> <http://www.w3.org/2000/01/rdf-schema#comment> "Names are great!\\n<br/> <a href=\\"X\\">Y</a>"@en .
 <http://schema.org/Thing> <http://www.w3.org/2000/01/rdf-schema#comment> "Things are amazing!\\n\\n<br/><br /><ul><li>Foo</li><li>Bar</li><li><em>Baz</em>, and <strong>Bat</strong></li><ul>"@en .
 <http://schema.org/Widget> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Thing> .
 <http://schema.org/Gadget> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Thing> .
@@ -60,7 +60,10 @@ test(`baseine_${basename(__filename)}`, async () => {
     export type Text = string;
 
     interface ThingBase extends Partial<IdReference> {
-        /** Names are great! {@link X Y} */
+        /**
+         * Names are great!
+         * {@link X Y}
+         */
         \\"name\\"?: SchemaValue<Text>;
     }
     interface ThingLeaf extends ThingBase {

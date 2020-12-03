@@ -20,6 +20,9 @@ import html from 'rehype-parse';
 import {Node, setSyntheticLeadingComments, SyntaxKind} from 'typescript';
 import type {Literal, Node as AstNode, Parent} from 'unist';
 import {wikiLinkPlugin} from 'remark-wiki-link';
+import mdastToHast from 'remark-rehype';
+import stripWhitespace from 'rehype-minify-whitespace';
+import raw from 'rehype-raw';
 
 export function withComments<T extends Node>(
   comment: string | undefined,
@@ -52,27 +55,30 @@ function parseComment(comment: string): string {
   const parseAsHtml = shouldParseAsHtml(comment);
 
   const processor = parseAsHtml
-    ? unified().use(html, {fragment: true})
+    ? unified().use(html, {fragment: true}).use(stripWhitespace)
     : unified()
         .use(markdown)
         .use(wikiLinkPlugin, {
-          hrefTemplate: s => s,
+          hrefTemplate: s => `https://schema.org/${s}`,
           pageResolver: s => [s],
           aliasDivider: '|',
-        });
+        })
+        .use(mdastToHast, {allowDangerousHtml: true})
+        .use(raw)
+        .use(stripWhitespace);
 
   const ast = processor.runSync(processor.parse(unescape(comment)));
 
   const context: ParseContext = {
     result: [],
-    onTag: new Map(
-      parseAsHtml
-        ? [...universalHandlers, ...htmlHandlers]
-        : [...universalHandlers, ...markdownHandlers]
-    ),
+    onTag: new Map([...universalHandlers, ...htmlHandlers]),
   };
 
-  one(ast, context, {isFirstChild: true});
+  one(ast, context, {
+    isFirstChild: true,
+    isLastChild: true,
+    parent: undefined,
+  });
 
   const lines = context.result.join('').trim().split('\n');
 
@@ -86,11 +92,17 @@ function parseComment(comment: string): string {
 // and new lines are insignificant, and all meaning is expressed through HTML
 // tags, including <a> and <br/>.
 //
-// Starting Schema.org 11, comments are represented as markdown.
+// Starting Schema.org 11, comments are represented as markdown. v11 still mixes
+// some HTML with Markdown.
 //
-// To decide how we're handling them, we'll simply check for the presence of
-// *any* HTML tag. Without, we'll assume markup.
+// To decide how we're handling them, we'll check for the presence of newlines
+// without line break tags as a strong indication to use Markdown (even if other
+//  HTML exists). Othrewise, we simply test for the existence of any HTML tag.
 function shouldParseAsHtml(s: string): boolean {
+  const BR = /<[Bb][Rr]\s*\/?>/g;
+  const NL = /\/*n/g;
+  if (NL.test(s) && !BR.test(s)) return false;
+
   return /<[A-Za-z][A-Za-z0-9-]*[^>]*>/g.test(s);
 }
 
@@ -105,12 +117,14 @@ type OnTagBuilder = readonly [string, OnTag];
 interface OnTag {
   value?(value: string): string;
   open?(context: TagContext): string;
-  close?(context: {isFirstChild: boolean}): string;
+  close?(context: TagContext): string;
 }
 
 interface TagContext {
   readonly node: FriendlyNode;
   readonly isFirstChild: boolean;
+  readonly isLastChild: boolean;
+  readonly parent: FriendlyNode | undefined;
 }
 
 interface FriendlyNode {
@@ -131,22 +145,18 @@ const strong: OnTag = {
   open: () => '__',
   close: () => '__',
 };
-const code: OnTag = {
-  open: () => '`',
-  close: () => '`',
-};
 
 // Our top-level tag handler.
 const universalHandlers: OnTagBuilder[] = [
   ['root', {}],
   ['text', {value: v => sanitizeText(v)}],
-  [
-    'paragraph',
-    {open: ({isFirstChild}) => (isFirstChild ? '' : '\n'), close: () => '\n'},
-  ],
 ];
 
 const htmlHandlers: OnTagBuilder[] = [
+  [
+    'p',
+    {open: ({isFirstChild}) => (isFirstChild ? '' : '\n'), close: () => '\n'},
+  ],
   [
     'a',
     {open: ({node}) => `{@link ${node.properties!['href']} `, close: () => '}'},
@@ -163,52 +173,51 @@ const htmlHandlers: OnTagBuilder[] = [
       /* Ignore <UL> entirely. */
     },
   ],
-  ['code', code],
-  ['pre', code],
-];
-
-const markdownHandlers: OnTagBuilder[] = [
-  ['link', {open: ({node}) => `{@link ${node.url} `, close: () => '}'}],
   [
-    'wikiLink',
+    'code',
     {
-      open({node}) {
-        // Use shorthand for something like "[[CreativeWork]]", which can simply
-        // become {@link CreativeWork}.
-        if (node.data.alias && node.data.alias === node.data.permalink) {
-          return `{@link ${node.data.permalink}`;
+      open({isFirstChild, isLastChild, parent}) {
+        if (
+          parent &&
+          isFirstChild &&
+          isLastChild &&
+          getNodeType(parent as AstNode) === 'pre'
+        ) {
+          return '';
         }
-
-        return `{@link ${node.data.permalink} ${node.data.alias}`;
+        return '`';
       },
-      close: () => '}',
+      close({isFirstChild, isLastChild, parent}) {
+        if (
+          parent &&
+          isFirstChild &&
+          isLastChild &&
+          getNodeType(parent as AstNode) === 'pre'
+        ) {
+          return '';
+        }
+        return '`';
+      },
     },
   ],
-  ['emphasis', em],
-  ['strong', strong],
-  ['inlineCode', code],
-  ['list', {}],
-  ['listItem', {open: () => '- '}],
-  ['html', {}], // Ignore HTML in Markdown. We shouldn't get here, but v11 for example contains an erroneous `</a>`.
-  ['code', {open: () => '```', close: () => '```', value: v => v}],
+  ['pre', {open: () => '```\n', close: () => '\n```\n'}],
 ];
 
 function one(
   node: AstNode,
   context: ParseContext,
-  nodeContext: {isFirstChild: boolean}
+  nodeContext: {
+    isFirstChild: boolean;
+    isLastChild: boolean;
+    parent: FriendlyNode | undefined;
+  }
 ): void {
-  const handler =
-    node.type === 'element'
-      ? context.onTag.get(((node as unknown) as {tagName: string}).tagName)
-      : context.onTag.get(node.type);
+  const handler = context.onTag.get(getNodeType(node));
   if (!handler) {
     throw new Error(
-      `While parsing comment: unknown node type for: ${JSON.stringify(
-        node,
-        undefined,
-        2
-      )}.`
+      `While parsing comment: unknown node type (${getNodeType(
+        node
+      )}) for: ${JSON.stringify(node, undefined, 2)}.`
     );
   }
 
@@ -228,14 +237,25 @@ function one(
       const child = p.children[i];
       one(child, context, {
         isFirstChild: i === 0,
+        isLastChild: i === p.children.length - 1,
+        parent: node as FriendlyNode,
       });
     }
   }
 
   if (handler.close) {
-    context.result.push(handler.close(nodeContext));
+    context.result.push(
+      handler.close({...nodeContext, node: node as FriendlyNode})
+    );
   }
 }
+
+function getNodeType(node: AstNode): string {
+  return node.type === 'element'
+    ? ((node as unknown) as {tagName: string}).tagName
+    : node.type;
+}
+
 // String Replacement: make sure we replace unicode strings as needed, wherever
 // they show up as text.
 const replacer: Array<[RegExp, string]> = [
@@ -251,5 +271,6 @@ function unescape(str: string): string {
   return str;
 }
 function sanitizeText(str: string): string {
-  return str.replace(/\s+/g, ' ');
+  return str;
+  // return str.replace(/\s+/g, ' ');
 }
