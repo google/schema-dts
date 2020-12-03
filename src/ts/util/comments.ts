@@ -14,30 +14,126 @@
  * limitations under the License.
  */
 
-import {Parser} from 'htmlparser2';
+import unified from 'unified';
+import markdown from 'remark-parse';
+import html from 'rehype-parse';
 import {Node, setSyntheticLeadingComments, SyntaxKind} from 'typescript';
-import {assert} from '../../util/assert';
+import type {Literal, Node as AstNode, Parent} from 'unist';
+import {wikiLinkPlugin} from 'remark-wiki-link';
+import mdastToHast from 'remark-rehype';
+import stripWhitespace from 'rehype-minify-whitespace';
+import raw from 'rehype-raw';
 
-// String Replacement: make sure we replace unicode strings as needed, wherever
-// they show up as text.
-const replacer: Array<[RegExp, string]> = [
-  [/\\n/g, ''],
-  [/\\u2014/gi, '\u2014'],
-  [/\\u2019/gi, '\u2019'],
-  [/\\u00A3/gi, '\u00A3'],
-];
-function replace(str: string): string {
-  for (const [regexp, replacement] of replacer) {
-    str = str.replace(regexp, replacement);
+export function withComments<T extends Node>(
+  comment: string | undefined,
+  node: T
+): T {
+  if (!comment) return node;
+
+  try {
+    return setSyntheticLeadingComments(node, [
+      {
+        text: parseComment(comment),
+        kind: SyntaxKind.MultiLineCommentTrivia,
+        hasTrailingNewLine: true,
+        pos: -1,
+        end: -1,
+      },
+    ]);
+  } catch (error) {
+    throw new Error(`${error}\n... while processing comment:\n${comment}`);
   }
-  return str;
 }
+
+export function appendLine(first: string | undefined, next: string): string {
+  if (!first) return next;
+  if (shouldParseAsHtml(first)) return `${first}<br/>${next}`;
+  return `${first}\n\n${next}`;
+}
+
+function parseComment(comment: string): string {
+  const parseAsHtml = shouldParseAsHtml(comment);
+
+  const processor = parseAsHtml
+    ? unified().use(html, {fragment: true}).use(stripWhitespace)
+    : unified()
+        .use(markdown)
+        .use(wikiLinkPlugin, {
+          hrefTemplate: s => `https://schema.org/${s}`,
+          pageResolver: s => [s],
+          aliasDivider: '|',
+        })
+        .use(mdastToHast, {allowDangerousHtml: true})
+        .use(raw)
+        .use(stripWhitespace);
+
+  const ast = processor.runSync(processor.parse(unescape(comment)));
+
+  const context: ParseContext = {
+    result: [],
+    onTag: new Map([...universalHandlers, ...htmlHandlers]),
+  };
+
+  one(ast, context, {
+    isFirstChild: true,
+    isLastChild: true,
+    parent: undefined,
+  });
+
+  const lines = context.result.join('').trim().split('\n');
+
+  // Hack to get JSDOCs working. Microsoft does not expose JSDOC-creation API.
+  return lines.length === 1
+    ? `* ${lines[0]} `
+    : '*\n * ' + lines.join('\n * ') + '\n ';
+}
+
+// Older Schema.org comment strings are represented as HTML, where whitespace
+// and new lines are insignificant, and all meaning is expressed through HTML
+// tags, including <a> and <br/>.
+//
+// Starting Schema.org 11, comments are represented as markdown. v11 still mixes
+// some HTML with Markdown.
+//
+// To decide how we're handling them, we'll check for the presence of newlines
+// without line break tags as a strong indication to use Markdown (even if other
+//  HTML exists). Othrewise, we simply test for the existence of any HTML tag.
+function shouldParseAsHtml(s: string): boolean {
+  const BR = /<[Bb][Rr]\s*\/?>/g;
+  const NL = /\/*n/g;
+  if (NL.test(s) && !BR.test(s)) return false;
+
+  return /<[A-Za-z][A-Za-z0-9-]*[^>]*>/g.test(s);
+}
+
+interface ParseContext {
+  readonly result: string[];
+  readonly onTag: Map<string, OnTag>;
+}
+type OnTagBuilder = readonly [string, OnTag];
 
 // Tag Management: Define functions describing what to do with HTML tags in our
 // comments.
 interface OnTag {
-  open?(attrs: {[key: string]: string}): string;
-  close?(): string;
+  value?(value: string): string;
+  open?(context: TagContext): string;
+  close?(context: TagContext): string;
+}
+
+interface TagContext {
+  readonly node: FriendlyNode;
+  readonly isFirstChild: boolean;
+  readonly isLastChild: boolean;
+  readonly parent: FriendlyNode | undefined;
+}
+
+interface FriendlyNode {
+  properties?: {[attribute: string]: string};
+  url?: string;
+  data: {
+    alias?: string;
+    permalink?: string;
+  };
 }
 
 // Some handlers for behaviors that apply to multiple tags:
@@ -45,18 +141,26 @@ const em: OnTag = {
   open: () => '_',
   close: () => '_',
 };
-const strong = {
+const strong: OnTag = {
   open: () => '__',
   close: () => '__',
 };
-const code = {
-  open: () => '`',
-  close: () => '`',
-};
 
 // Our top-level tag handler.
-const onTag = new Map<string, OnTag>([
-  ['a', {open: attrs => `{@link ${attrs['href']} `, close: () => '}'}],
+const universalHandlers: OnTagBuilder[] = [
+  ['root', {}],
+  ['text', {value: v => v}],
+];
+
+const htmlHandlers: OnTagBuilder[] = [
+  [
+    'p',
+    {open: ({isFirstChild}) => (isFirstChild ? '' : '\n'), close: () => '\n'},
+  ],
+  [
+    'a',
+    {open: ({node}) => `{@link ${node.properties!['href']} `, close: () => '}'},
+  ],
   ['em', em],
   ['i', em],
   ['strong', strong],
@@ -69,60 +173,100 @@ const onTag = new Map<string, OnTag>([
       /* Ignore <UL> entirely. */
     },
   ],
-  ['code', code],
-  ['pre', code],
-]);
-
-function parseComment(comment: string): string {
-  const result: string[] = [];
-  const parser = new Parser({
-    ontext: (text: string) => result.push(replace(text)),
-    onopentag: (tag: string, attrs: {[key: string]: string}) => {
-      const handler = onTag.get(tag);
-      if (!handler) {
-        throw new Error(`Unknown tag "${tag}".`);
-      }
-
-      if (handler.open) {
-        result.push(handler.open(attrs));
-      }
+  [
+    'code',
+    {
+      open({isFirstChild, isLastChild, parent}) {
+        if (
+          parent &&
+          isFirstChild &&
+          isLastChild &&
+          getNodeType(parent as AstNode) === 'pre'
+        ) {
+          return '';
+        }
+        return '`';
+      },
+      close({isFirstChild, isLastChild, parent}) {
+        if (
+          parent &&
+          isFirstChild &&
+          isLastChild &&
+          getNodeType(parent as AstNode) === 'pre'
+        ) {
+          return '';
+        }
+        return '`';
+      },
     },
-    onclosetag: (tag: string) => {
-      const handler = onTag.get(tag);
-      assert(handler);
+  ],
+  ['pre', {open: () => '```\n', close: () => '\n```\n'}],
+];
 
-      if (handler.close) {
-        result.push(handler.close());
-      }
-    },
-  });
-  parser.write(comment);
-  parser.end();
-
-  const lines = result.join('').split('\n');
-  if (lines[lines.length - 1] === '') {
-    lines.pop();
+function one(
+  node: AstNode,
+  context: ParseContext,
+  nodeContext: {
+    isFirstChild: boolean;
+    isLastChild: boolean;
+    parent: FriendlyNode | undefined;
+  }
+): void {
+  const handler = context.onTag.get(getNodeType(node));
+  if (!handler) {
+    throw new Error(
+      `While parsing comment: unknown node type (${getNodeType(
+        node
+      )}) for: ${JSON.stringify(node, undefined, 2)}.`
+    );
   }
 
-  // Hack to get JSDOCs working. Microsoft does not expose JSDOC-creation API.
-  return lines.length === 1
-    ? `* ${lines[0]} `
-    : '*\n * ' + lines.join('\n * ') + '\n ';
+  if (handler.open) {
+    context.result.push(
+      handler.open({...nodeContext, node: node as FriendlyNode})
+    );
+  }
+
+  if (handler.value && (node as Literal).value) {
+    context.result.push(handler.value((node as Literal).value as string));
+  }
+
+  if ((node as Parent).children) {
+    const p = node as Parent;
+    for (let i = 0; i < p.children.length; ++i) {
+      const child = p.children[i];
+      one(child, context, {
+        isFirstChild: i === 0,
+        isLastChild: i === p.children.length - 1,
+        parent: node as FriendlyNode,
+      });
+    }
+  }
+
+  if (handler.close) {
+    context.result.push(
+      handler.close({...nodeContext, node: node as FriendlyNode})
+    );
+  }
 }
 
-export function withComments<T extends Node>(
-  comment: string | undefined,
-  node: T
-): T {
-  if (!comment) return node;
+function getNodeType(node: AstNode): string {
+  return node.type === 'element'
+    ? ((node as unknown) as {tagName: string}).tagName
+    : node.type;
+}
 
-  return setSyntheticLeadingComments(node, [
-    {
-      text: parseComment(comment),
-      kind: SyntaxKind.MultiLineCommentTrivia,
-      hasTrailingNewLine: true,
-      pos: -1,
-      end: -1,
-    },
-  ]);
+// String Replacement: make sure we replace unicode strings as needed, wherever
+// they show up as text.
+const replacer: Array<[RegExp, string]> = [
+  [/\\?\\n/g, '\n'],
+  [/\\?\\u2014/gi, '\u2014'],
+  [/\\?\\u2019/gi, '\u2019'],
+  [/\\?\\u00A3/gi, '\u00A3'],
+];
+function unescape(str: string): string {
+  for (const [regexp, replacement] of replacer) {
+    str = str.replace(regexp, replacement);
+  }
+  return str;
 }

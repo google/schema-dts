@@ -52,6 +52,11 @@ test(`baseine_${basename(__filename)}`, async () => {
 <http://schema.org/names> <http://www.w3.org/2000/01/rdf-schema#comment> "Names are great!\\n <a href=\\"X\\">Y</a>" .
 <http://schema.org/names> <http://schema.org/supersededBy> <http://schema.org/name> .
 <http://schema.org/names> <http://schema.org/supersededBy> <http://schema.org/height> .
+<http://schema.org/names2> <http://schema.org/rangeIncludes> <http://schema.org/Text> .
+<http://schema.org/names2> <http://schema.org/domainIncludes> <http://schema.org/Thing> .
+<http://schema.org/names2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
+<http://schema.org/names2> <http://www.w3.org/2000/01/rdf-schema#comment> "Names are great!\\n<br/><a href=\\"X\\">Y</a>" .
+<http://schema.org/names2> <http://schema.org/supersededBy> <http://schema.org/name> .
 <http://schema.org/Text> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/DataType> .
 <http://schema.org/Text> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
 <http://schema.org/Number> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/DataType> .
@@ -99,9 +104,16 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"name\\"?: SchemaValue<Text>;
         /**
          * Names are great! {@link X Y}
+         *
          * @deprecated Consider using http://schema.org/name or http://schema.org/height instead.
          */
         \\"names\\"?: SchemaValue<Text>;
+        /**
+         * Names are great!
+         * {@link X Y}
+         * @deprecated Consider using http://schema.org/name instead.
+         */
+        \\"names2\\"?: SchemaValue<Text>;
     }
     interface ThingLeaf extends ThingBase {
         \\"@type\\": \\"Thing\\";

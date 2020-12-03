@@ -35,6 +35,10 @@
   ],
   "homepage": "https://opensource.google/projects/schema-dts",
   "bugs": "https://github.com/google/schema-dts/issues",
-  "repository": "github:google/schema-dts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/google/schema-dts.git",
+    "directory": "dist/schema"
+  },
   "license": "Apache-2.0"
 }

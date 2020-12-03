@@ -216,6 +216,7 @@ describe('Class', () => {
         }
         /**
          * Fantastic
+         *
          * @deprecated Use CoolPerson instead.
          */
         export type Person = PersonLeaf;"
@@ -244,7 +245,7 @@ describe('Class', () => {
         )
       ).toBe(true);
 
-      expect(() => cls.toNode(ctx, true)).toThrowError('Unknown tag');
+      expect(() => cls.toNode(ctx, true)).toThrowError('unknown node type');
     });
   });
 });
