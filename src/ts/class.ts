@@ -37,7 +37,7 @@ import {Context} from './context';
 import {EnumValue} from './enum';
 import {Property, TypeProperty} from './property';
 import {arrayOf} from './util/arrayof';
-import {withComments} from './util/comments';
+import {appendLine, withComments} from './util/comments';
 import {toClassName} from './util/names';
 import {assert} from '../util/assert';
 import {IdReferenceName} from './helper_types';
@@ -93,7 +93,8 @@ export class Class {
     const deprecated = `@deprecated Use ${this.supersededBy()
       .map(c => c.className())
       .join(' or ')} instead.`;
-    return this._comment ? `${this._comment}\n${deprecated}` : deprecated;
+
+    return appendLine(this._comment, deprecated);
   }
 
   protected get typedefs(): string[] {

@@ -27,8 +27,12 @@ test(`baseine_${basename(__filename)}`, async () => {
 <http://schema.org/name> <http://schema.org/rangeIncludes> <http://schema.org/Text> .
 <http://schema.org/name> <http://schema.org/domainIncludes> <http://schema.org/Thing> .
 <http://schema.org/name> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
+<http://schema.org/name2> <http://schema.org/rangeIncludes> <http://schema.org/Text> .
+<http://schema.org/name2> <http://schema.org/domainIncludes> <http://schema.org/Thing> .
+<http://schema.org/name2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
 <http://schema.org/Thing> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
 <http://schema.org/name> <http://www.w3.org/2000/01/rdf-schema#comment> "Names are great!\\n <a href=\\"X\\">Y</a>" .
+<http://schema.org/name2> <http://www.w3.org/2000/01/rdf-schema#comment> "Names are great!\\n [Y](X)" .
 <http://schema.org/Thing> <http://www.w3.org/2000/01/rdf-schema#comment> "Things are amazing!\\n\\n<br/><br /><ul><li>Foo</li><li>Bar</li><li><em>Baz</em>, and <strong>Bat</strong></li><ul>" .
 <http://schema.org/knows> <http://www.w3.org/2000/01/rdf-schema#comment> "Reminds me of this quote:\\n\\n<br /><code>Foo\\nBar</code>\\n\\n<br/><br/><pre>Hey!</pre> this." .
 <http://schema.org/knows> <http://schema.org/rangeIncludes> <http://schema.org/Text> .
@@ -37,6 +41,9 @@ test(`baseine_${basename(__filename)}`, async () => {
 <http://schema.org/Text> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/DataType> .
 <http://schema.org/Text> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
 <http://schema.org/Text> <http://www.w3.org/2000/01/rdf-schema#comment> "Data type: Text." .
+<https://schema.org/Number> <http://www.w3.org/2000/01/rdf-schema#comment> "Data type: Number.\\n\\nUsage guidelines:\\n\\n* Use values from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE' (U+0039)) rather than superficially similiar Unicode symbols.\\n* Use '.' (Unicode 'FULL STOP' (U+002E)) rather than ',' to indicate a decimal point. Avoid using these symbols as a readability separator." .
+<https://schema.org/Number> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
+<https://schema.org/Number> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://schema.org/DataType> .
       `,
     ['--ontology', `https://fake.com/${basename(__filename)}.nt`]
   );
@@ -56,19 +63,30 @@ test(`baseine_${basename(__filename)}`, async () => {
         \\"@id\\": string;
     };
 
+    /**
+     * Data type: Number.
+     *
+     * Usage guidelines:
+     * - Use values from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE' (U+0039)) rather than superficially similiar Unicode symbols.
+     * - Use '.' (Unicode 'FULL STOP' (U+002E)) rather than ',' to indicate a decimal point. Avoid using these symbols as a readability separator.
+     */
+    export type Number = number;
+
     /** Data type: Text. */
     export type Text = string;
 
     interface ThingBase extends Partial<IdReference> {
         /**
          * Reminds me of this quote:
-         * \`FooBar\`
+         * \`Foo Bar\`
          *
          * \`Hey!\` this.
          */
         \\"knows\\"?: SchemaValue<Text>;
         /** Names are great! {@link X Y} */
         \\"name\\"?: SchemaValue<Text>;
+        /** Names are great! {@link X Y} */
+        \\"name2\\"?: SchemaValue<Text>;
     }
     interface ThingLeaf extends ThingBase {
         \\"@type\\": \\"Thing\\";

@@ -28,7 +28,7 @@ import {
 
 import type {Class, ClassMap} from './class';
 import {Context} from './context';
-import {withComments} from './util/comments';
+import {appendLine, withComments} from './util/comments';
 import {SchemaValueName, IdReferenceName} from './helper_types';
 
 /**
@@ -47,7 +47,7 @@ export class PropertyType {
       .map(o => o.toString())
       .join(' or ')} instead.`;
 
-    return this._comment ? `${this._comment}\n${deprecated}` : deprecated;
+    return appendLine(this._comment, deprecated);
   }
 
   get deprecated() {
