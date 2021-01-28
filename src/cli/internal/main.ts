@@ -16,7 +16,7 @@
 
 import {Log, SetOptions} from '../../logging';
 import {WriteDeclarations} from '../../transform/transform';
-import {load} from '../../triples/reader';
+import {load, loadFile} from '../../triples/reader';
 import {Context} from '../../ts/context';
 
 import {ParseFlags} from '../args';
@@ -26,9 +26,16 @@ export async function main(args?: string[]) {
   SetOptions(options);
 
   const ontologyUrl = options.ontology;
-  Log(`Loading Ontology from URL: ${ontologyUrl}`);
+  const filePath = options.file;
+  let result = '';
+  if (ontologyUrl && ontologyUrl.startsWith('https://')) {
+    Log(`Loading Ontology from URL: ${ontologyUrl}`);
 
-  const result = load(ontologyUrl);
+    result = load(ontologyUrl);
+  } else if (filePath) {
+    Log(`Loading Ontology from path: ${filePath}`);
+    result = loadFile(filePath);
+  }
   const context = Context.Parse(options.context);
   await WriteDeclarations(result, options.deprecated, context, write);
 }
