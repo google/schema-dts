@@ -19,7 +19,7 @@ import {ArgumentParser} from 'argparse';
 export interface Options {
   /** HTTPS URL to an .nt file defining a custom ontology. */
   ontology: string;
-  file: string;
+  file: string | undefined;
   verbose: boolean;
   deprecated: boolean;
   context: string;

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import {Observable} from 'rxjs';
+import {Triple} from '../..';
 import {Log, SetOptions} from '../../logging';
 import {WriteDeclarations} from '../../transform/transform';
 import {load, loadFile} from '../../triples/reader';
@@ -27,14 +29,15 @@ export async function main(args?: string[]) {
 
   const ontologyUrl = options.ontology;
   const filePath = options.file;
-  let result;
-  if (ontologyUrl && ontologyUrl.startsWith('https://')) {
+  let result: Observable<Triple>;
+
+  if (filePath) {
+    Log(`Loading Ontology from path: ${filePath}`);
+    result = loadFile(filePath);
+  } else {
     Log(`Loading Ontology from URL: ${ontologyUrl}`);
 
     result = load(ontologyUrl);
-  } else if (filePath) {
-    Log(`Loading Ontology from path: ${filePath}`);
-    result = loadFile(filePath);
   }
   if (!result) {
     Log(`Ontology could not be read`);
