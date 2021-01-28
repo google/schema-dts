@@ -95,10 +95,22 @@ function handleFile(
     crlfDelay: Infinity,
   });
 
+  const data: string[] = [];
+
   rl.on('line', (line: string) => {
-    subscriber.next(line);
+    data.push(line);
   });
+
   rl.on('close', () => {
+    try {
+      const triples = toTripleStrings(data);
+      for (const triple of process(triples)) {
+        subscriber.next(triple);
+      }
+    } catch (error) {
+      Log(`Caught Error on end: ${error}`);
+      subscriber.error(error);
+    }
     subscriber.complete();
   });
 }

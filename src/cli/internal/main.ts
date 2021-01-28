@@ -27,7 +27,7 @@ export async function main(args?: string[]) {
 
   const ontologyUrl = options.ontology;
   const filePath = options.file;
-  let result = '';
+  let result;
   if (ontologyUrl && ontologyUrl.startsWith('https://')) {
     Log(`Loading Ontology from URL: ${ontologyUrl}`);
 
@@ -35,6 +35,10 @@ export async function main(args?: string[]) {
   } else if (filePath) {
     Log(`Loading Ontology from path: ${filePath}`);
     result = loadFile(filePath);
+  }
+  if (!result) {
+    Log(`Ontology could not be read`);
+    return;
   }
   const context = Context.Parse(options.context);
   await WriteDeclarations(result, options.deprecated, context, write);
