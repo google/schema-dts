@@ -24,6 +24,7 @@ describe('ParseFlags', () => {
     expect(options.context).toBe('https://schema.org');
     expect(options.deprecated).toBe(true);
     expect(options.verbose).toBe(false);
+    expect(options.file).toBeUndefined();
 
     expect(options.ontology).toBe(
       'https://schema.org/version/latest/schemaorg-current-https.nt'
@@ -35,6 +36,13 @@ describe('ParseFlags', () => {
     expect(options).not.toBeUndefined();
 
     expect(options.ontology).toBe('https://google.com/foo');
+  });
+
+  it('custom file', () => {
+    const options = ParseFlags(['--file', './ontology.nt'])!;
+    expect(options).not.toBeUndefined();
+
+    expect(options.file).toBe('./ontology.nt');
   });
 
   describe('deprecated fields', () => {
