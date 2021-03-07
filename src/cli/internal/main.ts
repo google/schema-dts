@@ -36,12 +36,7 @@ export async function main(args?: string[]) {
     result = loadFile(filePath);
   } else {
     Log(`Loading Ontology from URL: ${ontologyUrl}`);
-
     result = load(ontologyUrl);
-  }
-  if (!result) {
-    Log(`Ontology could not be read`);
-    return;
   }
   const context = Context.Parse(options.context);
   await WriteDeclarations(result, options.deprecated, context, write);
