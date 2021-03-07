@@ -32,7 +32,7 @@ describe('main Args logs', () => {
       .mockImplementation(path => mockedStream);
   });
   it(`the path it is loading from`, async () => {
-    let logs = [''];
+    const logs = [''];
     // log messages get caught for checking assert:
     jest
       .spyOn(Logging, 'Log')
