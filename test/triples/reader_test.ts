@@ -445,6 +445,15 @@ describe('load', () => {
           //@ts-ignore
           .mockImplementation(path => mockedStream);
       });
+      it('fails loading a file (containing .nt syntax errors)', async () => {
+        const failingMockPath = './bad-ontology.nt';
+        const failingMockLine = `<https://schema.org/knowsAbout> <https://sc`;
+        const failingMockedStream = Readable.from([failingMockLine]);
+        readStreamCreatorFn.mockImplementation(path => failingMockedStream);
+
+        const fileTriples = loadFile(failingMockPath).toPromise();
+        await expect(fileTriples).rejects.toThrow('Unexpected');
+      });
       it('loads a file from the correct path', async () => {
         const mockFilePath = './ontology.nt';
 
