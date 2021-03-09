@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 import https from 'https';
+import fs from 'fs';
+import readline from 'readline';
 import {Observable, Subscriber, TeardownLogic} from 'rxjs';
 
 import {Log} from '../logging';
@@ -72,6 +74,44 @@ export function toTripleStrings(data: string[]) {
 export function load(url: string): Observable<Triple> {
   return new Observable<Triple>(subscriber => {
     handleUrl(url, subscriber);
+  });
+}
+
+/**
+ * does the same as load(), but for a local file
+ */
+export function loadFile(path: string): Observable<Triple> {
+  return new Observable<Triple>(subscriber => {
+    handleFile(path, subscriber);
+  });
+}
+
+function handleFile(
+  path: string,
+  subscriber: Subscriber<Triple>
+): TeardownLogic {
+  const rl = readline.createInterface({
+    input: fs.createReadStream(path),
+    crlfDelay: Infinity,
+  });
+
+  const data: string[] = [];
+
+  rl.on('line', (line: string) => {
+    data.push(line);
+  });
+
+  rl.on('close', () => {
+    try {
+      const triples = toTripleStrings(data);
+      for (const triple of process(triples)) {
+        subscriber.next(triple);
+      }
+    } catch (error) {
+      Log(`Caught Error on end: ${error}`);
+      subscriber.error(error);
+    }
+    subscriber.complete();
   });
 }
 

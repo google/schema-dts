@@ -19,6 +19,7 @@ import {ArgumentParser} from 'argparse';
 export interface Options {
   /** HTTPS URL to an .nt file defining a custom ontology. */
   ontology: string;
+  file: string | undefined;
   verbose: boolean;
   deprecated: boolean;
   context: string;
@@ -77,6 +78,11 @@ export function ParseFlags(args?: string[]): Options {
       "'domainIncludes', and 'rangeIncludes'.",
     metavar: 'https://url.to/schema.nt',
     dest: 'ontology',
+  });
+  parser.add_argument('--file', {
+    default: undefined,
+    help: 'file path to a .nt file, for using a local ontology file',
+    dest: 'file',
   });
 
   const deprecated = parser.add_mutually_exclusive_group({required: false});
