@@ -103,7 +103,7 @@ module.exports = {
     'default-case': 'error',
     eqeqeq: ['error', 'smart'],
     'guard-for-in': 'error',
-    'id-blacklist': [
+    'id-denylist': [
       'error',
       'any',
       'Number',

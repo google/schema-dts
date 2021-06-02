@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/google/schema-dts.svg?branch=master)](https://travis-ci.org/google/schema-dts)
-[![Coverage Status](https://coveralls.io/repos/github/google/schema-dts/badge.svg?branch=master)](https://coveralls.io/github/google/schema-dts?branch=master)
+[![Build Status](https://travis-ci.org/google/schema-dts.svg?branch=main)](https://travis-ci.org/google/schema-dts)
+[![Coverage Status](https://coveralls.io/repos/github/google/schema-dts/badge.svg?branch=main)](https://coveralls.io/github/google/schema-dts?branch=main)
 [![schema-dts npm version](https://badge.fury.io/js/schema-dts.svg)](https://www.npmjs.com/package/schema-dts)
 
 # schema-dts

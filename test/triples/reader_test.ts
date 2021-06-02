@@ -17,9 +17,10 @@
 import {ClientRequest, IncomingMessage} from 'http';
 import https from 'https';
 import {toArray} from 'rxjs/operators';
-import {PassThrough, Writable} from 'stream';
+import {PassThrough, Readable, Writable} from 'stream';
 
-import {load} from '../../src/triples/reader';
+import fs from 'fs';
+import {load, loadFile} from '../../src/triples/reader';
 import {Triple} from '../../src/triples/triple';
 import {SchemaString, UrlNode} from '../../src/triples/types';
 import {flush} from '../helpers/async';
@@ -432,6 +433,38 @@ describe('load', () => {
             Object: SchemaString.Parse('"science"')!,
           },
         ]);
+      });
+    });
+    describe('local file', () => {
+      let readStreamCreatorFn: jest.SpyInstance;
+      beforeEach(() => {
+        const mockFileLine = `<https://schema.org/Person> <https://schema.org/knowsAbout> <https://schema.org/Event> .\n`;
+        const mockedStream = Readable.from([mockFileLine]);
+        readStreamCreatorFn = jest
+          .spyOn(fs, 'createReadStream')
+          //@ts-ignore
+          .mockImplementation(path => mockedStream);
+      });
+      it('fails loading a file (containing .nt syntax errors)', async () => {
+        const failingMockPath = './bad-ontology.nt';
+        const failingMockLine = `<https://schema.org/knowsAbout> <https://sc`;
+        const failingMockedStream = Readable.from([failingMockLine]);
+        readStreamCreatorFn.mockImplementation(path => failingMockedStream);
+
+        const fileTriples = loadFile(failingMockPath).toPromise();
+        await expect(fileTriples).rejects.toThrow('Unexpected');
+      });
+      it('loads a file from the correct path', async () => {
+        const mockFilePath = './ontology.nt';
+
+        const fileTriples = loadFile(mockFilePath).toPromise();
+
+        expect(readStreamCreatorFn).toBeCalledWith(mockFilePath);
+        await expect(fileTriples).resolves.toEqual({
+          Subject: UrlNode.Parse('https://schema.org/Person'),
+          Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
+          Object: UrlNode.Parse('https://schema.org/Event')!,
+        });
       });
     });
   });
