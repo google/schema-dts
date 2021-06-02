@@ -1,6 +1,6 @@
 {
   "name": "schema-dts",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "displayName": "schema-dts: Strongly-typed Schema.org vocabulary declarations",
   "description": "A TypeScript package with latest Schema.org Schema Typings",
   "authors": [
