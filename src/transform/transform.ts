@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {Observable} from 'rxjs';
+import {firstValueFrom, Observable} from 'rxjs';
 import {
   createPrinter,
   createSourceFile,
@@ -52,7 +52,7 @@ export async function WriteDeclarations(
   context: Context,
   write: (content: string) => Promise<void> | void
 ) {
-  const topics = await triples.pipe(asTopicArray()).toPromise();
+  const topics = await firstValueFrom(triples.pipe(asTopicArray()));
 
   const classes = ProcessClasses(topics);
   ProcessProperties(topics, classes);

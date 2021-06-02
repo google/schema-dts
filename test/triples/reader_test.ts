@@ -24,6 +24,7 @@ import {load, loadFile} from '../../src/triples/reader';
 import {Triple} from '../../src/triples/triple';
 import {SchemaString, UrlNode} from '../../src/triples/types';
 import {flush} from '../helpers/async';
+import {firstValueFrom} from 'rxjs';
 
 describe('load', () => {
   let get: jest.Mock<
@@ -73,7 +74,7 @@ describe('load', () => {
       });
 
       // toPromise makes Observables un-lazy, so we can just go ahead.
-      triples = triples$.pipe(toArray()).toPromise();
+      triples = firstValueFrom(triples$.pipe(toArray()));
 
       await flush();
     });
