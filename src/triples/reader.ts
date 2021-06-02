@@ -52,7 +52,8 @@ function object(content: string) {
   return o;
 }
 
-const totalRegex = /\s*<([^<>]+)>\s*<([^<>]+)>\s*((?:<[^<>"]+>)|(?:"(?:[^"]|(?:\\"))+(?:[^\"]|\\")"(?:@[a-zA-Z]+)?))\s*\./;
+const totalRegex =
+  /\s*<([^<>]+)>\s*<([^<>]+)>\s*((?:<[^<>"]+>)|(?:"(?:[^"]|(?:\\"))+(?:[^\"]|\\")"(?:@[a-zA-Z]+)?))\s*\./;
 export function toTripleStrings(data: string[]) {
   const linearTriples = data
     .join('')

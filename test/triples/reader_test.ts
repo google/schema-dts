@@ -66,7 +66,7 @@ describe('load', () => {
       const triples$ = load('https://schema.org/');
       get.mockImplementationOnce((_, cb) => {
         // Unfortunately, we use another overload that doesn't appear here.
-        const callback = (cb as unknown) as (inc: IncomingMessage) => void;
+        const callback = cb as unknown as (inc: IncomingMessage) => void;
         fakeResponse = makeFakeResponse(callback);
 
         return passThrough();
@@ -337,7 +337,7 @@ describe('load', () => {
         // on second call:
         get.mockImplementationOnce((_, cb) => {
           // Unfortunately, we use another overload that doesn't appear here.
-          const callback = (cb as unknown) as (inc: IncomingMessage) => void;
+          const callback = cb as unknown as (inc: IncomingMessage) => void;
           fakeResponse2 = makeFakeResponse(callback);
 
           return passThrough();
@@ -471,7 +471,7 @@ describe('load', () => {
 });
 
 function passThrough(): ClientRequest {
-  return (new PassThrough() as Writable) as ClientRequest;
+  return new PassThrough() as Writable as ClientRequest;
 }
 
 interface Control {

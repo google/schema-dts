@@ -252,7 +252,7 @@ function one(
 
 function getNodeType(node: AstNode): string {
   return node.type === 'element'
-    ? ((node as unknown) as {tagName: string}).tagName
+    ? (node as unknown as {tagName: string}).tagName
     : node.type;
 }
 
