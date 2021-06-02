@@ -24,6 +24,7 @@ import {load, loadFile} from '../../src/triples/reader';
 import {Triple} from '../../src/triples/triple';
 import {SchemaString, UrlNode} from '../../src/triples/types';
 import {flush} from '../helpers/async';
+import {firstValueFrom} from 'rxjs';
 
 describe('load', () => {
   let get: jest.Mock<
@@ -66,14 +67,14 @@ describe('load', () => {
       const triples$ = load('https://schema.org/');
       get.mockImplementationOnce((_, cb) => {
         // Unfortunately, we use another overload that doesn't appear here.
-        const callback = (cb as unknown) as (inc: IncomingMessage) => void;
+        const callback = cb as unknown as (inc: IncomingMessage) => void;
         fakeResponse = makeFakeResponse(callback);
 
         return passThrough();
       });
 
       // toPromise makes Observables un-lazy, so we can just go ahead.
-      triples = triples$.pipe(toArray()).toPromise();
+      triples = firstValueFrom(triples$.pipe(toArray()));
 
       await flush();
     });
@@ -337,7 +338,7 @@ describe('load', () => {
         // on second call:
         get.mockImplementationOnce((_, cb) => {
           // Unfortunately, we use another overload that doesn't appear here.
-          const callback = (cb as unknown) as (inc: IncomingMessage) => void;
+          const callback = cb as unknown as (inc: IncomingMessage) => void;
           fakeResponse2 = makeFakeResponse(callback);
 
           return passThrough();
@@ -471,7 +472,7 @@ describe('load', () => {
 });
 
 function passThrough(): ClientRequest {
-  return (new PassThrough() as Writable) as ClientRequest;
+  return new PassThrough() as Writable as ClientRequest;
 }
 
 interface Control {

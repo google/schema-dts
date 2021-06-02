@@ -3,7 +3,7 @@ module.exports = {
     es6: true,
     node: true,
   },
-  extends: ['prettier', 'prettier/@typescript-eslint'],
+  extends: ['prettier'],
   plugins: ['@typescript-eslint', 'import', 'jsdoc'],
   ignorePatterns: [],
   parser: '@typescript-eslint/parser',
