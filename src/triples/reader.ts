@@ -182,7 +182,7 @@ export function* process(triples: string[][]): Iterable<Triple> {
     //  Predicate:  <http://www.w3.org/2000/01/rdf-schema#comment>
     //  Object:     "A test comment.")
     // We skip it manually.
-    if (/http[s]?:\/\/meta.schema.org\//.test(match[0])) {
+    if (/http[s]?:\/\/meta\.schema\.org\//.test(match[0])) {
       continue;
     }
 
