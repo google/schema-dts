@@ -98,8 +98,8 @@
   "license": "Apache-2.0",
   "scripts": {
     "clean": "del-cli built dist/gen dist/schema/**/* !dist/schema/package.json !dist/schema/README.md",
-    "lint": "eslint src/**/*.ts test/**/*.ts && prettier --check \"src/**/*.ts\" && prettier --check \"test/**/*.ts\"",
-    "fix": "eslint --fix src/**/*.ts test/**/*.ts && prettier --write \"src/**/*.ts\" && prettier --write \"test/**/*.ts\"",
+    "lint": "eslint src/**/*.ts test/**/*.ts && prettier --check \"src/**/*.ts\" \"test/**/*.ts\" \"dist/schema/*.md\" \"*.md\"",
+    "fix": "eslint --fix src/**/*.ts test/**/*.ts && prettier --write \"src/**/*.ts\" \"test/**/*.ts\"  \"dist/schema/*.md\" \"*.md\"",
     "test": "npm run lint && jest --coverage",
     "coverage_on_travis": "cat ./coverage/lcov.info | coveralls",
     "build": "tsc -b",
