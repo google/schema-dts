@@ -17,7 +17,7 @@ function IdPropertyNode() {
 }
 
 function WithContextType(context: Context) {
-  // export type WithContent<T extends Thing> = T & { "@context": TYPE_NODE }
+  // export type WithContext<T extends Thing> = T & { "@context": TYPE_NODE }
   return withComments(
     'Used at the top-level node to indicate the context for the JSON-LD ' +
       'objects used. The context provided in this type is compatible ' +
@@ -32,14 +32,9 @@ function WithContextType(context: Context) {
           factory.createTypeReferenceNode('Thing', /*typeArguments=*/ undefined)
         ),
       ],
-      factory.createUnionTypeNode([
-        factory.createTypeReferenceNode(GraphTypeName),
-        factory.createParenthesizedType(
-          factory.createIntersectionTypeNode([
-            factory.createTypeReferenceNode('T', /*typeArguments=*/ undefined),
-            factory.createTypeLiteralNode([context.contextProperty()]),
-          ])
-        ),
+      factory.createIntersectionTypeNode([
+        factory.createTypeReferenceNode('T', /*typeArguments=*/ undefined),
+        factory.createTypeLiteralNode([context.contextProperty()]),
       ])
     )
   );
