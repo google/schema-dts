@@ -16,8 +16,8 @@ completions and stricter validation.
 
 This repository contains two NPM packages:
 
-- **[schema-dts-gen](https://www.npmjs.com/package/schema-dts-gen)** Providing
-  a command-line tool to generate TypeScript files based on a specific Schema
+- **[schema-dts-gen](https://www.npmjs.com/package/schema-dts-gen)** Providing a
+  command-line tool to generate TypeScript files based on a specific Schema
   version and layer.
 - **[schema-dts](https://www.npmjs.com/package/schema-dts)** Pre-packaged
   TypeScript typings of latest Schema.org schema, without
@@ -31,13 +31,17 @@ To use the typings for your project, simply add the
 [`schema-dts`](https://www.npmjs.com/package/schema-dts) NPM package to your
 project:
 
-    npm install schema-dts
+```command
+npm install schema-dts
+```
 
 Then you can use it by importing `"schema-dts"`.
 
 ### Root context
 
-You will usually want your top-level item to include a `@context`, like `https://schema.org`. In order for your object type to accept this property, you can augment it with `WithContext`, e.g.:
+You will usually want your top-level item to include a `@context`, like
+`https://schema.org`. In order for your object type to accept this property, you
+can augment it with `WithContext`, e.g.:
 
 ```ts
 import {Person, WithContext} from 'schema-dts';
@@ -55,14 +59,23 @@ const p: WithContext<Person> = {
 
 ### Graphs and IDs
 
-JSON-LD supports `'@graph'` objects that have richer interconnected links between the nodes. You can do that easily in `schema-dts` by using the `Graph` type.
+JSON-LD supports `'@graph'` objects that have richer interconnected links
+between the nodes. You can do that easily in `schema-dts` by using the `Graph`
+type.
 
-Notice that any node can have an `@id` when defining it. And you can reference the same node from different places by simply using an ID stub, for example `{ '@id': 'https://my.site/about/#page }` below is an ID stub.
+Notice that any node can have an `@id` when defining it. And you can reference
+the same node from different places by simply using an ID stub, for example
+`{ '@id': 'https://my.site/about/#page }` below is an ID stub.
 
-The example below shows potential JSON-LD for an About page. It includes definitions of Alyssa P. Hacker (the author & subject of the page), the specific page in this URL, and the website it belongs to. Some objects are still defined as inline nested objects (e.g. Occupation), since they are only referenced by their parent. Other objects are defined at the top-level with an `@id`, because multiple nodes refer to them.
+The example below shows potential JSON-LD for an About page. It includes
+definitions of Alyssa P. Hacker (the author & subject of the page), the specific
+page in this URL, and the website it belongs to. Some objects are still defined
+as inline nested objects (e.g. Occupation), since they are only referenced by
+their parent. Other objects are defined at the top-level with an `@id`, because
+multiple nodes refer to them.
 
 ```ts
-import { Graph } from 'schema-dts';
+import {Graph} from 'schema-dts';
 
 const graph: Graph = {
   '@context': 'https://schema.org',
@@ -74,10 +87,10 @@ const graph: Graph = {
       hasOccupation: {
         '@type': 'Occupation',
         name: 'LISP Hacker',
-        qualifications: 'Knows LISP'
+        qualifications: 'Knows LISP',
       },
-      mainEntityOfPage: { '@id': 'https://my.site/about/#page' },
-      subjectOf: { '@id': 'https://my.site/about/#page' }
+      mainEntityOfPage: {'@id': 'https://my.site/about/#page'},
+      subjectOf: {'@id': 'https://my.site/about/#page'},
     },
     {
       '@type': 'AboutPage',
@@ -86,7 +99,7 @@ const graph: Graph = {
       name: "Alyssa P. Hacker's Website",
       inLanguage: 'en-US',
       description: 'The personal website of LISP legend Alyssa P. Hacker',
-      mainEntity: { '@id': 'https://my.site/#alyssa' }
+      mainEntity: {'@id': 'https://my.site/#alyssa'},
     },
     {
       '@type': 'WebPage',
@@ -95,12 +108,12 @@ const graph: Graph = {
       name: "About | Alyssa P. Hacker's Website",
       inLanguage: 'en-US',
       isPartOf: {
-        '@id': 'https://my.site/#site'
+        '@id': 'https://my.site/#site',
       },
-      about: { '@id': 'https://my.site/#alyssa' },
-      mainEntity: { '@id': 'https://my.site/#alyssa' }
-    }
-  ]
+      about: {'@id': 'https://my.site/#alyssa'},
+      mainEntity: {'@id': 'https://my.site/#alyssa'},
+    },
+  ],
 };
 ```
 
@@ -141,17 +154,23 @@ Command line usage:
 
 Use NPM to install dependencies:
 
-    npm install
+```command
+npm install
+```
 
 We have wrappers around `tsc` and `tsc --build` to build our generator other
 .d.ts files.
 
 To generate TypeScript from the latest Schema.org Schema:
 
-    npm run build-gen && npm run build-schema
+```command
+npm run build-gen && npm run build-schema
+```
 
 or simply build the schema-dts generator:
 
-    npm run build-gen
+```command
+npm run build-gen
+```
 
 To contribute changes, see [the CONTRIBUTING.md file](./CONTRIBUTING.md).
