@@ -4,5 +4,5 @@ module.exports = {
   testMatch: ['**/*_test.[jt]s?(x)'],
   testPathIgnorePatterns: ['/node_modules/', '/built/', '/dist/'],
   collectCoverage: true,
-  coveragePathIgnorePatterns: ['/node_modules/', '/built/', '/dist/']
+  coveragePathIgnorePatterns: ['/node_modules/', '/built/', '/dist/'],
 };
