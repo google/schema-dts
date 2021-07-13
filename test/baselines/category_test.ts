@@ -41,38 +41,38 @@ test(`baseine_${basename(__filename)}`, async () => {
   );
 
   expect(actual).toMatchInlineSnapshot(`
-    "/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
-    export type WithContext<T extends Thing> = Graph | (T & {
-        \\"@context\\": \\"https://schema.org\\";
-    });
-    export interface Graph {
-        \\"@context\\": \\"https://schema.org\\";
-        \\"@graph\\": readonly Thing[];
-    }
-    type SchemaValue<T> = T | readonly T[];
-    type IdReference = {
-        /** IRI identifying the canonical address of this object. */
-        \\"@id\\": string;
-    };
+"/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
+export type WithContext<T extends Thing> = T & {
+    \\"@context\\": \\"https://schema.org\\";
+};
+export interface Graph {
+    \\"@context\\": \\"https://schema.org\\";
+    \\"@graph\\": readonly Thing[];
+}
+type SchemaValue<T> = T | readonly T[];
+type IdReference = {
+    /** IRI identifying the canonical address of this object. */
+    \\"@id\\": string;
+};
 
-    export type Text = string;
+export type Text = string;
 
-    interface DistilleryLeaf extends ThingBase {
-        \\"@type\\": \\"Distillery\\";
-    }
-    /** A distillery. */
-    export type Distillery = DistilleryLeaf;
+interface DistilleryLeaf extends ThingBase {
+    \\"@type\\": \\"Distillery\\";
+}
+/** A distillery. */
+export type Distillery = DistilleryLeaf;
 
-    interface ThingBase extends Partial<IdReference> {
-        \\"name\\"?: SchemaValue<Text>;
-    }
-    interface ThingLeaf extends ThingBase {
-        \\"@type\\": \\"Thing\\";
-    }
-    export type Thing = ThingLeaf | Distillery;
+interface ThingBase extends Partial<IdReference> {
+    \\"name\\"?: SchemaValue<Text>;
+}
+interface ThingLeaf extends ThingBase {
+    \\"@type\\": \\"Thing\\";
+}
+export type Thing = ThingLeaf | Distillery;
 
-    "
-  `);
+"
+`);
   expect(actualLogs).toMatchInlineSnapshot(`
     "Loading Ontology from URL: https://fake.com/category_test.ts.nt
     Got Response 200: Ok.

@@ -30,29 +30,29 @@ test(`baseine_${basename(__filename)}`, async () => {
   );
 
   expect(actual).toMatchInlineSnapshot(`
-    "/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
-    export type WithContext<T extends Thing> = Graph | (T & {
-        \\"@context\\": \\"https://schema.org\\";
-    });
-    export interface Graph {
-        \\"@context\\": \\"https://schema.org\\";
-        \\"@graph\\": readonly Thing[];
-    }
-    type SchemaValue<T> = T | readonly T[];
-    type IdReference = {
-        /** IRI identifying the canonical address of this object. */
-        \\"@id\\": string;
-    };
+"/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
+export type WithContext<T extends Thing> = T & {
+    \\"@context\\": \\"https://schema.org\\";
+};
+export interface Graph {
+    \\"@context\\": \\"https://schema.org\\";
+    \\"@graph\\": readonly Thing[];
+}
+type SchemaValue<T> = T | readonly T[];
+type IdReference = {
+    /** IRI identifying the canonical address of this object. */
+    \\"@id\\": string;
+};
 
-    interface ThingBase extends Partial<IdReference> {
-    }
-    interface ThingLeaf extends ThingBase {
-        \\"@type\\": \\"Thing\\";
-    }
-    export type Thing = ThingLeaf;
+interface ThingBase extends Partial<IdReference> {
+}
+interface ThingLeaf extends ThingBase {
+    \\"@type\\": \\"Thing\\";
+}
+export type Thing = ThingLeaf;
 
-    "
-  `);
+"
+`);
   expect(actualLogs).toMatchInlineSnapshot(`
     "Loading Ontology from URL: https://schema.org/version/latest/schemaorg-current-https.nt
     Got Response 200: Ok.
