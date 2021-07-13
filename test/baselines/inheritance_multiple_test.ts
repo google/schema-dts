@@ -47,48 +47,48 @@ test(`baseine_${basename(__filename)}`, async () => {
   );
 
   expect(actual).toMatchInlineSnapshot(`
-    "/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
-    export type WithContext<T extends Thing> = Graph | (T & {
-        \\"@context\\": \\"https://schema.org\\";
-    });
-    export interface Graph {
-        \\"@context\\": \\"https://schema.org\\";
-        \\"@graph\\": readonly Thing[];
-    }
-    type SchemaValue<T> = T | readonly T[];
-    type IdReference = {
-        /** IRI identifying the canonical address of this object. */
-        \\"@id\\": string;
-    };
+"/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
+export type WithContext<T extends Thing> = T & {
+    \\"@context\\": \\"https://schema.org\\";
+};
+export interface Graph {
+    \\"@context\\": \\"https://schema.org\\";
+    \\"@graph\\": readonly Thing[];
+}
+type SchemaValue<T> = T | readonly T[];
+type IdReference = {
+    /** IRI identifying the canonical address of this object. */
+    \\"@id\\": string;
+};
 
-    export type Number = number;
+export type Number = number;
 
-    export type Text = string;
+export type Text = string;
 
-    interface PersonLikeBase extends ThingBase {
-        \\"height\\"?: SchemaValue<Number>;
-    }
-    interface PersonLikeLeaf extends PersonLikeBase {
-        \\"@type\\": \\"PersonLike\\";
-    }
-    export type PersonLike = PersonLikeLeaf;
+interface PersonLikeBase extends ThingBase {
+    \\"height\\"?: SchemaValue<Number>;
+}
+interface PersonLikeLeaf extends PersonLikeBase {
+    \\"@type\\": \\"PersonLike\\";
+}
+export type PersonLike = PersonLikeLeaf;
 
-    interface ThingBase extends Partial<IdReference> {
-        \\"name\\"?: SchemaValue<Text>;
-    }
-    interface ThingLeaf extends ThingBase {
-        \\"@type\\": \\"Thing\\";
-    }
-    export type Thing = ThingLeaf | PersonLike | Vehicle;
+interface ThingBase extends Partial<IdReference> {
+    \\"name\\"?: SchemaValue<Text>;
+}
+interface ThingLeaf extends ThingBase {
+    \\"@type\\": \\"Thing\\";
+}
+export type Thing = ThingLeaf | PersonLike | Vehicle;
 
-    interface VehicleBase extends ThingBase {
-        \\"doors\\"?: SchemaValue<Number>;
-    }
-    interface VehicleLeaf extends VehicleBase {
-        \\"@type\\": \\"Vehicle\\";
-    }
-    export type Vehicle = VehicleLeaf;
+interface VehicleBase extends ThingBase {
+    \\"doors\\"?: SchemaValue<Number>;
+}
+interface VehicleLeaf extends VehicleBase {
+    \\"@type\\": \\"Vehicle\\";
+}
+export type Vehicle = VehicleLeaf;
 
-    "
-  `);
+"
+`);
 });

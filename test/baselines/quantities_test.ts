@@ -49,60 +49,60 @@ test(`baseine_${basename(__filename)}`, async () => {
   );
 
   expect(actual).toMatchInlineSnapshot(`
-    "/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
-    export type WithContext<T extends Thing> = Graph | (T & {
-        \\"@context\\": \\"https://schema.org\\";
-    });
-    export interface Graph {
-        \\"@context\\": \\"https://schema.org\\";
-        \\"@graph\\": readonly Thing[];
-    }
-    type SchemaValue<T> = T | readonly T[];
-    type IdReference = {
-        /** IRI identifying the canonical address of this object. */
-        \\"@id\\": string;
-    };
+"/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
+export type WithContext<T extends Thing> = T & {
+    \\"@context\\": \\"https://schema.org\\";
+};
+export interface Graph {
+    \\"@context\\": \\"https://schema.org\\";
+    \\"@graph\\": readonly Thing[];
+}
+type SchemaValue<T> = T | readonly T[];
+type IdReference = {
+    /** IRI identifying the canonical address of this object. */
+    \\"@id\\": string;
+};
 
-    export type Text = string;
+export type Text = string;
 
-    interface DistanceLeaf extends ThingBase {
-        \\"@type\\": \\"Distance\\";
-    }
-    export type Distance = DistanceLeaf | string;
+interface DistanceLeaf extends ThingBase {
+    \\"@type\\": \\"Distance\\";
+}
+export type Distance = DistanceLeaf | string;
 
-    interface DurationLeaf extends ThingBase {
-        \\"@type\\": \\"Duration\\";
-    }
-    export type Duration = DurationLeaf | string;
+interface DurationLeaf extends ThingBase {
+    \\"@type\\": \\"Duration\\";
+}
+export type Duration = DurationLeaf | string;
 
-    interface EnergyLeaf extends ThingBase {
-        \\"@type\\": \\"Energy\\";
-    }
-    export type Energy = EnergyLeaf | string;
+interface EnergyLeaf extends ThingBase {
+    \\"@type\\": \\"Energy\\";
+}
+export type Energy = EnergyLeaf | string;
 
-    interface IntangibleLeaf extends ThingBase {
-        \\"@type\\": \\"Intangible\\";
-    }
-    export type Intangible = IntangibleLeaf | Quantity;
+interface IntangibleLeaf extends ThingBase {
+    \\"@type\\": \\"Intangible\\";
+}
+export type Intangible = IntangibleLeaf | Quantity;
 
-    interface MassLeaf extends ThingBase {
-        \\"@type\\": \\"Mass\\";
-    }
-    export type Mass = MassLeaf | string;
+interface MassLeaf extends ThingBase {
+    \\"@type\\": \\"Mass\\";
+}
+export type Mass = MassLeaf | string;
 
-    interface QuantityLeaf extends ThingBase {
-        \\"@type\\": \\"Quantity\\";
-    }
-    export type Quantity = QuantityLeaf | Distance | Duration | Energy | Mass | string;
+interface QuantityLeaf extends ThingBase {
+    \\"@type\\": \\"Quantity\\";
+}
+export type Quantity = QuantityLeaf | Distance | Duration | Energy | Mass | string;
 
-    interface ThingBase extends Partial<IdReference> {
-        \\"name\\"?: SchemaValue<Text>;
-    }
-    interface ThingLeaf extends ThingBase {
-        \\"@type\\": \\"Thing\\";
-    }
-    export type Thing = ThingLeaf | Intangible;
+interface ThingBase extends Partial<IdReference> {
+    \\"name\\"?: SchemaValue<Text>;
+}
+interface ThingLeaf extends ThingBase {
+    \\"@type\\": \\"Thing\\";
+}
+export type Thing = ThingLeaf | Intangible;
 
-    "
-  `);
+"
+`);
 });
