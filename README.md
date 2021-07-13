@@ -31,7 +31,9 @@ To use the typings for your project, simply add the
 [`schema-dts`](https://www.npmjs.com/package/schema-dts) NPM package to your
 project:
 
-    npm install schema-dts
+```command
+npm install schema-dts
+```
 
 Then you can use it by importing `"schema-dts"`.
 
@@ -152,17 +154,23 @@ Command line usage:
 
 Use NPM to install dependencies:
 
-    npm install
+```command
+npm install
+```
 
 We have wrappers around `tsc` and `tsc --build` to build our generator other
 .d.ts files.
 
 To generate TypeScript from the latest Schema.org Schema:
 
-    npm run build-gen && npm run build-schema
+```command
+npm run build-gen && npm run build-schema
+```
 
 or simply build the schema-dts generator:
 
-    npm run build-gen
+```command
+npm run build-gen
+```
 
 To contribute changes, see [the CONTRIBUTING.md file](./CONTRIBUTING.md).

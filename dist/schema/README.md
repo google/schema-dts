@@ -20,7 +20,9 @@ Note: This is not an officially supported Google product.
 To use the typings for your project, simply add the `schema-dts` NPM package to
 your project:
 
-    npm install schema-dts
+```command
+npm install schema-dts
+```
 
 Then you can use it by importing `"schema-dts"`.
 
