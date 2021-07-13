@@ -76,7 +76,7 @@ Notice that any node can have an `@id` when defining it. And you can reference t
 The example below shows potential JSON-LD for an About page. It includes definitions of Alyssa P. Hacker (the author & subject of the page), the specific page in this URL, and the website it belongs to. Some objects are still defined as inline nested objects (e.g. Occupation), since they are only referenced by their parent. Other objects are defined at the top-level with an `@id`, because multiple nodes refer to them.
 
 ```ts
-import { Graph } from 'schema-dts';
+import {Graph} from 'schema-dts';
 
 const graph: Graph = {
   '@context': 'https://schema.org',
@@ -88,10 +88,10 @@ const graph: Graph = {
       hasOccupation: {
         '@type': 'Occupation',
         name: 'LISP Hacker',
-        qualifications: 'Knows LISP'
+        qualifications: 'Knows LISP',
       },
-      mainEntityOfPage: { '@id': 'https://my.site/about/#page' },
-      subjectOf: { '@id': 'https://my.site/about/#page' }
+      mainEntityOfPage: {'@id': 'https://my.site/about/#page'},
+      subjectOf: {'@id': 'https://my.site/about/#page'},
     },
     {
       '@type': 'AboutPage',
@@ -100,7 +100,7 @@ const graph: Graph = {
       name: "Alyssa P. Hacker's Website",
       inLanguage: 'en-US',
       description: 'The personal website of LISP legend Alyssa P. Hacker',
-      mainEntity: { '@id': 'https://my.site/#alyssa' }
+      mainEntity: {'@id': 'https://my.site/#alyssa'},
     },
     {
       '@type': 'WebPage',
@@ -109,11 +109,11 @@ const graph: Graph = {
       name: "About | Alyssa P. Hacker's Website",
       inLanguage: 'en-US',
       isPartOf: {
-        '@id': 'https://my.site/#site'
+        '@id': 'https://my.site/#site',
       },
-      about: { '@id': 'https://my.site/#alyssa' },
-      mainEntity: { '@id': 'https://my.site/#alyssa' }
-    }
-  ]
+      about: {'@id': 'https://my.site/#alyssa'},
+      mainEntity: {'@id': 'https://my.site/#alyssa'},
+    },
+  ],
 };
 ```
