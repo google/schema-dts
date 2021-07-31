@@ -72,7 +72,7 @@ export type Date = string;
 
 export type DateTime = string;
 
-export type Number = number;
+export type Number = number | \`\${number}\`;
 
 export type Text = string;
 

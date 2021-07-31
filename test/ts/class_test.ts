@@ -70,14 +70,6 @@ describe('Class', () => {
     });
   });
 
-  it("can't add typedef twice", () => {
-    const cls = makeClass('https://schema.org/Person');
-    cls.addTypedef('string');
-    expect(() => cls.addTypedef('Foo')).toThrowError(
-      'already has typedef string'
-    );
-  });
-
   describe('toNode', () => {
     it('by default (no parent)', () => {
       // A class with no parent has a top-level "@id"
@@ -309,28 +301,40 @@ describe('Sort(Class, Class)', () => {
       // Before regular classes.
       expect(
         Sort(
-          new AliasBuiltin('https://schema.org/Text', 'string'),
+          new AliasBuiltin(
+            'https://schema.org/Text',
+            AliasBuiltin.Alias('string')
+          ),
           makeClass('https://schema.org/A')
         )
       ).toBe(-1);
       expect(
         Sort(
           makeClass('https://schema.org/A'),
-          new AliasBuiltin('https://schema.org/Text', 'string')
+          new AliasBuiltin(
+            'https://schema.org/Text',
+            AliasBuiltin.Alias('string')
+          )
         )
       ).toBe(+1);
 
       // Before regular classes with different domains.
       expect(
         Sort(
-          new AliasBuiltin('https://schema.org/Text', 'string'),
+          new AliasBuiltin(
+            'https://schema.org/Text',
+            AliasBuiltin.Alias('string')
+          ),
           makeClass('https://a.org/DataType')
         )
       ).toBe(-1);
       expect(
         Sort(
           makeClass('https://a.org/DataType'),
-          new AliasBuiltin('https://schema.org/Text', 'string')
+          new AliasBuiltin(
+            'https://schema.org/Text',
+            AliasBuiltin.Alias('string')
+          )
         )
       ).toBe(+1);
 
@@ -338,18 +342,24 @@ describe('Sort(Class, Class)', () => {
       expect(
         Sort(
           new DataTypeUnion('https://schema.org/DataType', []),
-          new AliasBuiltin('https://schema.org/A', 'string')
+          new AliasBuiltin('https://schema.org/A', AliasBuiltin.Alias('string'))
         )
       ).toBe(+1);
       expect(
         Sort(
-          new AliasBuiltin('https://schema.org/A', 'string'),
+          new AliasBuiltin(
+            'https://schema.org/A',
+            AliasBuiltin.Alias('string')
+          ),
           new DataTypeUnion('https://schema.org/DataType', [])
         )
       ).toBe(-1);
       expect(
         Sort(
-          new AliasBuiltin('https://schema.org/Z', 'string'),
+          new AliasBuiltin(
+            'https://schema.org/Z',
+            AliasBuiltin.Alias('string')
+          ),
           new DataTypeUnion('https://schema.org/DataType', [])
         )
       ).toBe(-1);
@@ -358,48 +368,60 @@ describe('Sort(Class, Class)', () => {
       expect(
         Sort(
           new Builtin(UrlNode.Parse('https://schema.org/Boo')),
-          new AliasBuiltin('https://schema.org/Boo', 'Text')
+          new AliasBuiltin('https://schema.org/Boo', AliasBuiltin.Alias('Text'))
         )
       ).toBe(0);
 
       // Sorts within Builtins
       expect(
         Sort(
-          new AliasBuiltin('https://schema.org/A', 'string'),
-          new AliasBuiltin('https://schema.org/B', 'string')
+          new AliasBuiltin(
+            'https://schema.org/A',
+            AliasBuiltin.Alias('string')
+          ),
+          new AliasBuiltin('https://schema.org/B', AliasBuiltin.Alias('string'))
         )
       ).toBe(-1);
 
       expect(
         Sort(
-          new AliasBuiltin('https://schema.org/B', 'string'),
-          new AliasBuiltin('https://schema.org/A', 'string')
+          new AliasBuiltin(
+            'https://schema.org/B',
+            AliasBuiltin.Alias('string')
+          ),
+          new AliasBuiltin('https://schema.org/A', AliasBuiltin.Alias('string'))
         )
       ).toBe(+1);
 
       expect(
         Sort(
-          new AliasBuiltin('https://schema.org/C', 'string'),
-          new AliasBuiltin('https://schema.org/C', 'string')
+          new AliasBuiltin(
+            'https://schema.org/C',
+            AliasBuiltin.Alias('string')
+          ),
+          new AliasBuiltin('https://schema.org/C', AliasBuiltin.Alias('string'))
         )
       ).toBe(0);
 
       expect(
         Sort(
-          new AliasBuiltin('https://schema.org/A#Z', 'string'),
-          new AliasBuiltin('https://schema.org/C', 'string')
+          new AliasBuiltin(
+            'https://schema.org/A#Z',
+            AliasBuiltin.Alias('string')
+          ),
+          new AliasBuiltin('https://schema.org/C', AliasBuiltin.Alias('string'))
         )
       ).toBe(+1);
       expect(
         Sort(
-          new AliasBuiltin('https://z.org/C', 'string'),
-          new AliasBuiltin('https://schema.org/C', 'string')
+          new AliasBuiltin('https://z.org/C', AliasBuiltin.Alias('string')),
+          new AliasBuiltin('https://schema.org/C', AliasBuiltin.Alias('string'))
         )
       ).toBe(+1);
       expect(
         Sort(
-          new AliasBuiltin('https://z.org/Z#A', 'string'),
-          new AliasBuiltin('https://schema.org/C', 'string')
+          new AliasBuiltin('https://z.org/Z#A', AliasBuiltin.Alias('string')),
+          new AliasBuiltin('https://schema.org/C', AliasBuiltin.Alias('string'))
         )
       ).toBe(-1);
     });

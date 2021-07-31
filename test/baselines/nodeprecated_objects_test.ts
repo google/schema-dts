@@ -79,7 +79,7 @@ type IdReference = {
     \\"@id\\": string;
 };
 
-export type Number = number;
+export type Number = number | \`\${number}\`;
 
 export type Text = string;
 

@@ -1,6 +1,6 @@
 {
   "name": "schema-dts",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "displayName": "schema-dts: Strongly-typed Schema.org vocabulary declarations",
   "description": "A TypeScript package with latest Schema.org Schema Typings",
   "authors": [
@@ -17,7 +17,7 @@
   "devDependencies": {},
   "dependencies": {},
   "peerDependencies": {
-    "typescript": ">=3.4.0"
+    "typescript": ">=4.1.0"
   },
   "keywords": [
     "typescript",

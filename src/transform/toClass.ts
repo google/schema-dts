@@ -39,12 +39,18 @@ function toClass(cls: Class, topic: Topic, map: ClassMap): Class {
 }
 
 const wellKnownTypes = [
-  new AliasBuiltin('http://schema.org/Text', 'string'),
-  new AliasBuiltin('http://schema.org/Number', 'number'),
-  new AliasBuiltin('http://schema.org/Time', 'string'),
-  new AliasBuiltin('http://schema.org/Date', 'string'),
-  new AliasBuiltin('http://schema.org/DateTime', 'string'),
-  new AliasBuiltin('http://schema.org/Boolean', 'boolean'),
+  new AliasBuiltin('http://schema.org/Text', AliasBuiltin.Alias('string')),
+  // IMPORTANT: In the future, if possible, we should have: `${number}` in Float only,
+  // an integer string literal in Integer only, and Number becomes simply Float|Integer.
+  new AliasBuiltin(
+    'http://schema.org/Number',
+    AliasBuiltin.Alias('number'),
+    AliasBuiltin.NumberStringLiteral()
+  ),
+  new AliasBuiltin('http://schema.org/Time', AliasBuiltin.Alias('string')),
+  new AliasBuiltin('http://schema.org/Date', AliasBuiltin.Alias('string')),
+  new AliasBuiltin('http://schema.org/DateTime', AliasBuiltin.Alias('string')),
+  new AliasBuiltin('http://schema.org/Boolean', AliasBuiltin.Alias('boolean')),
 ];
 
 // Should we allow 'string' to be a valid type for all values of this type?
@@ -85,7 +91,7 @@ function ForwardDeclareClasses(topics: readonly TypedTopic[]): ClassMap {
     const allowString = wellKnownStrings.some(wks =>
       wks.equivTo(topic.Subject)
     );
-    if (allowString) cls.addTypedef('string');
+    if (allowString) cls.addTypedef(AliasBuiltin.Alias('string'));
 
     classes.set(topic.Subject.toString(), cls);
   }
