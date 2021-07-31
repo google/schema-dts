@@ -61,7 +61,7 @@ export type ClassMap = Map<string, Class>;
  */
 export class Class {
   private _comment?: string;
-  private _typedef?: string;
+  private _typedefs: TypeNode[] = [];
   private readonly children: Class[] = [];
   private readonly _parents: Class[] = [];
   private readonly _props: Set<Property> = new Set();
@@ -97,11 +97,15 @@ export class Class {
     return appendLine(this._comment, deprecated);
   }
 
-  protected get typedefs(): string[] {
+  protected get typedefs(): TypeNode[] {
+    const f: TypeNode = undefined!;
+
     const parents = this.allParents().flatMap(p => p.typedefs);
     return Array.from(
-      new Set(this._typedef ? [this._typedef, ...parents] : parents)
-    ).sort();
+      new Map([...this._typedefs, ...parents].map(t => [JSON.stringify(t), t]))
+    )
+      .sort(([key1, value1], [key2, value2]) => key1.localeCompare(key2))
+      .map(([_, value]) => value);
   }
 
   private properties() {
@@ -198,13 +202,8 @@ export class Class {
     return false;
   }
 
-  addTypedef(typedef: string) {
-    if (this._typedef) {
-      throw new Error(
-        `Class ${this.subject.href} already has typedef ${this._typedef} but we're also adding ${typedef}`
-      );
-    }
-    this._typedef = typedef;
+  addTypedef(typedef: TypeNode) {
+    this._typedefs.push(typedef);
   }
 
   addProp(p: Property) {
@@ -299,7 +298,7 @@ export class Class {
 
   protected nonEnumType(skipDeprecated: boolean): TypeNode[] {
     this.children.sort((a, b) => CompareKeys(a.subject, b.subject));
-    const children = this.children
+    const children: TypeNode[] = this.children
       .filter(child => !(child.deprecated && skipDeprecated))
       .map(child =>
         factory.createTypeReferenceNode(
@@ -309,11 +308,7 @@ export class Class {
       );
 
     // A type can have a valid typedef, add that if so.
-    children.push(
-      ...this.typedefs.map(t =>
-        factory.createTypeReferenceNode(t, /*typeArgs=*/ [])
-      )
-    );
+    children.push(...this.typedefs);
 
     const upRef = this.leafName() || this.baseName();
     return upRef
@@ -379,9 +374,25 @@ export class Builtin extends Class {}
  * in JSON-LD and JavaScript as a typedef to a native type.
  */
 export class AliasBuiltin extends Builtin {
-  constructor(url: string, equivTo: string) {
+  constructor(url: string, ...equivTo: TypeNode[]) {
     super(UrlNode.Parse(url));
-    this.addTypedef(equivTo);
+    for (const t of equivTo) this.addTypedef(t);
+  }
+
+  static Alias(equivTo: string): TypeNode {
+    return factory.createTypeReferenceNode(equivTo, /*typeArgs=*/ []);
+  }
+
+  static NumberStringLiteral(): TypeNode {
+    return factory.createTemplateLiteralType(
+      factory.createTemplateHead(/* text= */ ''),
+      [
+        factory.createTemplateLiteralTypeSpan(
+          factory.createTypeReferenceNode('number'),
+          factory.createTemplateTail(/* text= */ '')
+        ),
+      ]
+    );
   }
 }
 
