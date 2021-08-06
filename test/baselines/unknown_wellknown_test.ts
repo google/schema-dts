@@ -36,5 +36,5 @@ test(`baseline_${basename(__filename)}`, async () => {
       `,
       ['--ontology', `https://fake.com/${basename(__filename)}.nt`]
     )
-  ).rejects.toThrow('has no corresponding well-known type');
+  ).rejects.toThrow('must have corresponding well-known type.');
 });

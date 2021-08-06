@@ -75,19 +75,18 @@ function ForwardDeclareClasses(topics: readonly TypedTopic[]): ClassMap {
     if (IsDataType(topic.Subject)) {
       classes.set(topic.Subject.toString(), dataType);
       continue;
-    } else if (IsWellKnown(topic)) {
-      const wk = wellKnownTypes.find(wk => wk.subject.equivTo(topic.Subject));
-      if (!wk) {
-        throw new Error(
-          `Non-Object type ${topic.Subject.toString()} has no corresponding well-known type.`
-        );
-      }
-      classes.set(topic.Subject.toString(), wk);
-      dataType.wk.push(wk);
-      continue;
     } else if (!IsNamedClass(topic)) continue;
 
-    const cls = new Class(topic.Subject);
+    const wk = wellKnownTypes.find(wk => wk.subject.equivTo(topic.Subject));
+    if (IsWellKnown(topic)) {
+      assert(
+        wk,
+        `${topic.Subject.toString()} must have corresponding well-known type.`
+      );
+      dataType.wk.push(wk);
+    }
+
+    const cls = wk || new Class(topic.Subject);
     const allowString = wellKnownStrings.some(wks =>
       wks.equivTo(topic.Subject)
     );
