@@ -59,6 +59,14 @@ export async function WriteDeclarations(
   ProcessEnums(topics, classes);
   const sorted = Array.from(classes.values()).sort(Sort);
 
+  const properties = {
+    hasRole: !!(
+      classes.get('http://schema.org/Role') ||
+      classes.get('https://schema.org/Role')
+    ),
+    skipDeprecatedProperties: !includeDeprecated,
+  };
+
   const source = createSourceFile(
     'result.ts',
     '',
@@ -68,7 +76,7 @@ export async function WriteDeclarations(
   );
   const printer = createPrinter({newLine: NewLineKind.LineFeed});
 
-  for (const helperType of HelperTypes(context)) {
+  for (const helperType of HelperTypes(context, properties)) {
     write(printer.printNode(EmitHint.Unspecified, helperType, source));
     write('\n');
   }
@@ -77,7 +85,7 @@ export async function WriteDeclarations(
   for (const cls of sorted) {
     if (cls.deprecated && !includeDeprecated) continue;
 
-    for (const node of cls.toNode(context, !includeDeprecated)) {
+    for (const node of cls.toNode(context, properties)) {
       const result = printer.printNode(EmitHint.Unspecified, node, source);
       await write(result);
       await write('\n');

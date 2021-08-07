@@ -17,8 +17,14 @@
 import {Log} from '../logging';
 import {ObjectPredicate, Topic, TypedTopic} from '../triples/triple';
 import {UrlNode} from '../triples/types';
-import {IsNamedClass, IsWellKnown, IsDataType} from '../triples/wellKnown';
-import {AliasBuiltin, Class, ClassMap, DataTypeUnion} from '../ts/class';
+import {IsNamedClass, IsDataType, ClassIsDataType} from '../triples/wellKnown';
+import {
+  AliasBuiltin,
+  Class,
+  ClassMap,
+  DataTypeUnion,
+  RoleBuiltin,
+} from '../ts/class';
 import {assert} from '../util/assert';
 
 function toClass(cls: Class, topic: Topic, map: ClassMap): Class {
@@ -51,6 +57,11 @@ const wellKnownTypes = [
   new AliasBuiltin('http://schema.org/Date', AliasBuiltin.Alias('string')),
   new AliasBuiltin('http://schema.org/DateTime', AliasBuiltin.Alias('string')),
   new AliasBuiltin('http://schema.org/Boolean', AliasBuiltin.Alias('boolean')),
+  new RoleBuiltin(UrlNode.Parse('http://schema.org/Role')),
+  new RoleBuiltin(UrlNode.Parse('http://schema.org/OrganizationRole')),
+  new RoleBuiltin(UrlNode.Parse('http://schema.org/EmployeeRole')),
+  new RoleBuiltin(UrlNode.Parse('http://schema.org/LinkRole')),
+  new RoleBuiltin(UrlNode.Parse('http://schema.org/PerformanceRole')),
 ];
 
 // Should we allow 'string' to be a valid type for all values of this type?
@@ -78,12 +89,14 @@ function ForwardDeclareClasses(topics: readonly TypedTopic[]): ClassMap {
     } else if (!IsNamedClass(topic)) continue;
 
     const wk = wellKnownTypes.find(wk => wk.subject.equivTo(topic.Subject));
-    if (IsWellKnown(topic)) {
+    if (ClassIsDataType(topic)) {
       assert(
         wk,
         `${topic.Subject.toString()} must have corresponding well-known type.`
       );
       dataType.wk.push(wk);
+
+      wk['_isDataType'] = true;
     }
 
     const cls = wk || new Class(topic.Subject);
