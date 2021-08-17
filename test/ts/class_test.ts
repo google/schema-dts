@@ -237,7 +237,9 @@ describe('Class', () => {
         )
       ).toBe(true);
 
-      expect(() => cls.toNode(ctx, true)).toThrowError('unknown node type');
+      expect(() =>
+        cls.toNode(ctx, {skipDeprecatedProperties: true, hasRole: false})
+      ).toThrowError('unknown node type');
     });
   });
 });
@@ -496,7 +498,10 @@ function asString(
   const printer = createPrinter({newLine: NewLineKind.LineFeed});
 
   return cls
-    .toNode(context, !!skipDeprecated)
+    .toNode(context, {
+      skipDeprecatedProperties: !!skipDeprecated,
+      hasRole: false,
+    })
     .map(node => printer.printNode(EmitHint.Unspecified, node, source))
     .join('\n');
 }

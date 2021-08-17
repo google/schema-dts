@@ -1,7 +1,9 @@
-import {factory, ModifierFlags, SyntaxKind} from 'typescript';
+import {factory, ModifierFlags, SyntaxKind, TypeNode} from 'typescript';
 import {Context} from './context';
+import {arrayOf} from './util/arrayof';
 
 import {withComments} from './util/comments';
+import {typeUnion} from './util/union';
 
 function IdPropertyNode() {
   return withComments(
@@ -70,11 +72,26 @@ function GraphType(context: Context) {
   );
 }
 
-export const SchemaValueName = 'SchemaValue';
+const SchemaValueName = 'SchemaValue';
 export const IdReferenceName = 'IdReference';
 export const GraphTypeName = 'Graph';
 
-export function HelperTypes(context: Context) {
+export function SchemaValueReference(
+  {hasRole}: {hasRole: boolean},
+  makeScalarType: () => TypeNode,
+  propertyName: string
+) {
+  return factory.createTypeReferenceNode(
+    SchemaValueName,
+    /* typeArguments = */ arrayOf(
+      makeScalarType(),
+      hasRole &&
+        factory.createLiteralTypeNode(factory.createStringLiteral(propertyName))
+    )
+  );
+}
+
+export function HelperTypes(context: Context, {hasRole}: {hasRole: boolean}) {
   return [
     WithContextType(context),
     GraphType(context),
@@ -82,16 +99,37 @@ export function HelperTypes(context: Context) {
       /*decorators=*/ [],
       /*modifiers=*/ [],
       SchemaValueName,
-      [factory.createTypeParameterDeclaration('T')],
-      factory.createUnionTypeNode([
-        factory.createTypeReferenceNode('T', /*typeArguments=*/ []),
-        factory.createTypeOperatorNode(
-          SyntaxKind.ReadonlyKeyword,
-          factory.createArrayTypeNode(
-            factory.createTypeReferenceNode('T', /*typeArguments=*/ [])
+      arrayOf(
+        factory.createTypeParameterDeclaration('T'),
+        hasRole &&
+          factory.createTypeParameterDeclaration(
+            'TProperty',
+            /*constraint=*/ factory.createTypeReferenceNode('string')
           )
-        ),
-      ])
+      ),
+      factory.createUnionTypeNode(
+        arrayOf<TypeNode>(
+          factory.createTypeReferenceNode('T', /*typeArguments=*/ []),
+          hasRole &&
+            factory.createTypeReferenceNode('Role', [
+              /*TContent=*/ factory.createTypeReferenceNode('T'),
+              /*TProperty=*/ factory.createTypeReferenceNode('TProperty'),
+            ]),
+          factory.createTypeOperatorNode(
+            SyntaxKind.ReadonlyKeyword,
+            factory.createArrayTypeNode(
+              typeUnion(
+                factory.createTypeReferenceNode('T', /*typeArguments=*/ []),
+                hasRole &&
+                  factory.createTypeReferenceNode('Role', [
+                    /*TContent=*/ factory.createTypeReferenceNode('T'),
+                    /*TProperty=*/ factory.createTypeReferenceNode('TProperty'),
+                  ])
+              )
+            )
+          )
+        )
+      )
     ),
     factory.createTypeAliasDeclaration(
       /*decorators=*/ [],

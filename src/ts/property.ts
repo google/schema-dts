@@ -29,7 +29,8 @@ import {
 import type {Class, ClassMap} from './class';
 import {Context} from './context';
 import {appendLine, withComments} from './util/comments';
-import {SchemaValueName, IdReferenceName} from './helper_types';
+import {IdReferenceName, SchemaValueReference} from './helper_types';
+import {typeUnion} from './util/union';
 
 /**
  * A "class" of properties, not associated with any particuar object.
@@ -111,14 +112,7 @@ export class PropertyType {
       factory.createTypeReferenceNode(type, /*typeArguments=*/ [])
     );
 
-    switch (typeNodes.length) {
-      case 0:
-        return factory.createKeywordTypeNode(SyntaxKind.NeverKeyword);
-      case 1:
-        return typeNodes[0];
-      default:
-        return factory.createUnionTypeNode(typeNodes);
-    }
+    return typeUnion(...typeNodes);
   }
 }
 
@@ -132,21 +126,22 @@ export class Property {
     return this.type.deprecated;
   }
 
-  private typeNode() {
-    return factory.createTypeReferenceNode(
-      factory.createIdentifier(SchemaValueName),
-      /* typeArguments = */ [this.type.scalarTypeNode()]
+  private typeNode(context: Context, properties: {hasRole: boolean}) {
+    return SchemaValueReference(
+      properties,
+      () => this.type.scalarTypeNode(),
+      context.getScopedName(this.key)
     );
   }
 
-  toNode(context: Context): PropertySignature {
+  toNode(context: Context, properties: {hasRole: boolean}): PropertySignature {
     return withComments(
       this.type.comment,
       factory.createPropertySignature(
         /* modifiers= */ [],
         factory.createStringLiteral(context.getScopedName(this.key)),
         factory.createToken(SyntaxKind.QuestionToken),
-        /*typeNode=*/ this.typeNode()
+        /*typeNode=*/ this.typeNode(context, properties)
       )
     );
   }

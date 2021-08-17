@@ -21,6 +21,7 @@ import {
   TypeNode,
   SyntaxKind,
   InterfaceDeclaration,
+  TypeParameterDeclaration,
 } from 'typescript';
 
 import {Log} from '../logging';
@@ -31,6 +32,9 @@ import {
   GetSubClassOf,
   IsSupersededBy,
   IsClassType,
+  IsDataType,
+  IsType,
+  IsTypeName,
 } from '../triples/wellKnown';
 
 import {Context} from './context';
@@ -43,6 +47,7 @@ import {assert} from '../util/assert';
 import {IdReferenceName} from './helper_types';
 
 import {shim as shimFlatMap} from 'array.prototype.flatmap';
+import {typeUnion} from './util/union';
 shimFlatMap();
 
 /** Maps fully qualified IDs of each Class to the class itself. */
@@ -62,6 +67,7 @@ export type ClassMap = Map<string, Class>;
 export class Class {
   private _comment?: string;
   private _typedefs: TypeNode[] = [];
+  private _isDataType = false;
   private readonly children: Class[] = [];
   private readonly _parents: Class[] = [];
   private readonly _props: Set<Property> = new Set();
@@ -78,7 +84,7 @@ export class Class {
   }
 
   isNodeType(): boolean {
-    if (this instanceof Builtin) return false;
+    if (this._isDataType) return false;
     if (this._props.size > 0) return true;
 
     return this.allParents().every(n => n.isNodeType());
@@ -126,7 +132,7 @@ export class Class {
     );
   }
 
-  private baseName(): string | undefined {
+  protected baseName(): string | undefined {
     // If Skip Base, we use the parent type instead.
     if (this.skipBase()) {
       if (this.namedParents().length === 0) return undefined;
@@ -137,7 +143,7 @@ export class Class {
     return toClassName(this.subject) + 'Base';
   }
 
-  private leafName(): string | undefined {
+  protected leafName(): string | undefined {
     // If the leaf has no node type and doesn't refer to any parent,
     // skip defining it.
     if (!this.isNodeType() && this.namedParents().length === 0) {
@@ -219,8 +225,8 @@ export class Class {
   }
 
   private baseDecl(
-    skipDeprecatedProperties: boolean,
-    context: Context
+    context: Context,
+    properties: {skipDeprecatedProperties: boolean; hasRole: boolean}
   ): InterfaceDeclaration | undefined {
     if (this.skipBase()) {
       return undefined;
@@ -251,8 +257,10 @@ export class Class {
     );
 
     const members = this.properties()
-      .filter(property => !property.deprecated || !skipDeprecatedProperties)
-      .map(prop => prop.toNode(context));
+      .filter(
+        property => !property.deprecated || !properties.skipDeprecatedProperties
+      )
+      .map(prop => prop.toNode(context, properties));
 
     return factory.createInterfaceDeclaration(
       /*decorators=*/ [],
@@ -264,7 +272,7 @@ export class Class {
     );
   }
 
-  protected leafDecl(context: Context): InterfaceDeclaration | undefined {
+  protected leafDecl(context: Context): DeclarationStatement | undefined {
     const leafName = this.leafName();
     if (!leafName) return undefined;
 
@@ -274,10 +282,6 @@ export class Class {
     //
     // so when "Leaf" is present, Base will always be present.
     assert(baseName, 'Expect baseName to exist when leafName exists.');
-    const baseTypeReference = factory.createTypeReferenceNode(
-      baseName,
-      /*typeArguments=*/ []
-    );
 
     return factory.createInterfaceDeclaration(
       /*decorators=*/ [],
@@ -303,7 +307,7 @@ export class Class {
       .map(child =>
         factory.createTypeReferenceNode(
           child.className(),
-          /*typeArguments=*/ []
+          /*typeArguments=*/ child.typeArguments(this.typeParameters())
         )
       );
 
@@ -311,33 +315,51 @@ export class Class {
     children.push(...this.typedefs);
 
     const upRef = this.leafName() || this.baseName();
+    const typeArgs = this.leafName() ? this.leafTypeArguments() : [];
+
     return upRef
-      ? [factory.createTypeReferenceNode(upRef, /*typeArgs=*/ []), ...children]
+      ? [factory.createTypeReferenceNode(upRef, typeArgs), ...children]
       : children;
   }
 
   private totalType(context: Context, skipDeprecated: boolean): TypeNode {
-    const isEnum = this._enums.size > 0;
-
-    if (isEnum) {
-      return factory.createUnionTypeNode([
-        ...this.enums().flatMap(e => e.toTypeLiteral(context)),
-        ...this.nonEnumType(skipDeprecated),
-      ]);
-    } else {
-      return factory.createUnionTypeNode(this.nonEnumType(skipDeprecated));
-    }
+    return typeUnion(
+      ...this.enums().flatMap(e => e.toTypeLiteral(context)),
+      ...this.nonEnumType(skipDeprecated)
+    );
   }
 
-  toNode(context: Context, skipDeprecated: boolean): readonly Statement[] {
-    const typeValue: TypeNode = this.totalType(context, skipDeprecated);
+  /** Generic Type Parameter Declarations for this class */
+  protected typeParameters(): readonly TypeParameterDeclaration[] {
+    return [];
+  }
+
+  /** Generic Types to pass to this total type when referencing it. */
+  protected typeArguments(
+    available: readonly TypeParameterDeclaration[]
+  ): readonly TypeNode[] {
+    return [];
+  }
+
+  protected leafTypeArguments(): readonly TypeNode[] {
+    return [];
+  }
+
+  toNode(
+    context: Context,
+    properties: {skipDeprecatedProperties: boolean; hasRole: boolean}
+  ): readonly Statement[] {
+    const typeValue: TypeNode = this.totalType(
+      context,
+      properties.skipDeprecatedProperties
+    );
     const declaration = withComments(
       this.comment,
       factory.createTypeAliasDeclaration(
         /* decorators = */ [],
         factory.createModifiersFromModifierFlags(ModifierFlags.Export),
         this.className(),
-        [],
+        this.typeParameters(),
         typeValue
       )
     );
@@ -357,7 +379,7 @@ export class Class {
     //                  |Child1|Child2|...          // Child Piece: Optional.
     // //-------------------------------------------//
     return arrayOf<Statement>(
-      this.baseDecl(skipDeprecated, context),
+      this.baseDecl(context, properties),
       this.leafDecl(context),
       declaration
     );
@@ -392,6 +414,100 @@ export class AliasBuiltin extends Builtin {
           factory.createTemplateTail(/* text= */ '')
         ),
       ]
+    );
+  }
+}
+
+export class RoleBuiltin extends Builtin {
+  private static readonly kContentTypename = 'TContent';
+  private static readonly kPropertyTypename = 'TProperty';
+
+  protected typeParameters(): readonly TypeParameterDeclaration[] {
+    return [
+      factory.createTypeParameterDeclaration(
+        /*name=*/ RoleBuiltin.kContentTypename,
+        /*constraint=*/ undefined,
+        /*default=*/ factory.createTypeReferenceNode('never')
+      ),
+      factory.createTypeParameterDeclaration(
+        /*name=*/ RoleBuiltin.kPropertyTypename,
+        /*constraint=*/ factory.createTypeReferenceNode('string'),
+        /*default=*/ factory.createTypeReferenceNode('never')
+      ),
+    ];
+  }
+
+  protected leafTypeArguments(): readonly TypeNode[] {
+    return [
+      factory.createTypeReferenceNode(RoleBuiltin.kContentTypename),
+      factory.createTypeReferenceNode(RoleBuiltin.kPropertyTypename),
+    ];
+  }
+
+  protected typeArguments(
+    availableParams: readonly TypeParameterDeclaration[]
+  ): TypeNode[] {
+    const hasTContent = !!availableParams.find(
+      param => param.name.escapedText === RoleBuiltin.kContentTypename
+    );
+    const hasTProperty = !!availableParams.find(
+      param => param.name.escapedText === RoleBuiltin.kPropertyTypename
+    );
+
+    assert(
+      (hasTProperty && hasTContent) || (!hasTProperty && !hasTContent),
+      `hasTcontent and hasTProperty should be both true or both false, but saw (${hasTContent}, ${hasTProperty})`
+    );
+
+    return hasTContent && hasTProperty
+      ? [
+          factory.createTypeReferenceNode(RoleBuiltin.kContentTypename),
+          factory.createTypeReferenceNode(RoleBuiltin.kPropertyTypename),
+        ]
+      : [];
+  }
+
+  protected leafDecl(context: Context): DeclarationStatement {
+    const leafName = this.leafName();
+    const baseName = this.baseName();
+    assert(leafName, 'Role must have Leaf Name');
+    assert(baseName, 'Role must have Base Name.');
+
+    return factory.createTypeAliasDeclaration(
+      /*decorators=*/ [],
+      /*modifiers=*/ [],
+      leafName,
+      /*typeParameters=*/ [
+        factory.createTypeParameterDeclaration(
+          /*name=*/ RoleBuiltin.kContentTypename,
+          /*constraint=*/ undefined
+        ),
+        factory.createTypeParameterDeclaration(
+          /*name=*/ RoleBuiltin.kPropertyTypename,
+          /*constraint=*/ factory.createTypeReferenceNode('string')
+        ),
+      ],
+      /*type=*/
+      factory.createIntersectionTypeNode([
+        factory.createTypeReferenceNode(baseName),
+        factory.createTypeLiteralNode([
+          new TypeProperty(this.subject).toNode(context),
+        ]),
+        factory.createMappedTypeNode(
+          /*initialToken=*/ undefined,
+          /*typeParameter=*/ factory.createTypeParameterDeclaration(
+            'key',
+            /*constraint=*/ factory.createTypeReferenceNode(
+              RoleBuiltin.kPropertyTypename
+            )
+          ),
+          /*nameType=*/ undefined,
+          /*questionToken=*/ undefined,
+          /*type=*/ factory.createTypeReferenceNode(
+            RoleBuiltin.kContentTypename
+          )
+        ),
+      ])
     );
   }
 }

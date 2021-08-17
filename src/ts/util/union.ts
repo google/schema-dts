@@ -1,5 +1,5 @@
 /**
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,19 @@
  * limitations under the License.
  */
 
-export function arrayOf<T>(
-  ...args: Array<T | undefined | null | 0 | '' | false>
-): T[] {
-  return args.filter((elem): elem is T => !!elem);
+import {factory, SyntaxKind, TypeNode} from 'typescript';
+
+export function typeUnion(
+  ...args: Array<TypeNode | undefined | null | false>
+): TypeNode {
+  const types = args.filter((elem): elem is TypeNode => !!elem);
+
+  switch (types.length) {
+    case 0:
+      return factory.createKeywordTypeNode(SyntaxKind.NeverKeyword);
+    case 1:
+      return types[0];
+    default:
+      return factory.createUnionTypeNode(types);
+  }
 }
