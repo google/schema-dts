@@ -1,2 +1,3 @@
 #!/usr/bin/node
-import '../dist/src/cli/cli.js';
+console.log('ABC!!!!!!!!!!!!!!!!1');
+// import '../dist/src/cli/cli.js';
