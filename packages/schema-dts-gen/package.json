@@ -89,7 +89,6 @@
   "scripts": {
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --coverage",
     "prepare": "npm run build",
-    "coverage_on_travis": "cat ./coverage/lcov.info | coveralls",
     "build": "tsc -b"
   }
 }
