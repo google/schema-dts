@@ -22,6 +22,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
-      - run: npm run build
-      - run: npm test
+      - run: npm run build --workspaces
+      - run: npm run lint
+      - run: npm test --workspaces
       - run: npm run coverage_on_travis
