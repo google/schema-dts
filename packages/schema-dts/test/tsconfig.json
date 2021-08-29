@@ -4,7 +4,7 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "schema-dts": ["../dist/schema."]
+      "schema-dts": ["../dist/schema/schema.js"]
     }
   }
 }
