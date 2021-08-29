@@ -19,9 +19,9 @@
  */
 import {basename} from 'path';
 
-import {inlineCli} from '../helpers/main_driver';
+import {inlineCli} from '../helpers/main_driver.js';
 
-test(`baseine_${basename(__filename)}`, async () => {
+test(`baseline_${basename(import.meta.url)}`, async () => {
   const {actual} = await inlineCli(
     `
 <http://schema.org/a> <http://schema.org/rangeIncludes> <http://schema.org/Time> .
@@ -48,7 +48,7 @@ test(`baseine_${basename(__filename)}`, async () => {
 <http://schema.org/True> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Boolean> .
 <http://schema.org/False> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Boolean> .
       `,
-    ['--ontology', `https://fake.com/${basename(__filename)}.nt`]
+    ['--ontology', `https://fake.com/${basename(import.meta.url)}.nt`]
   );
 
   expect(actual).toMatchInlineSnapshot(`

@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import {jest} from '@jest/globals';
 
-import {ParseFlags} from '../../src/cli/args';
+import {ParseFlags} from '../../src/cli/args.js';
 import {ArgumentParser} from 'argparse';
 
 describe('ParseFlags', () => {
@@ -46,17 +47,10 @@ describe('ParseFlags', () => {
   });
 
   describe('deprecated fields', () => {
-    let mockExit: jest.MockInstance<
-      ReturnType<typeof ArgumentParser.prototype.exit>,
-      Parameters<typeof ArgumentParser.prototype.exit>
-    >;
-
     beforeEach(() => {
-      mockExit = jest
-        .spyOn(ArgumentParser.prototype, 'exit')
-        .mockImplementation(e => {
-          throw new Error(`${e}`);
-        });
+      jest.spyOn(ArgumentParser.prototype, 'exit').mockImplementation(e => {
+        throw new Error(`${e}`);
+      });
     });
 
     it('--layer', () => {

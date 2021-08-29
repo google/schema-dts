@@ -19,9 +19,9 @@
  */
 import {basename} from 'path';
 
-import {inlineCli} from '../helpers/main_driver';
+import {inlineCli} from '../helpers/main_driver.js';
 
-test(`baseine_${basename(__filename)}`, async () => {
+test(`baseline_${basename(import.meta.url)}`, async () => {
   const {actual, actualLogs} = await inlineCli(
     `
 <http://schema.org/Thing> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .

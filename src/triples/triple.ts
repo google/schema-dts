@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {Rdfs, SchemaString, UrlNode} from './types';
+import {Rdfs, SchemaString, UrlNode} from './types.js';
 
 /** Represents a parsed Subject-Predicate-Object statement. */
 export interface Triple {

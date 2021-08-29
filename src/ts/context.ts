@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-import {factory, PropertySignature} from 'typescript';
+import ts from 'typescript';
+import type {PropertySignature} from 'typescript';
+const {factory} = ts;
 
-import {TSubject} from '../triples/triple';
+import {TSubject} from '../triples/triple.js';
 
 export class Context {
   private readonly context: Array<readonly [string, string]> = [];

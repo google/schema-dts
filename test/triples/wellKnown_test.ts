@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {Rdfs, SchemaString, UrlNode} from '../../src/triples/types';
+import {Rdfs, SchemaString, UrlNode} from '../../src/triples/types.js';
 import {
   GetComment,
   GetSubClassOf,
   GetType,
   GetTypes,
   IsNamedClass,
-} from '../../src/triples/wellKnown';
+} from '../../src/triples/wellKnown.js';
 
 describe('wellKnown', () => {
   describe('GetComment', () => {

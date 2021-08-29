@@ -1,5 +1,3 @@
-#! /usr/bin/env node
-
 /**
  * Copyright 2020 Google LLC
  *
@@ -15,9 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {main} from './internal/main';
+import {main} from './internal/main.js';
 
-main()
+function write(content: string) {
+  process.stdout.write(content, 'utf-8');
+}
+
+main(write)
   .then(() => {
     process.exit();
   })

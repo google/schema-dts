@@ -28,5 +28,10 @@ export function Log(message: string): void {
 }
 
 export function SetLogger(newLogger: (msg: string) => void) {
+  const previousLogger = logger;
+  function RestoreLogger() {
+    logger = previousLogger;
+  }
   logger = newLogger;
+  return RestoreLogger;
 }

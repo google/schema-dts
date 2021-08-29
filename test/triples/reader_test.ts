@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import {jest} from '@jest/globals';
 
 import {ClientRequest, IncomingMessage} from 'http';
 import https from 'https';
@@ -20,23 +21,22 @@ import {toArray} from 'rxjs/operators';
 import {PassThrough, Readable, Writable} from 'stream';
 
 import fs from 'fs';
-import {load, loadFile} from '../../src/triples/reader';
-import {Triple} from '../../src/triples/triple';
-import {SchemaString, UrlNode} from '../../src/triples/types';
-import {flush} from '../helpers/async';
+import {load, loadFile} from '../../src/triples/reader.js';
+import {Triple} from '../../src/triples/triple.js';
+import {SchemaString, UrlNode} from '../../src/triples/types.js';
+import {flush} from '../helpers/async.js';
 import {firstValueFrom} from 'rxjs';
+import {Mocked, SpiedFunction} from '../helpers/jest-types.js';
 
 describe('load', () => {
-  let get: jest.Mock<
-    ReturnType<typeof https['get']>,
-    Parameters<typeof https['get']>
-  >;
+  let get: Mocked<typeof https.get>;
   let ogGet: typeof https['get'];
 
   beforeEach(() => {
     get = jest.fn();
     ogGet = https.get;
-    https.get = get as typeof https['get'];
+    // @ts-ignore
+    https.get = get;
   });
   afterEach(() => {
     https.get = ogGet;
@@ -437,28 +437,29 @@ describe('load', () => {
       });
     });
     describe('local file', () => {
-      let readStreamCreatorFn: jest.SpyInstance;
+      let readStreamCreatorFn: SpiedFunction<typeof fs.createReadStream>;
       beforeEach(() => {
         const mockFileLine = `<https://schema.org/Person> <https://schema.org/knowsAbout> <https://schema.org/Event> .\n`;
         const mockedStream = Readable.from([mockFileLine]);
         readStreamCreatorFn = jest
           .spyOn(fs, 'createReadStream')
-          //@ts-ignore
-          .mockImplementation(path => mockedStream);
+          .mockImplementation(path => mockedStream as fs.ReadStream);
       });
       it('fails loading a file (containing .nt syntax errors)', async () => {
         const failingMockPath = './bad-ontology.nt';
         const failingMockLine = `<https://schema.org/knowsAbout> <https://sc`;
         const failingMockedStream = Readable.from([failingMockLine]);
-        readStreamCreatorFn.mockImplementation(path => failingMockedStream);
+        readStreamCreatorFn.mockImplementation(
+          path => failingMockedStream as fs.ReadStream
+        );
 
-        const fileTriples = loadFile(failingMockPath).toPromise();
+        const fileTriples = firstValueFrom(loadFile(failingMockPath));
         await expect(fileTriples).rejects.toThrow('Unexpected');
       });
       it('loads a file from the correct path', async () => {
         const mockFilePath = './ontology.nt';
 
-        const fileTriples = loadFile(mockFilePath).toPromise();
+        const fileTriples = firstValueFrom(loadFile(mockFilePath));
 
         expect(readStreamCreatorFn).toBeCalledWith(mockFilePath);
         await expect(fileTriples).resolves.toEqual({

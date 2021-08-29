@@ -14,25 +14,18 @@
  * limitations under the License.
  */
 
-import {
-  createPrinter,
-  createSourceFile,
-  EmitHint,
-  NewLineKind,
-  ScriptKind,
-  ScriptTarget,
-} from 'typescript';
+import ts from 'typescript';
 
-import {SchemaString, UrlNode} from '../../src/triples/types';
+import {SchemaString, UrlNode} from '../../src/triples/types.js';
 import {
   AliasBuiltin,
   Class,
   DataTypeUnion,
   Sort,
   Builtin,
-} from '../../src/ts/class';
-import {Context} from '../../src/ts/context';
-import {makeClass, makeClassMap} from '../helpers/make_class';
+} from '../../src/ts/class.js';
+import {Context} from '../../src/ts/context.js';
+import {makeClass, makeClassMap} from '../helpers/make_class.js';
 
 describe('Class', () => {
   let cls: Class;
@@ -488,21 +481,21 @@ function asString(
   context: Context,
   {skipDeprecated}: {skipDeprecated?: boolean} = {}
 ): string {
-  const source = createSourceFile(
+  const source = ts.createSourceFile(
     'result.ts',
     '',
-    ScriptTarget.ES2015,
+    ts.ScriptTarget.ES2015,
     /*setParentNodes=*/ false,
-    ScriptKind.TS
+    ts.ScriptKind.TS
   );
-  const printer = createPrinter({newLine: NewLineKind.LineFeed});
+  const printer = ts.createPrinter({newLine: ts.NewLineKind.LineFeed});
 
   return cls
     .toNode(context, {
       skipDeprecatedProperties: !!skipDeprecated,
       hasRole: false,
     })
-    .map(node => printer.printNode(EmitHint.Unspecified, node, source))
+    .map(node => printer.printNode(ts.EmitHint.Unspecified, node, source))
     .join('\n');
 }
 

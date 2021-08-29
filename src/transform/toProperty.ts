@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {Log} from '../logging';
-import {Format, ObjectPredicate, TypedTopic} from '../triples/triple';
-import {IsPropertyType} from '../triples/wellKnown';
-import {ClassMap} from '../ts/class';
-import {PropertyType} from '../ts/property';
+import {Log} from '../logging/index.js';
+import {Format, ObjectPredicate, TypedTopic} from '../triples/triple.js';
+import {IsPropertyType} from '../triples/wellKnown.js';
+import {ClassMap} from '../ts/class.js';
+import {PropertyType} from '../ts/property.js';
 
 /**
  * Annotates classes with any Property values they blong to.

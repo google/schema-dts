@@ -19,9 +19,9 @@
  */
 import {basename} from 'path';
 
-import {inlineCli} from '../helpers/main_driver';
+import {inlineCli} from '../helpers/main_driver.js';
 
-test(`baseine_${basename(__filename)}`, async () => {
+test(`baseline_${basename(import.meta.url)}`, async () => {
   const {actual} = await inlineCli(
     `
 <http://schema.org/name> <http://schema.org/rangeIncludes> <http://schema.org/Text> .
@@ -59,7 +59,7 @@ test(`baseine_${basename(__filename)}`, async () => {
 `,
     [
       '--ontology',
-      `https://fake.com/${basename(__filename)}.nt`,
+      `https://fake.com/${basename(import.meta.url)}.nt`,
       '--nodeprecated',
     ]
   );

@@ -13,20 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {
-  factory,
+import ts from 'typescript';
+import type {
   DeclarationStatement,
-  ModifierFlags,
   Statement,
   TypeNode,
-  SyntaxKind,
   InterfaceDeclaration,
   TypeParameterDeclaration,
 } from 'typescript';
+const {factory, ModifierFlags, SyntaxKind} = ts;
 
-import {Log} from '../logging';
-import {TObject, TPredicate, TSubject} from '../triples/triple';
-import {UrlNode} from '../triples/types';
+import {Log} from '../logging/index.js';
+import {TObject, TPredicate, TSubject} from '../triples/triple.js';
+import {UrlNode} from '../triples/types.js';
 import {
   GetComment,
   GetSubClassOf,
@@ -35,20 +34,17 @@ import {
   IsDataType,
   IsType,
   IsTypeName,
-} from '../triples/wellKnown';
+} from '../triples/wellKnown.js';
 
-import {Context} from './context';
-import {EnumValue} from './enum';
-import {Property, TypeProperty} from './property';
-import {arrayOf} from './util/arrayof';
-import {appendLine, withComments} from './util/comments';
-import {toClassName} from './util/names';
-import {assert} from '../util/assert';
-import {IdReferenceName} from './helper_types';
-
-import {shim as shimFlatMap} from 'array.prototype.flatmap';
-import {typeUnion} from './util/union';
-shimFlatMap();
+import {Context} from './context.js';
+import {EnumValue} from './enum.js';
+import {Property, TypeProperty} from './property.js';
+import {arrayOf} from './util/arrayof.js';
+import {appendLine, withComments} from './util/comments.js';
+import {toClassName} from './util/names.js';
+import {assert} from '../util/assert.js';
+import {IdReferenceName} from './helper_types.js';
+import {typeUnion} from './util/union.js';
 
 /** Maps fully qualified IDs of each Class to the class itself. */
 export type ClassMap = Map<string, Class>;

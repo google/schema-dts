@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {UrlNode} from '../../src/triples/types';
-import {Class, ClassMap} from '../../src/ts/class';
+import {UrlNode} from '../../src/triples/types.js';
+import {Class, ClassMap} from '../../src/ts/class.js';
 
 export function makeClass(url: string): Class {
   return new Class(UrlNode.Parse(url));

@@ -18,11 +18,11 @@ import fs from 'fs';
 import readline from 'readline';
 import {Observable, Subscriber, TeardownLogic} from 'rxjs';
 
-import {Log} from '../logging';
-import {assert} from '../util/assert';
+import {Log} from '../logging/index.js';
+import {assert} from '../util/assert.js';
 
-import {Triple} from './triple';
-import {Rdfs, SchemaString, UrlNode} from './types';
+import {Triple} from './triple.js';
+import {Rdfs, SchemaString, UrlNode} from './types.js';
 
 function unWrap<T>(
   maker: (content: string) => T | null

@@ -126,7 +126,7 @@ module.exports = {
     'no-throw-literal': 'error',
     'no-underscore-dangle': ['error', {allowAfterThis: true}],
     'no-unsafe-finally': 'error',
-    'no-unused-expressions': 'error',
+    'no-unused-expressions': ['error', {allowShortCircuit: true}],
     'no-unused-labels': 'error',
     'no-var': 'error',
     'object-shorthand': 'error',

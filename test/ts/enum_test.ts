@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import {jest} from '@jest/globals';
 
-import {UrlNode} from '../../src/triples/types';
-import {EnumValue} from '../../src/ts/enum';
-import {makeClass, makeClassMap} from '../helpers/make_class';
+import {UrlNode} from '../../src/triples/types.js';
+import {EnumValue} from '../../src/ts/enum.js';
+import {makeClass, makeClassMap} from '../helpers/make_class.js';
 
 describe('EnumValue', () => {
   describe('constructor', () => {

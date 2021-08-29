@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-import {factory, PropertySignature, SyntaxKind} from 'typescript';
+import ts from 'typescript';
+import type {PropertySignature} from 'typescript';
+const {factory, SyntaxKind} = ts;
 
-import {Log} from '../logging';
-import {Format, ObjectPredicate, TObject, TSubject} from '../triples/triple';
+import {Log} from '../logging/index.js';
+import {Format, ObjectPredicate, TObject, TSubject} from '../triples/triple.js';
 import {
   GetComment,
   IsDomainIncludes,
   IsRangeIncludes,
   IsSupersededBy,
   IsTypeName,
-} from '../triples/wellKnown';
+} from '../triples/wellKnown.js';
 
-import type {Class, ClassMap} from './class';
-import {Context} from './context';
-import {appendLine, withComments} from './util/comments';
-import {IdReferenceName, SchemaValueReference} from './helper_types';
-import {typeUnion} from './util/union';
+import type {Class, ClassMap} from './class.js';
+import {Context} from './context.js';
+import {appendLine, withComments} from './util/comments.js';
+import {IdReferenceName, SchemaValueReference} from './helper_types.js';
+import {typeUnion} from './util/union.js';
 
 /**
  * A "class" of properties, not associated with any particuar object.

@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-import unified from 'unified';
+import ts from 'typescript';
+import type {Node} from 'typescript';
+const {setSyntheticLeadingComments, SyntaxKind} = ts;
+
+import {unified} from 'unified';
+import type {Processor} from 'unified';
 import markdown from 'remark-parse';
 import html from 'rehype-parse';
-import {Node, setSyntheticLeadingComments, SyntaxKind} from 'typescript';
 import type {Literal, Node as AstNode, Parent} from 'unist';
-import {wikiLinkPlugin} from 'remark-wiki-link';
+import wikiLinkPlugin from 'remark-wiki-link';
 import mdastToHast from 'remark-rehype';
 import stripWhitespace from 'rehype-minify-whitespace';
 import raw from 'rehype-raw';
@@ -53,7 +57,7 @@ export function appendLine(first: string | undefined, next: string): string {
 
 function parseComment(comment: string): string {
   const parseAsHtml = shouldParseAsHtml(comment);
-
+  const commentToParse = unescape(comment);
   const processor = parseAsHtml
     ? unified().use(html, {fragment: true}).use(stripWhitespace)
     : unified()
@@ -67,7 +71,7 @@ function parseComment(comment: string): string {
         .use(raw)
         .use(stripWhitespace);
 
-  const ast = processor.runSync(processor.parse(unescape(comment)));
+  const ast = parseCommentInternal(processor, commentToParse);
 
   const context: ParseContext = {
     result: [],
@@ -86,6 +90,13 @@ function parseComment(comment: string): string {
   return lines.length === 1
     ? `* ${lines[0]} `
     : '*\n * ' + lines.join('\n * ') + '\n ';
+}
+
+function parseCommentInternal<P extends Processor>(
+  processor: P,
+  comment: string
+) {
+  return processor.runSync(processor.parse(comment));
 }
 
 // Older Schema.org comment strings are represented as HTML, where whitespace

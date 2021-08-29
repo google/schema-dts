@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import {Format, ObjectPredicate, Triple} from '../../src/triples/triple';
-import {Rdfs, SchemaString, UrlNode} from '../../src/triples/types';
+import {Format, ObjectPredicate, Triple} from '../../src/triples/triple.js';
+import {Rdfs, SchemaString, UrlNode} from '../../src/triples/types.js';
 
 describe('Format(Triple)', () => {
   it('smoke test 1', () => {

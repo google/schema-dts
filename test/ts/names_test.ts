@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {UrlNode} from '../../src/triples/types';
-import {toClassName} from '../../src/ts/util/names';
+import {UrlNode} from '../../src/triples/types.js';
+import {toClassName} from '../../src/ts/util/names.js';
 
 describe('toClassName', () => {
   it('operates normally, with typical inputs', () => {

@@ -14,36 +14,38 @@
  * limitations under the License.
  *
  */
+import {jest} from '@jest/globals';
 
 import {Readable} from 'stream';
 import fs from 'fs';
-import {main} from '../../src/cli/internal/main';
-import * as Logging from '../../src/logging';
-import * as Transform from '../../src/transform/transform';
+import {main} from '../../src/cli/internal/main.js';
+import {SetLogger} from '../../src/logging/index.js';
 
 describe('main Args logs', () => {
-  let readStreamCreatorFn: jest.SpyInstance;
+  let logs: string[];
+  let ResetLogger: undefined | (() => void) = undefined;
+
   beforeEach(() => {
     const mockFileLine = `<http://schema.org/Thing> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .\n`;
     const mockedStream = Readable.from([mockFileLine]);
-    readStreamCreatorFn = jest
+    jest
       .spyOn(fs, 'createReadStream')
       //@ts-ignore
       .mockImplementation(path => mockedStream);
+
+    logs = [];
+    ResetLogger = SetLogger(msg => logs.push(msg));
   });
+  afterEach(() => {
+    ResetLogger && ResetLogger();
+  });
+
   it(`the path it is loading from`, async () => {
-    const logs = [''];
-    // log messages get caught for checking assert:
-    jest
-      .spyOn(Logging, 'Log')
-      .mockImplementation((msg: string) => void logs.push(msg));
-    // but doesn't write the output .ts-file:
-    jest
-      .spyOn(Transform, 'WriteDeclarations')
-      .mockImplementation(async (...args) => {});
-    await main(['--file', `ontology-file.nt`, `--verbose`]);
+    await main(noop, ['--file', `ontology-file.nt`, `--verbose`]);
     expect(logs.join('')).toMatchInlineSnapshot(
       `"Loading Ontology from path: ontology-file.nt"`
     );
   });
 });
+
+function noop() {}

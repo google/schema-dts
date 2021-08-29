@@ -14,29 +14,21 @@
  * limitations under the License.
  */
 
-import {
-  createPrinter,
-  createSourceFile,
-  EmitHint,
-  NewLineKind,
-  Node,
-  ScriptKind,
-  ScriptTarget,
-} from 'typescript';
+import ts from 'typescript';
 
-import {UrlNode} from '../../src/triples/types';
-import {Context} from '../../src/ts/context';
+import {UrlNode} from '../../src/triples/types.js';
+import {Context} from '../../src/ts/context.js';
 
-function asString(node: Node): string {
-  const printer = createPrinter({newLine: NewLineKind.LineFeed});
-  const source = createSourceFile(
+function asString(node: ts.Node): string {
+  const printer = ts.createPrinter({newLine: ts.NewLineKind.LineFeed});
+  const source = ts.createSourceFile(
     'test.ts',
     '',
-    ScriptTarget.Latest,
+    ts.ScriptTarget.Latest,
     /*setParentNodes=*/ false,
-    ScriptKind.TS
+    ts.ScriptKind.TS
   );
-  return printer.printNode(EmitHint.Unspecified, node, source);
+  return printer.printNode(ts.EmitHint.Unspecified, node, source);
 }
 
 describe('WithContext generation', () => {

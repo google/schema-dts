@@ -16,14 +16,14 @@
 
 import {Observable} from 'rxjs';
 import {Triple} from '../..';
-import {Log, SetOptions} from '../../logging';
-import {WriteDeclarations} from '../../transform/transform';
-import {load, loadFile} from '../../triples/reader';
-import {Context} from '../../ts/context';
+import {Log, SetOptions} from '../../logging/index.js';
+import {WriteDeclarations} from '../../transform/transform.js';
+import {load, loadFile} from '../../triples/reader.js';
+import {Context} from '../../ts/context.js';
 
-import {ParseFlags} from '../args';
+import {ParseFlags} from '../args.js';
 
-export async function main(args?: string[]) {
+export async function main(write: (s: string) => void, args?: string[]) {
   const options = ParseFlags(args);
   SetOptions(options);
 
@@ -40,8 +40,4 @@ export async function main(args?: string[]) {
   }
   const context = Context.Parse(options.context);
   await WriteDeclarations(result, options.deprecated, context, write);
-}
-
-function write(content: string) {
-  process.stdout.write(content, 'utf-8');
 }

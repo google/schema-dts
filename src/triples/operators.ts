@@ -16,8 +16,8 @@
 import {OperatorFunction} from 'rxjs';
 import {groupBy, map, mergeMap, toArray} from 'rxjs/operators';
 
-import {Topic, Triple, TypedTopic} from './triple';
-import {GetTypes, IsType} from './wellKnown';
+import {Topic, Triple, TypedTopic} from './triple.js';
+import {GetTypes, IsType} from './wellKnown.js';
 
 function groupBySubject(): OperatorFunction<Triple, Topic> {
   return observable =>

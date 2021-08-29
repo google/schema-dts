@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-import {factory, SyntaxKind, TypeNode} from 'typescript';
+import ts from 'typescript';
+import type {TypeNode} from 'typescript';
+const {factory, SyntaxKind} = ts;
 
 export function typeUnion(
   ...args: Array<TypeNode | undefined | null | false>

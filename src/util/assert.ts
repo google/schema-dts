@@ -22,10 +22,3 @@ export function assert<T>(
 ): asserts item is T {
   ok(item, message);
 }
-
-export function assertTypeof(
-  item: unknown,
-  type: 'string'
-): asserts item is string {
-  ok(typeof item === 'string');
-}

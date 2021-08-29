@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import {Log} from '../logging';
-import {Format, ObjectPredicate, TypedTopic} from '../triples/triple';
-import {HasEnumType} from '../triples/wellKnown';
-import {ClassMap} from '../ts/class';
-import {EnumValue} from '../ts/enum';
+import {Log} from '../logging/index.js';
+import {Format, ObjectPredicate, TypedTopic} from '../triples/triple.js';
+import {HasEnumType} from '../triples/wellKnown.js';
+import {ClassMap} from '../ts/class.js';
+import {EnumValue} from '../ts/enum.js';
 
 /**
  * Annotates classes with any Enum values they blong to.

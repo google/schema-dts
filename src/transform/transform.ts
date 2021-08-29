@@ -13,25 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {firstValueFrom, Observable} from 'rxjs';
-import {
+import ts from 'typescript';
+const {
   createPrinter,
   createSourceFile,
   EmitHint,
   NewLineKind,
   ScriptKind,
   ScriptTarget,
-} from 'typescript';
+} = ts;
 
-import {asTopicArray} from '../triples/operators';
-import {Triple} from '../triples/triple';
-import {Sort} from '../ts/class';
-import {Context} from '../ts/context';
+import {firstValueFrom, Observable} from 'rxjs';
 
-import {ProcessClasses} from './toClass';
-import {ProcessEnums} from './toEnum';
-import {ProcessProperties} from './toProperty';
-import {HelperTypes} from '../ts/helper_types';
+import {asTopicArray} from '../triples/operators.js';
+import {Triple} from '../triples/triple.js';
+import {Sort} from '../ts/class.js';
+import {Context} from '../ts/context.js';
+
+import {ProcessClasses} from './toClass.js';
+import {ProcessEnums} from './toEnum.js';
+import {ProcessProperties} from './toProperty.js';
+import {HelperTypes} from '../ts/helper_types.js';
 
 /**
  * Writes TypeScript declarations for all Classes, Typedefs, and Enums

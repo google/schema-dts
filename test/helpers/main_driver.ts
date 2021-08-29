@@ -20,36 +20,28 @@
 import {ClientRequest, IncomingMessage} from 'http';
 import https from 'https';
 
-import {main} from '../../src/cli/internal/main';
-import {SetLogger, SetOptions} from '../../src/logging';
-import {assert, assertTypeof} from '../../src/util/assert';
+import {main} from '../../src/cli/internal/main.js';
+import {SetLogger, SetOptions} from '../../src/logging/index.js';
+import {assert} from '../../src/util/assert.js';
 
-import {flush} from './async';
+import {flush} from './async.js';
 
 export async function inlineCli(
   content: string,
   args: string[]
 ): Promise<{actual: string; actualLogs: string}> {
   // Restorables
-  const realWrite = process.stdout.write;
   const realGet = https.get;
+  let ResetLogger: undefined | (() => void) = undefined;
 
   try {
     // Controllers
     let innerOnData: (chunk: Buffer) => void;
     let innerOnEnd: () => void;
 
-    // Mockables
-    process.stdout.write = ((
-      ...params: Parameters<typeof process.stdout.write>
-    ): boolean => {
-      const str = params[0];
-      assertTypeof(str, 'string');
-      writes.push(str);
-      return true;
-    }) as typeof process.stdout.write;
+    const write = (s: string) => writes.push(s);
 
-    SetLogger((msg: string) => void logs.push(msg));
+    ResetLogger = SetLogger((msg: string) => void logs.push(msg));
 
     // TODO(eyas): A lot of the mocking here is due to the fact that https.get
     // cannot read local file:/// paths. If it were possible, the get mocking
@@ -73,7 +65,7 @@ export async function inlineCli(
     const writes: string[] = [];
     const logs: string[] = [];
 
-    const wholeProgram = main(args);
+    const wholeProgram = main(write, args);
     await flush();
 
     assert(innerOnData!);
@@ -89,11 +81,10 @@ export async function inlineCli(
       actualLogs: logs.join('\n') + '\n',
     };
   } finally {
-    process.stdout.write = realWrite;
     https.get = realGet;
 
     // Always reset verbosity settings.
     SetOptions({verbose: false});
-    SetLogger(console.error);
+    ResetLogger && ResetLogger();
   }
 }

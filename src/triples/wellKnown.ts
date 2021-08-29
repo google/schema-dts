@@ -20,8 +20,8 @@ import {
   TSubject,
   TTypeName,
   TypedTopic,
-} from './triple';
-import {UrlNode} from './types';
+} from './triple.js';
+import {UrlNode} from './types.js';
 
 /** Whether the context corresponds to rdf-schema. */
 export function IsRdfSchema(value: UrlNode): boolean {

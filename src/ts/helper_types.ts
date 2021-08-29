@@ -1,9 +1,12 @@
-import {factory, ModifierFlags, SyntaxKind, TypeNode} from 'typescript';
-import {Context} from './context';
-import {arrayOf} from './util/arrayof';
+import ts from 'typescript';
+import type {TypeNode} from 'typescript';
+const {factory, SyntaxKind, ModifierFlags} = ts;
 
-import {withComments} from './util/comments';
-import {typeUnion} from './util/union';
+import {Context} from './context.js';
+import {arrayOf} from './util/arrayof.js';
+
+import {withComments} from './util/comments.js';
+import {typeUnion} from './util/union.js';
 
 function IdPropertyNode() {
   return withComments(

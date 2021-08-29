@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-import {Log} from '../logging';
-import {ObjectPredicate, Topic, TypedTopic} from '../triples/triple';
-import {UrlNode} from '../triples/types';
-import {IsNamedClass, IsDataType, ClassIsDataType} from '../triples/wellKnown';
+import {Log} from '../logging/index.js';
+import {ObjectPredicate, Topic, TypedTopic} from '../triples/triple.js';
+import {UrlNode} from '../triples/types.js';
+import {
+  IsNamedClass,
+  IsDataType,
+  ClassIsDataType,
+} from '../triples/wellKnown.js';
 import {
   AliasBuiltin,
   Class,
   ClassMap,
   DataTypeUnion,
   RoleBuiltin,
-} from '../ts/class';
-import {assert} from '../util/assert';
+} from '../ts/class.js';
+import {assert} from '../util/assert.js';
 
 function toClass(cls: Class, topic: Topic, map: ClassMap): Class {
   const rest: ObjectPredicate[] = [];

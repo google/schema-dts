@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import {Rdfs, SchemaString, UrlNode} from '../../src/triples/types';
-import {PropertyType} from '../../src/ts/property';
-import {makeClass, makeClassMap} from '../helpers/make_class';
+import {Rdfs, SchemaString, UrlNode} from '../../src/triples/types.js';
+import {PropertyType} from '../../src/ts/property.js';
+import {makeClass, makeClassMap} from '../helpers/make_class.js';
 
 describe('PropertyType', () => {
   let prop: PropertyType;

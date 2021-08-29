@@ -13,14 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {factory, TypeNode} from 'typescript';
+import ts from 'typescript';
+import type {TypeNode} from 'typescript';
+const {factory} = ts;
 
-import {Log} from '../logging';
-import {ObjectPredicate, TSubject, TTypeName} from '../triples/triple';
-import {GetComment, IsClassType, IsDataType} from '../triples/wellKnown';
+import {Log} from '../logging/index.js';
+import {ObjectPredicate, TSubject, TTypeName} from '../triples/triple.js';
+import {GetComment, IsClassType, IsDataType} from '../triples/wellKnown.js';
 
-import {ClassMap} from './class';
-import {Context} from './context';
+import {ClassMap} from './class.js';
+import {Context} from './context.js';
 
 /**
  * Corresponds to a value that belongs to an Enumeration.

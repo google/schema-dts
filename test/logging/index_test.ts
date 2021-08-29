@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import {jest} from '@jest/globals';
 
-import {Log, SetLogger, SetOptions} from '../../src/logging';
+import {Log, SetLogger, SetOptions} from '../../src/logging/index.js';
+import {Mocked} from '../helpers/jest-types.js';
 
 describe('Log', () => {
-  let logErr: jest.Mock<
-    ReturnType<Console['error']>,
-    Parameters<Console['error']>
-  >;
+  let logErr: Mocked<Console['error']>;
+  let ResetLogger: undefined | (() => void) = undefined;
 
   beforeEach(() => {
     logErr = jest.fn();
-    SetLogger(logErr);
+    ResetLogger = SetLogger(logErr);
   });
 
   afterEach(() => {
-    SetLogger(console.error);
+    ResetLogger && ResetLogger();
   });
 
   it("doesn't log by default", () => {
