@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "declaration": true,
+    "outDir": "dist"
+  },
+  "files": ["lib/schema.ts"]
+}

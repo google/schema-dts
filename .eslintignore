@@ -1,5 +1,4 @@
 node_modules/
-built
 dist
 coverage
 jest.config.js
