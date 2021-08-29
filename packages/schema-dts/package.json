@@ -18,10 +18,9 @@
   "types": "./dist/schema.d.ts",
   "main": "./dist/schema.js",
   "devDependencies": {
-    "schema-dts-gen": "*",
-    "mkdirp": "^1.0.4"
+    "mkdirp": "^1.0.4",
+    "schema-dts-gen": "*"
   },
-  "dependencies": {},
   "peerDependencies": {
     "typescript": ">=4.1.0"
   },
@@ -48,7 +47,7 @@
   },
   "scripts": {
     "build": "mkdirp lib/ && schema-dts-gen > lib/schema.ts && tsc -p .",
-    "test": "echo ok"
+    "test": "tsc -p test/"
   },
   "license": "Apache-2.0"
 }

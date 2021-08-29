@@ -1,4 +1,3 @@
-// tsc built/ts-schema/schema.ts --declaration --noImplicitAny --outDir dist/schema/
 {
   "compilerOptions": {
     "strict": true,
