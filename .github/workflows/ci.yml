@@ -24,6 +24,4 @@ jobs:
       - run: npm install -g npm@latest  # Needed while 14.x is supported.
       - run: npm ci
       - run: npm run build
-      - run: npm run lint
       - run: npm test
-      - run: npm run coverage_on_travis

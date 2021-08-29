@@ -53,7 +53,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "clean": "rimraf \"packages/**/dist\" \"packages/**/*.tsbuildinfo\" packages/schema-dts/lib/*",
-    "build": "echo $PATH && npm run build --workspaces",
+    "build": "npm run build --workspaces",
     "lint:prettier": "prettier --check .",
     "lint:eslint": "eslint ",
     "lint": "npm run lint:eslint && npm run lint:prettier",
