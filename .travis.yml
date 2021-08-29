@@ -1,7 +1,0 @@
-language: node_js
-node_js:
-  - 'node'
-before_script: npm run build
-after_success: npm run coverage_on_travis
-git:
-  depth: 1
