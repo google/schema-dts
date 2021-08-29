@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {TSubject, TTypeName} from '../../triples/triple';
+import type {TTypeName} from '../../triples/triple';
 
 function decodeOr(component: string) {
   try {
