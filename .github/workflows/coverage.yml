@@ -26,4 +26,5 @@ jobs:
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        base-path: packages/schema-dts-gen/
+        path-to-lcov: ./packages/schema-ts-gen/coverage/lcov.info
+        base-path: ./packages/schema-dts-gen/
