@@ -46,7 +46,10 @@
     "directory": "packages/schema-dts"
   },
   "scripts": {
-    "build": "mkdirp lib/ && schema-dts-gen > lib/schema.ts && tsc -p .",
+    "prepare": "mkdirp lib/",
+    "build:generate": "schema-dts-gen > lib/schema.ts",
+    "build:compile": "tsc -p .",
+    "build": "npm run build:generate && npm run build:compile",
     "test": "npm run build && tsc -p test/"
   },
   "license": "Apache-2.0"
