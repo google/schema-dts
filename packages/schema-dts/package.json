@@ -47,7 +47,7 @@
   },
   "scripts": {
     "build": "mkdirp lib/ && schema-dts-gen > lib/schema.ts && tsc -p .",
-    "test": "tsc -p test/"
+    "test": "npm run build && tsc -p test/"
   },
   "license": "Apache-2.0"
 }
