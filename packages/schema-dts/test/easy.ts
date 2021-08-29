@@ -1,4 +1,4 @@
-import {Thing} from 'schema-dts';
+import {Thing} from '../dist/schema';
 
 // "@type" is required
 // @ts-expect-error

@@ -1,4 +1,4 @@
-import {Thing, WithContext} from 'schema-dts';
+import {Thing, WithContext} from '../dist/schema';
 
 // "@context" and "@type" are both required
 // @ts-expect-error

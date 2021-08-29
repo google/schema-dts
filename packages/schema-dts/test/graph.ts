@@ -1,4 +1,4 @@
-import {Graph} from 'schema-dts';
+import {Graph} from '../dist/schema';
 
 // "@context" and "@graph" are both required
 // @ts-expect-error

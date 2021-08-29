@@ -2,9 +2,6 @@
   "compilerOptions": {
     "strict": true,
     "noEmit": true,
-    "baseUrl": ".",
-    "paths": {
-      "schema-dts": ["./test/fwd"]
-    }
+    "baseUrl": "."
   }
 }
