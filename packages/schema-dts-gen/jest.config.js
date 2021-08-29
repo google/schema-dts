@@ -13,4 +13,5 @@ export default {
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   collectCoverage: true,
   coveragePathIgnorePatterns: ['/node_modules/', '/dist/'],
+  coverageReporters: ['json', ['lcov', {projectRoot: '../../'}], 'text'],
 };
