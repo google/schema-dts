@@ -1,6 +1,6 @@
 {
   "name": "monorepo",
-  "version": "0.11.0",
+  "private": "true",
   "authors": [
     "Eyas Sharaiha <eyas@google.com> (https://eyas.sh/)"
   ],
