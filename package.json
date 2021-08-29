@@ -1,58 +1,26 @@
 {
-  "name": "schema-dts-gen",
+  "name": "monorepo",
   "version": "0.11.0",
-  "displayName": "schema-dts Generator",
-  "description": "Generate TypeScript Definitions for Schema.org Schema",
   "authors": [
     "Eyas Sharaiha <eyas@google.com> (https://eyas.sh/)"
   ],
   "maintainers": [
     "Eyas Sharaiha <npm@eyas.sh> (https://eyas.sh/)"
   ],
-  "files": [
-    "dist/gen/**/*"
-  ],
-  "types": "./dist/gen/index.d.ts",
-  "main": "./dist/gen/index.js",
-  "bin": {
-    "schema-dts-gen": "dist/gen/cli/cli.js"
-  },
-  "sideEffects": false,
-  "type": "module",
   "devDependencies": {
     "@jest/globals": "^27.1.0",
-    "@types/argparse": "^2.0.10",
-    "@types/array.prototype.flatmap": "^1.2.2",
-    "@types/diff": "^5.0.1",
-    "@types/node": "^16.7.4",
-    "@types/unist": "^2.0.6",
     "@typescript-eslint/eslint-plugin": "^4.29.3",
     "@typescript-eslint/parser": "^4.29.3",
-    "clang-format": "^1.5.0",
     "coveralls": "^3.1.1",
-    "cpy-cli": "^3.1.1",
-    "cross-env": "^7.0.3",
-    "del-cli": "^4.0.1",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.24.2",
     "eslint-plugin-jsdoc": "^36.0.8",
     "jest": "^27.1.0",
-    "mkdirp": "^1.0.4",
     "prettier": "^2.3.2",
-    "rehype-minify-whitespace": "^5.0.0",
-    "rehype-parse": "^8.0.2",
-    "rehype-raw": "^6.1.0",
-    "remark-parse": "^10.0.0",
-    "remark-rehype": "^9.0.0",
-    "remark-wiki-link": "^1.0.4",
+    "rimraf": "^3.0.2",
     "ts-jest": "^27.0.5",
-    "typescript": "^4.3.2",
-    "unified": "^10.1.0"
-  },
-  "dependencies": {
-    "argparse": "^2.0.1",
-    "rxjs": "^7.3.0"
+    "typescript": "^4.3.2"
   },
   "engines": {
     "node": ">=14.0.0"
@@ -78,35 +46,25 @@
     ],
     "all": true
   },
-  "keywords": [
-    "typescript",
-    "tsd",
-    "dts",
-    "schema.org",
-    "Semantic Web",
-    "semantic-web",
-    "Linked Data",
-    "linked-data",
-    "jsonld",
-    "JSON-LD",
-    "structured data",
-    "structured-data"
-  ],
   "homepage": "https://opensource.google/projects/schema-dts",
   "bugs": "https://github.com/google/schema-dts/issues",
   "repository": "github:google/schema-dts",
   "license": "Apache-2.0",
   "scripts": {
-    "clean": "del-cli built dist/gen dist/schema/**/* !dist/schema/package.json !dist/schema/README.md",
-    "lint": "eslint src/**/*.ts test/**/*.ts && prettier --check .",
-    "fix": "eslint --fix src/**/*.ts test/**/*.ts && prettier --write .",
-    "test": "npm run lint && cross-env NODE_OPTIONS=--experimental-vm-modules jest --coverage",
-    "coverage_on_travis": "cat ./coverage/lcov.info | coveralls",
-    "build": "tsc -b",
-    "build-gen": "tsc -p src",
-    "build-schema": "mkdirp built/ts-schema && node built/src/cli/cli.js > built/ts-schema/schema.ts",
-    "pkg-gen": "cpy --parents --cwd=built/src . ../../dist/gen/",
-    "pkg-schema": "cpy LICENSE dist/schema/ && tsc built/ts-schema/schema.ts --declaration --noImplicitAny --outDir dist/schema/",
-    "pkg": "npm run clean && npm run build-gen && npm run build-schema && npm run pkg-gen && npm run pkg-schema"
-  }
+    "clean": "rimraf \"packages/**/dist\" \"packages/**/*.tsbuildinfo\"",
+    "build": "npm run build --workspaces",
+    "lint:prettier": "prettier --check .",
+    "lint:eslint": "eslint ",
+    "lint": "npm run lint:eslint && npm run lint:prettier",
+    "fix:prettier": "prettier --write .",
+    "fix:eslint": "eslint --fix ",
+    "fix": "npm run fix:eslint && npm run fix:prettier",
+    "test": "npm run lint && npm run test --workspaces",
+    "coverage_on_travis": "npm run coverage_on_travis -w schema-dts-gen",
+    "pkg": "npm run clean && npm run build"
+  },
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ]
 }

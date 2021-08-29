@@ -1,0 +1,94 @@
+{
+  "name": "schema-dts-gen",
+  "version": "1.0.0-beta",
+  "displayName": "schema-dts Generator",
+  "description": "Generate TypeScript Definitions for Schema.org Schema",
+  "authors": [
+    "Eyas Sharaiha <eyas@google.com> (https://eyas.sh/)"
+  ],
+  "maintainers": [
+    "Eyas Sharaiha <npm@eyas.sh> (https://eyas.sh/)"
+  ],
+  "files": [
+    "dist/src/**/*"
+  ],
+  "types": "./dist/src/index.d.ts",
+  "main": "./dist/src/index.js",
+  "bin": {
+    "schema-dts-gen": "bin/schema-dts-gen.js"
+  },
+  "sideEffects": false,
+  "type": "module",
+  "devDependencies": {
+    "@jest/globals": "^27.1.0",
+    "@types/argparse": "^2.0.10",
+    "@types/array.prototype.flatmap": "^1.2.2",
+    "@types/diff": "^5.0.1",
+    "@types/jest": "^27.0.1",
+    "@types/node": "^16.7.4",
+    "@types/unist": "^2.0.6",
+    "cross-env": "^7.0.3",
+    "rehype-minify-whitespace": "^5.0.0",
+    "rehype-parse": "^8.0.2",
+    "rehype-raw": "^6.1.0",
+    "remark-parse": "^10.0.0",
+    "remark-rehype": "^9.0.0",
+    "remark-wiki-link": "^1.0.4",
+    "unified": "^10.1.0"
+  },
+  "dependencies": {
+    "argparse": "^2.0.1",
+    "rxjs": "^7.3.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "engineStrict": true,
+  "peerDependencies": {
+    "typescript": ">=4.1.0"
+  },
+  "nyc": {
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "exclude": [
+      "**/*.d.ts",
+      "dist/**/*",
+      "coverage/**/*",
+      "test/**/*",
+      "src/cli/cli.ts"
+    ],
+    "reporter": [
+      "html"
+    ],
+    "all": true
+  },
+  "keywords": [
+    "typescript",
+    "tsd",
+    "dts",
+    "schema.org",
+    "Semantic Web",
+    "semantic-web",
+    "Linked Data",
+    "linked-data",
+    "jsonld",
+    "JSON-LD",
+    "structured data",
+    "structured-data"
+  ],
+  "homepage": "https://opensource.google/projects/schema-dts",
+  "bugs": "https://github.com/google/schema-dts/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/google/schema-dts.git",
+    "directory": "packages/schema-dts-gen"
+  },
+  "license": "Apache-2.0",
+  "scripts": {
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --coverage",
+    "coverage_on_travis": "cat ./coverage/lcov.info | coveralls",
+    "build": "tsc -b"
+  }
+}

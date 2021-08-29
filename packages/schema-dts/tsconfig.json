@@ -1,0 +1,9 @@
+// tsc built/ts-schema/schema.ts --declaration --noImplicitAny --outDir dist/schema/
+{
+  "compilerOptions": {
+    "strict": true,
+    "declaration": true,
+    "outDir": "dist"
+  },
+  "files": ["lib/schema.ts"]
+}

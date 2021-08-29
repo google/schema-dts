@@ -1,6 +1,6 @@
 {
   "name": "schema-dts",
-  "version": "0.11.0",
+  "version": "1.0.0-beta",
   "displayName": "schema-dts: Strongly-typed Schema.org vocabulary declarations",
   "description": "A TypeScript package with latest Schema.org Schema Typings",
   "authors": [
@@ -10,11 +10,17 @@
     "Eyas Sharaiha <npm@eyas.sh> (https://eyas.sh/)"
   ],
   "files": [
-    "**/*"
+    "dist/schema.d.ts",
+    "dist/schema.js",
+    "LICENSE",
+    "README.md"
   ],
-  "types": "./schema.d.ts",
-  "main": "./schema.js",
-  "devDependencies": {},
+  "types": "./dist/schema.d.ts",
+  "main": "./dist/schema.js",
+  "devDependencies": {
+    "schema-dts-gen": "*",
+    "mkdirp": "^1.0.4"
+  },
   "dependencies": {},
   "peerDependencies": {
     "typescript": ">=4.1.0"
@@ -37,8 +43,12 @@
   "bugs": "https://github.com/google/schema-dts/issues",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/google/schema-dts.git",
-    "directory": "dist/schema"
+    "url": "https://github.com/google/schema-dts.git",
+    "directory": "packages/schema-dts"
+  },
+  "scripts": {
+    "build": "mkdirp lib/ && schema-dts-gen > lib/schema.ts && tsc -p .",
+    "test": "echo ok"
   },
   "license": "Apache-2.0"
 }
