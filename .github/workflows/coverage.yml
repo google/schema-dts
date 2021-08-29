@@ -22,7 +22,8 @@ jobs:
     - run: npm ci
     - run: npm run build
     - run: npm test
-    - name: Coveralls
+    - name: Coveralls - schema-dts-gen
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
+        base-path: packages/schema-dts-gen/
