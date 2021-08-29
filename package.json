@@ -52,7 +52,7 @@
   "repository": "github:google/schema-dts",
   "license": "Apache-2.0",
   "scripts": {
-    "clean": "rimraf \"packages/**/dist\" \"packages/**/*.tsbuildinfo\"",
+    "clean": "rimraf \"packages/**/dist\" \"packages/**/*.tsbuildinfo\" packages/schema-dts/lib/*",
     "build": "npm run build --workspaces",
     "lint:prettier": "prettier --check .",
     "lint:eslint": "eslint ",
