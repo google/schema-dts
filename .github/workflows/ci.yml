@@ -23,6 +23,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm install -g npm@latest  # Needed while 14.x is supported.
       - run: npm ci
+      - run: ls node_modules/.bin/ # TEST
+      - run: cat node_modules/.bin/schema-dts-gen # TEST
       - run: npm run build
       - run: npm run lint
       - run: npm test
