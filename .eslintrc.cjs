@@ -5,7 +5,7 @@ module.exports = {
   },
   extends: ['prettier'],
   plugins: ['@typescript-eslint', 'import', 'jsdoc'],
-  ignorePatterns: [],
+  ignorePatterns: ['.eslintrc.cjs'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: [
