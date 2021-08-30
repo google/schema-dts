@@ -46,6 +46,7 @@
     "directory": "packages/schema-dts"
   },
   "scripts": {
+    "lint:eslint": "eslint test/**/*.ts",
     "prepare": "mkdirp lib/",
     "build:generate": "schema-dts-gen > lib/schema.ts",
     "build:compile": "tsc -p .",
