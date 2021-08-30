@@ -8,7 +8,14 @@ module.exports = {
   ignorePatterns: [],
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: ['./src/tsconfig.json', './test/tsconfig.json'],
+    project: [
+      // In our schema, we run eslint from individual
+      // packages. I'm sure there's a better way, but
+      // right now just use relative path to go back
+      // to project root.
+      '../../packages/*/src/tsconfig.json',
+      '../../packages/*/test/tsconfig.json',
+    ],
     sourceType: 'module',
   },
   rules: {
