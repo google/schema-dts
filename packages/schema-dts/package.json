@@ -1,13 +1,14 @@
 {
-  "name": "schema-dts",
-  "version": "1.0.0-beta",
+  "name": "digital-arsenal-schema-dts",
+  "version": "1.0.0",
   "displayName": "schema-dts: Strongly-typed Schema.org vocabulary declarations",
   "description": "A TypeScript package with latest Schema.org Schema Typings",
   "authors": [
-    "Eyas Sharaiha <eyas@google.com> (https://eyas.sh/)"
+    "Eyas Sharaiha <eyas@google.com> (https://eyas.sh/)",
+    "TJKoury <tj@digitalarsenal.io>"
   ],
   "maintainers": [
-    "Eyas Sharaiha <npm@eyas.sh> (https://eyas.sh/)"
+    "TJKoury <tj@digitalarsenal.io>"
   ],
   "files": [
     "dist/schema.d.ts",
@@ -42,7 +43,7 @@
   "bugs": "https://github.com/google/schema-dts/issues",
   "repository": {
     "type": "git",
-    "url": "https://github.com/google/schema-dts.git",
+    "url": "https://github.com/digitalarsenal/schema-dts.git",
     "directory": "packages/schema-dts"
   },
   "scripts": {
