@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import {Log} from '../logging/index.js';
-import {ObjectPredicate, Topic, TypedTopic} from '../triples/triple.js';
-import {UrlNode} from '../triples/types.js';
+import { Log } from '../logging/index.js';
+import { ObjectPredicate, Topic, TypedTopic } from '../triples/triple.js';
+import { UrlNode } from '../triples/types.js';
 import {
   IsNamedClass,
   IsDataType,
@@ -29,7 +29,7 @@ import {
   DataTypeUnion,
   RoleBuiltin,
 } from '../ts/class.js';
-import {assert} from '../util/assert.js';
+import { assert } from '../util/assert.js';
 
 function toClass(cls: Class, topic: Topic, map: ClassMap): Class {
   const rest: ObjectPredicate[] = [];
@@ -71,15 +71,6 @@ const wellKnownTypes = [
 // Should we allow 'string' to be a valid type for all values of this type?
 const wellKnownStrings = [
   UrlNode.Parse('http://schema.org/Quantity'),
-  UrlNode.Parse('http://schema.org/EntryPoint'),
-  UrlNode.Parse('http://schema.org/Organization'),
-  UrlNode.Parse('http://schema.org/Person'),
-  UrlNode.Parse('http://schema.org/Place'),
-  UrlNode.Parse('https://schema.org/Quantity'),
-  UrlNode.Parse('https://schema.org/EntryPoint'),
-  UrlNode.Parse('https://schema.org/Organization'),
-  UrlNode.Parse('https://schema.org/Person'),
-  UrlNode.Parse('https://schema.org/Place'),
 ];
 
 function ForwardDeclareClasses(topics: readonly TypedTopic[]): ClassMap {
