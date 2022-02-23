@@ -13,11 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {UrlNode} from '../../src/triples/types.js';
+import {Property, PropertyType} from '../../src/index.js';
+import {NamedUrlNode, UrlNode} from '../../src/triples/types.js';
 import {Class, ClassMap} from '../../src/ts/class.js';
 
 export function makeClass(url: string): Class {
-  return new Class(UrlNode.Parse(url));
+  return new Class(UrlNode.Parse(url) as NamedUrlNode);
+}
+
+export function makeProperty(url: string): Property {
+  const u = UrlNode.Parse(url);
+  return new Property(u, new PropertyType(u));
 }
 
 export function makeClassMap(...classes: Class[]): ClassMap {

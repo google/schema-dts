@@ -21,7 +21,7 @@ import {
   TTypeName,
   TypedTopic,
 } from './triple.js';
-import {UrlNode} from './types.js';
+import {NamedUrlNode, UrlNode} from './types.js';
 
 /** Whether the context corresponds to rdf-schema. */
 export function IsRdfSchema(value: UrlNode): boolean {
@@ -42,6 +42,13 @@ export function IsRdfSyntax(value: UrlNode): boolean {
 /** Whether the context corresponds to schema.org. */
 export function IsSchemaObject(value: UrlNode): boolean {
   return value.context.hostname === 'schema.org';
+}
+/** Wheter the context corresponds to OWL */
+export function IsOWL(value: UrlNode): boolean {
+  return (
+    value.context.hostname === 'www.w3.org' &&
+    value.context.path[value.context.path.length - 1] === 'owl'
+  );
 }
 
 /**
@@ -66,11 +73,16 @@ export function GetComment(value: ObjectPredicate): {comment: string} | null {
  */
 export function GetSubClassOf(
   value: ObjectPredicate
-): {subClassOf: TSubject} | null {
+): {subClassOf: TTypeName} | null {
   if (IsRdfSchema(value.Predicate) && value.Predicate.name === 'subClassOf') {
     if (value.Object.type === 'SchemaString' || value.Object.type === 'Rdfs') {
       throw new Error(
         `Unexpected object for predicate 'subClassOf': ${value.Object}.`
+      );
+    }
+    if (!IsNamedUrl(value.Object)) {
+      throw new Error(
+        `Unexpected "unnamed" URL used as a super-class: ${value.Object}`
       );
     }
     return {subClassOf: value.Object};
@@ -78,8 +90,18 @@ export function GetSubClassOf(
   return null;
 }
 
+/** Return true iff this object is a subclass of some other entity. */
+export function IsSubclass(topic: TypedTopic) {
+  return topic.values.some(op => GetSubClassOf(op) !== null);
+}
+
+/** Returns true iff a UrlNode has a "name" it can be addressed with. */
+export function IsNamedUrl(t: UrlNode): t is NamedUrlNode {
+  return t.name !== undefined;
+}
+
 /** Returns true iff a node corresponds to http://schema.org/DataType */
-export function IsDataType(t: TTypeName): boolean {
+export function IsDataType(t: TSubject): boolean {
   return IsSchemaObject(t) && t.name === 'DataType';
 }
 
@@ -89,8 +111,17 @@ export function ClassIsDataType(topic: TypedTopic): boolean {
   return false;
 }
 
-/** Returns true iff a Topic represents a named class. */
-export function IsNamedClass(topic: TypedTopic): boolean {
+/**
+ * Returns true iff a Topic represents a named class.
+ *
+ * Note that some schemas define subclasses without explicitly redefining them
+ * as classes. So just because a topic isn't directly named as a class doesn't
+ * mean that it isn't a named class.
+ *
+ * A named class is such if it *OR ANY OF ITS PARENTS* are directly named
+ * classes.
+ */
+export function IsDirectlyNamedClass(topic: TypedTopic): boolean {
   // Skip anything that isn't a class.
   return topic.types.some(IsClassType);
 }
@@ -99,13 +130,19 @@ export function IsNamedClass(topic: TypedTopic): boolean {
  * Returns true iff a Predicate corresponds to http://schema.org/domainIncludes
  */
 export function IsDomainIncludes(value: TPredicate): boolean {
-  return IsSchemaObject(value) && value.name === 'domainIncludes';
+  return (
+    (IsSchemaObject(value) && value.name === 'domainIncludes') ||
+    (IsRdfSchema(value) && value.name === 'domain')
+  );
 }
 /**
  * Returns true iff a Predicate corresponds to http://schema.org/rangeIncludes
  */
 export function IsRangeIncludes(value: TPredicate): boolean {
-  return IsSchemaObject(value) && value.name === 'rangeIncludes';
+  return (
+    (IsSchemaObject(value) && value.name === 'rangeIncludes') ||
+    (IsRdfSchema(value) && value.name === 'range')
+  );
 }
 /**
  * Returns true iff a Predicate corresponds to http://schema.org/supersededBy.
@@ -150,19 +187,9 @@ export function GetTypes(
 ): readonly TTypeName[] {
   const types = values.map(GetType).filter((t): t is TTypeName => !!t);
 
-  if (types.length === 0) {
-    throw new Error(
-      `No type found for Subject ${key.toString()}. Triples include:\n${values
-        .map(
-          v =>
-            `${v.Predicate.toString()}: ${JSON.stringify(
-              v.Predicate
-            )}\n\t=> ${v.Object.toString()}`
-        )
-        .join('\n')}`
-    );
-  }
-
+  // Allow empty types. Some custom schema assume "transitive" typing, e.g.
+  // gs1 has a TypeCode class which is an rdfs:Class, but its subclasses are
+  // not explicitly described as an rdfs:Class.
   return types;
 }
 
@@ -170,7 +197,7 @@ export function GetTypes(
  * Returns true iff a Type corresponds to
  * http://www.w3.org/2000/01/rdf-schema#Class
  */
-export function IsClassType(type: TTypeName): boolean {
+export function IsClassType(type: UrlNode): boolean {
   return IsRdfSchema(type) && type.name === 'Class';
 }
 
@@ -192,6 +219,25 @@ export function HasEnumType(types: readonly TTypeName[]): boolean {
   for (const type of types) {
     // Skip well-known types.
     if (IsClassType(type) || IsPropertyType(type) || IsDataType(type)) continue;
+
+    // Skip OWL "meta" types:
+    if (IsOWL(type)) {
+      if (
+        [
+          'Ontology',
+          'Class',
+          'DatatypeProperty',
+          'ObjectProperty',
+          'FunctionalProperty',
+          'InverseFunctionalProperty',
+          'AnnotationProperty',
+          'SymmetricProperty',
+          'TransitiveProperty',
+        ].includes(type.name)
+      ) {
+        continue;
+      }
+    }
 
     // If we're here, this is a 'Type' that is not well known.
     return true;

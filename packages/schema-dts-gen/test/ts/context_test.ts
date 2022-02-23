@@ -143,6 +143,13 @@ describe('Context.getScopedName', () => {
     expect(ctx.getScopedName(UrlNode.Parse('https://foo.org/Door'))).toBe(
       'https://foo.org/Door'
     );
+
+    expect(ctx.getScopedName(UrlNode.Parse('https://schema.org/'))).toBe(
+      'https://schema.org/'
+    );
+    expect(ctx.getScopedName(UrlNode.Parse('https://schema.org'))).toBe(
+      'https://schema.org/'
+    );
   });
 
   it('with single domain URL (http)', () => {
@@ -184,6 +191,12 @@ describe('Context.getScopedName', () => {
     ).toBe('rdfs:subClassOf');
     expect(ctx.getScopedName(UrlNode.Parse('http://foo.org/Door'))).toBe(
       'http://foo.org/Door'
+    );
+    expect(ctx.getScopedName(UrlNode.Parse('http://schema.org/'))).toBe(
+      'schema:'
+    );
+    expect(ctx.getScopedName(UrlNode.Parse('http://schema.org'))).toBe(
+      'schema:'
     );
   });
 });

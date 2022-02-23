@@ -54,7 +54,7 @@ describe('load', () => {
     get.mockReturnValueOnce(firstReturn);
     firstReturn.destroy(new Error('Bad!!!'));
 
-    await expect(triples$.toPromise()).rejects.toThrow('Bad!!!');
+    await expect(firstValueFrom(triples$)).rejects.toThrow('Bad!!!');
 
     expect(get).toBeCalledTimes(1);
   });
@@ -174,7 +174,7 @@ describe('load', () => {
       ]);
     });
 
-    it('Multiple (throws from bad URL: Subject)', async () => {
+    it('Multiple (works with unnamed URL: subject)', async () => {
       const control = fakeResponse(200, 'Ok');
       control.data(
         `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`
@@ -184,12 +184,49 @@ describe('load', () => {
       );
       control.end();
 
-      await expect(triples).rejects.toThrow(
-        'ParseError: Error: Unexpected URL'
-      );
+      await expect(triples).resolves.toEqual([
+        {
+          Subject: UrlNode.Parse('https://schema.org/Person'),
+          Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
+          Object: SchemaString.Parse('"math"')!,
+        },
+        {
+          Subject: UrlNode.Parse('http://schema.org/'),
+          Predicate: UrlNode.Parse(
+            'http://www.w3.org/2000/01/rdf-schema#comment'
+          ),
+          Object: SchemaString.Parse('"A test comment."')!,
+        },
+      ]);
     });
 
-    it('Multiple (throws from bad URL: Predicate)', async () => {
+    it('Multiple (works with search URL)', async () => {
+      const control = fakeResponse(200, 'Ok');
+      control.data(
+        `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`
+      );
+      control.data(
+        `<https://schema.org/X?A=B> <http://www.w3.org/2000/01/rdf-schema#comment> "A test comment." .\n`
+      );
+      control.end();
+
+      await expect(triples).resolves.toEqual([
+        {
+          Subject: UrlNode.Parse('https://schema.org/Person'),
+          Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
+          Object: SchemaString.Parse('"math"')!,
+        },
+        {
+          Subject: UrlNode.Parse('https://schema.org/X?A=B'),
+          Predicate: UrlNode.Parse(
+            'http://www.w3.org/2000/01/rdf-schema#comment'
+          ),
+          Object: SchemaString.Parse('"A test comment."')!,
+        },
+      ]);
+    });
+
+    it('Multiple (works with unnamed URL: predicate)', async () => {
       const control = fakeResponse(200, 'Ok');
       control.data(
         `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`
@@ -199,24 +236,18 @@ describe('load', () => {
       );
       control.end();
 
-      await expect(triples).rejects.toThrow(
-        'ParseError: Error: Unexpected URL'
-      );
-    });
-
-    it('Multiple (throws from bad URL: Object)', async () => {
-      const control = fakeResponse(200, 'Ok');
-      control.data(
-        `<https://schema.org/Person> <https://schema.org/knowsAbout> <https://schema.org/> .\n`
-      );
-      control.data(
-        `<http://schema.org/A> <http://www.w3.org/2000/01/rdf-schema#comment> "A test comment." .\n`
-      );
-      control.end();
-
-      await expect(triples).rejects.toThrow(
-        'ParseError: Error: Unexpected URL'
-      );
+      await expect(triples).resolves.toEqual([
+        {
+          Subject: UrlNode.Parse('https://schema.org/Person'),
+          Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
+          Object: SchemaString.Parse('"math"')!,
+        },
+        {
+          Subject: UrlNode.Parse('http://schema.org/A'),
+          Predicate: UrlNode.Parse('https://schema.org'),
+          Object: SchemaString.Parse('"A test comment."')!,
+        },
+      ]);
     });
 
     it('Multiple (dirty broken)', async () => {

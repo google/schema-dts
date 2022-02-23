@@ -18,11 +18,12 @@ import type {TypeNode} from 'typescript';
 const {factory} = ts;
 
 import {Log} from '../logging/index.js';
-import {ObjectPredicate, TSubject, TTypeName} from '../triples/triple.js';
+import {ObjectPredicate, TSubject} from '../triples/triple.js';
 import {GetComment, IsClassType, IsDataType} from '../triples/wellKnown.js';
 
 import {ClassMap} from './class.js';
 import {Context} from './context.js';
+import {UrlNode} from '../index.js';
 
 /**
  * Corresponds to a value that belongs to an Enumeration.
@@ -33,7 +34,7 @@ export class EnumValue {
   private comment?: string;
   constructor(
     readonly value: TSubject,
-    types: readonly TTypeName[],
+    types: readonly UrlNode[],
     map: ClassMap
   ) {
     for (const type of types) {

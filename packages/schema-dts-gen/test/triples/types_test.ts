@@ -47,35 +47,15 @@ describe('UrlNode', () => {
     expect(node.context.path).toEqual(['']);
   });
 
-  it('rejects search strings', () => {
-    expect(() =>
-      UrlNode.Parse('http://schema.org/Person?q=true&a')
-    ).toThrowError('Search string');
-
-    expect(() => UrlNode.Parse('http://schema.org/Person?q&a')).toThrowError(
-      'Search string'
-    );
-
-    expect(() => UrlNode.Parse('http://schema.org/Person?q')).toThrowError(
-      'Search string'
-    );
-
-    expect(() =>
-      UrlNode.Parse('http://schema.org/abc?q#foo')
-    ).not.toThrowError();
-    expect(() => UrlNode.Parse('http://schema.org/abc#?q')).not.toThrowError();
+  it('treats search strings as unnamed', () => {
+    const node = UrlNode.Parse('http://schema.org/Person?q=true&a');
+    expect(node.name).toBeUndefined();
+    expect(node.context.href).toBe('http://schema.org/Person?q=true&a');
   });
 
-  it('top-level domain', () => {
-    expect(() => UrlNode.Parse('http://schema.org/')).toThrowError(
-      "no room for 'name'"
-    );
-
-    expect(() => UrlNode.Parse('http://schema.org')).toThrowError(
-      "no room for 'name'"
-    );
-
-    expect(() => UrlNode.Parse('http://schema.org/#foo')).not.toThrowError();
+  it('treats top-level domain as unnamed', () => {
+    expect(UrlNode.Parse('http://schema.org/').name).toBeUndefined();
+    expect(UrlNode.Parse('http://schema.org').name).toBeUndefined();
   });
 
   describe('matches context', () => {

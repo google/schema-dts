@@ -24,8 +24,7 @@ export interface ReadonlyUrl {
   readonly path: readonly string[];
   readonly search: string;
 }
-function fromString(urlString: string): ReadonlyUrl {
-  const url = new URL(urlString);
+function fromUrl(url: URL): ReadonlyUrl {
   return {
     href: url.href,
     protocol: url.protocol,
@@ -33,6 +32,9 @@ function fromString(urlString: string): ReadonlyUrl {
     path: url.pathname.slice(1).split('/'),
     search: url.search,
   };
+}
+function fromString(urlString: string): ReadonlyUrl {
+  return fromUrl(new URL(urlString));
 }
 function pathEqual(first: readonly string[], second: readonly string[]) {
   if (first.length !== second.length) return false;
@@ -50,7 +52,7 @@ function pathEqual(first: readonly string[], second: readonly string[]) {
 export class UrlNode {
   readonly type = 'UrlNode';
   constructor(
-    readonly name: string,
+    readonly name: string | undefined,
     readonly context: ReadonlyUrl,
     readonly href: string
   ) {}
@@ -101,21 +103,25 @@ export class UrlNode {
     }
 
     if (url.search) {
-      throw new Error(
-        `Can't handle Search string in ${url.search} in ${url.href}`
+      // A URL with no hash but some "?..." search params
+      // should be treated the same as an unnamed URL.
+      return new UrlNode(
+        /*name=*/ undefined,
+        /*context=*/ fromUrl(url),
+        /*href=*/ url.href
       );
     }
 
     const split = url.pathname.split('/');
-    const name = split.pop();
-    if (!name) {
-      throw new Error(`Unexpected URL ${url.href} with no room for 'name'.`);
-    }
+    let name = split.pop();
+    if (name === '') name = undefined;
+
     const context = url.origin + split.join('/');
 
     return new UrlNode(name, fromString(context), url.href);
   }
 }
+export type NamedUrlNode = UrlNode & {name: string};
 
 /**
  * In-memory representation of a node in a Triple corresponding to a string

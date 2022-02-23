@@ -57,7 +57,15 @@ export class Context {
   getScopedName(node: TSubject): string {
     for (const [name, url] of this.context) {
       if (node.matchesContext(url)) {
-        return name === '' ? node.name : `${name}:${node.name}`;
+        // Valid possibilities:
+        // - "schema:Foo"  when name == schema && node.name == Foo.
+        // - "schema:"     when name == schema && node.name is undefined.
+        // - "Foo"         when name is empty and node.name is Foo.
+        //
+        // Don't allow "" when name is empty and  node.name is undefined.
+        return name === ''
+          ? node.name ?? node.toString()
+          : `${name}:${node.name || ''}`;
       }
     }
     return node.toString();
