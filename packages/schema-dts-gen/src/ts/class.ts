@@ -24,16 +24,14 @@ import type {
 const {factory, ModifierFlags, SyntaxKind} = ts;
 
 import {Log} from '../logging/index.js';
-import {TObject, TPredicate, TSubject} from '../triples/triple.js';
+import {TObject, TPredicate, TSubject, TTypeName} from '../triples/triple.js';
 import {UrlNode} from '../triples/types.js';
 import {
   GetComment,
   GetSubClassOf,
   IsSupersededBy,
   IsClassType,
-  IsDataType,
-  IsType,
-  IsTypeName,
+  IsNamedUrl,
 } from '../triples/wellKnown.js';
 
 import {Context} from './context.js';
@@ -42,7 +40,7 @@ import {Property, TypeProperty} from './property.js';
 import {arrayOf} from './util/arrayof.js';
 import {appendLine, withComments} from './util/comments.js';
 import {toClassName} from './util/names.js';
-import {assert} from '../util/assert.js';
+import {assert, asserted} from '../util/assert.js';
 import {IdReferenceName} from './helper_types.js';
 import {typeUnion} from './util/union.js';
 
@@ -64,6 +62,7 @@ export class Class {
   private _comment?: string;
   private _typedefs: TypeNode[] = [];
   private _isDataType = false;
+  private _explicitlyMarkedAsClass = false;
   private readonly children: Class[] = [];
   private readonly _parents: Class[] = [];
   private readonly _props: Set<Property> = new Set();
@@ -153,7 +152,7 @@ export class Class {
     return toClassName(this.subject);
   }
 
-  constructor(readonly subject: TSubject) {}
+  constructor(readonly subject: TTypeName) {}
   add(
     value: {Predicate: TPredicate; Object: TObject},
     classMap: ClassMap
@@ -206,6 +205,25 @@ export class Class {
 
   addTypedef(typedef: TypeNode) {
     this._typedefs.push(typedef);
+  }
+  markAsExplicitClass() {
+    this._explicitlyMarkedAsClass = true;
+  }
+  private isMarkedAsClass(visited: WeakSet<Class>): boolean {
+    if (visited.has(this)) return false;
+    visited.add(this);
+
+    return (
+      this._explicitlyMarkedAsClass ||
+      this._parents.some(p => p.isMarkedAsClass(visited))
+    );
+  }
+  validateClass(): void {
+    if (!this.isMarkedAsClass(new WeakSet())) {
+      throw new Error(
+        `Class ${this.className()} is not marked as an rdfs:Class, and neither are any of its parents.`
+      );
+    }
   }
 
   addProp(p: Property) {
@@ -385,7 +403,12 @@ export class Class {
 /**
  * Represents a DataType.
  */
-export class Builtin extends Class {}
+export class Builtin extends Class {
+  constructor(subject: TTypeName) {
+    super(subject);
+    this.markAsExplicitClass();
+  }
+}
 
 /**
  * A "Native" Schema.org object that is best represented
@@ -393,7 +416,7 @@ export class Builtin extends Class {}
  */
 export class AliasBuiltin extends Builtin {
   constructor(url: string, ...equivTo: TypeNode[]) {
-    super(UrlNode.Parse(url));
+    super(asserted(UrlNode.Parse(url), IsNamedUrl));
     for (const t of equivTo) this.addTypedef(t);
   }
 
@@ -510,7 +533,7 @@ export class RoleBuiltin extends Builtin {
 
 export class DataTypeUnion extends Builtin {
   constructor(url: string, readonly wk: Builtin[]) {
-    super(UrlNode.Parse(url));
+    super(asserted(UrlNode.Parse(url), IsNamedUrl));
   }
 
   toNode(): DeclarationStatement[] {
@@ -565,7 +588,7 @@ export function Sort(a: Class, b: Class): number {
 }
 
 function CompareKeys(a: TSubject, b: TSubject): number {
-  const byName = a.name.localeCompare(b.name);
+  const byName = (a.name || '').localeCompare(b.name || '');
   if (byName !== 0) return byName;
 
   return a.href.localeCompare(b.href);

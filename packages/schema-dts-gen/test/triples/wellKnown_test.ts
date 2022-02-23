@@ -13,13 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {Rdfs, SchemaString, UrlNode} from '../../src/triples/types.js';
+import {
+  NamedUrlNode,
+  Rdfs,
+  SchemaString,
+  UrlNode,
+} from '../../src/triples/types.js';
 import {
   GetComment,
   GetSubClassOf,
   GetType,
   GetTypes,
-  IsNamedClass,
+  IsDirectlyNamedClass,
 } from '../../src/triples/wellKnown.js';
 
 describe('wellKnown', () => {
@@ -122,6 +127,26 @@ describe('wellKnown', () => {
           Object: new Rdfs('foo'),
         })
       ).toThrowError('Unexpected object for predicate');
+    });
+
+    it('only supports named UrlNodes as parents', () => {
+      expect(() =>
+        GetSubClassOf({
+          Predicate: UrlNode.Parse(
+            'http://www.w3.org/2000/01/rdf-schema#subClassOf'
+          ),
+          Object: UrlNode.Parse('https://schema.org/'),
+        })
+      ).toThrowError('Unexpected "unnamed" URL used as a super-class');
+
+      expect(() =>
+        GetSubClassOf({
+          Predicate: UrlNode.Parse(
+            'http://www.w3.org/2000/01/rdf-schema#subClassOf'
+          ),
+          Object: UrlNode.Parse('https://schema.org'),
+        })
+      ).toThrowError('Unexpected "unnamed" URL used as a super-class');
     });
   });
 
@@ -234,39 +259,20 @@ describe('wellKnown', () => {
         UrlNode.Parse('http://schema.org/Thing'),
       ]);
     });
-
-    it('Throws if none', () => {
-      expect(() =>
-        GetTypes(UrlNode.Parse('https://schema.org/Widget'), [])
-      ).toThrowError('No type found');
-
-      expect(() =>
-        GetTypes(UrlNode.Parse('https://schema.org/Widget'), [
-          {
-            Predicate: UrlNode.Parse(
-              'http://www.w3.org/1999/02/22-rdf-syntax-ns#property'
-            ),
-            Object: UrlNode.Parse('http://www.w3.org/2000/01/rdf-schema#Class'),
-          },
-          {
-            Predicate: UrlNode.Parse(
-              'http://www.w3.org/2000/01/rdf-schema#label'
-            ),
-            Object: new SchemaString('Thing', undefined),
-          },
-        ])
-      ).toThrowError('No type found');
-    });
   });
 
-  describe('IsNamedClass', () => {
-    const cls = UrlNode.Parse('http://www.w3.org/2000/01/rdf-schema#Class');
-    const dataType = UrlNode.Parse('http://schema.org/DataType');
-    const bool = UrlNode.Parse('http://schema.org/Boolean');
+  describe('IsDirectlyNamedClass', () => {
+    const cls = UrlNode.Parse(
+      'http://www.w3.org/2000/01/rdf-schema#Class'
+    ) as NamedUrlNode;
+    const dataType = UrlNode.Parse(
+      'http://schema.org/DataType'
+    ) as NamedUrlNode;
+    const bool = UrlNode.Parse('http://schema.org/Boolean') as NamedUrlNode;
 
     it('a data type is a named class', () => {
       expect(
-        IsNamedClass({
+        IsDirectlyNamedClass({
           Subject: UrlNode.Parse('https://schema.org/Text'),
           types: [cls, dataType],
           values: [],
@@ -274,7 +280,7 @@ describe('wellKnown', () => {
       ).toBe(true);
 
       expect(
-        IsNamedClass({
+        IsDirectlyNamedClass({
           Subject: UrlNode.Parse('https://schema.org/Text'),
           types: [dataType, cls],
           values: [],
@@ -284,7 +290,7 @@ describe('wellKnown', () => {
 
     it('an only-enum is not a class', () => {
       expect(
-        IsNamedClass({
+        IsDirectlyNamedClass({
           Subject: UrlNode.Parse('https://schema.org/True'),
           types: [bool],
           values: [],
@@ -294,7 +300,7 @@ describe('wellKnown', () => {
 
     it('an enum can still be a class', () => {
       expect(
-        IsNamedClass({
+        IsDirectlyNamedClass({
           Subject: UrlNode.Parse('https://schema.org/ItsComplicated'),
           types: [bool, cls],
           values: [],
@@ -304,7 +310,7 @@ describe('wellKnown', () => {
 
     it('the DataType union is a class', () => {
       expect(
-        IsNamedClass({
+        IsDirectlyNamedClass({
           Subject: UrlNode.Parse('https://schema.org/DataType'),
           types: [cls],
           values: [

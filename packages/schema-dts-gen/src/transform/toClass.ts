@@ -18,9 +18,11 @@ import {Log} from '../logging/index.js';
 import {ObjectPredicate, Topic, TypedTopic} from '../triples/triple.js';
 import {UrlNode} from '../triples/types.js';
 import {
-  IsNamedClass,
+  IsDirectlyNamedClass,
   IsDataType,
   ClassIsDataType,
+  IsNamedUrl,
+  IsSubclass,
 } from '../triples/wellKnown.js';
 import {
   AliasBuiltin,
@@ -29,7 +31,7 @@ import {
   DataTypeUnion,
   RoleBuiltin,
 } from '../ts/class.js';
-import {assert} from '../util/assert.js';
+import {assert, asserted, assertIs} from '../util/assert.js';
 
 function toClass(cls: Class, topic: Topic, map: ClassMap): Class {
   const rest: ObjectPredicate[] = [];
@@ -61,11 +63,21 @@ const wellKnownTypes = [
   new AliasBuiltin('http://schema.org/Date', AliasBuiltin.Alias('string')),
   new AliasBuiltin('http://schema.org/DateTime', AliasBuiltin.Alias('string')),
   new AliasBuiltin('http://schema.org/Boolean', AliasBuiltin.Alias('boolean')),
-  new RoleBuiltin(UrlNode.Parse('http://schema.org/Role')),
-  new RoleBuiltin(UrlNode.Parse('http://schema.org/OrganizationRole')),
-  new RoleBuiltin(UrlNode.Parse('http://schema.org/EmployeeRole')),
-  new RoleBuiltin(UrlNode.Parse('http://schema.org/LinkRole')),
-  new RoleBuiltin(UrlNode.Parse('http://schema.org/PerformanceRole')),
+  new RoleBuiltin(
+    asserted(UrlNode.Parse('http://schema.org/Role'), IsNamedUrl)
+  ),
+  new RoleBuiltin(
+    asserted(UrlNode.Parse('http://schema.org/OrganizationRole'), IsNamedUrl)
+  ),
+  new RoleBuiltin(
+    asserted(UrlNode.Parse('http://schema.org/EmployeeRole'), IsNamedUrl)
+  ),
+  new RoleBuiltin(
+    asserted(UrlNode.Parse('http://schema.org/LinkRole'), IsNamedUrl)
+  ),
+  new RoleBuiltin(
+    asserted(UrlNode.Parse('http://schema.org/PerformanceRole'), IsNamedUrl)
+  ),
 ];
 
 // Should we allow 'string' to be a valid type for all values of this type?
@@ -90,7 +102,13 @@ function ForwardDeclareClasses(topics: readonly TypedTopic[]): ClassMap {
     if (IsDataType(topic.Subject)) {
       classes.set(topic.Subject.toString(), dataType);
       continue;
-    } else if (!IsNamedClass(topic)) continue;
+    } else if (!IsDirectlyNamedClass(topic) && !IsSubclass(topic)) continue;
+
+    if (!IsNamedUrl(topic.Subject)) {
+      throw new Error(
+        `Unexpected unnamed URL ${topic.Subject.toString()} as a class.`
+      );
+    }
 
     const wk = wellKnownTypes.find(wk => wk.subject.equivTo(topic.Subject));
     if (ClassIsDataType(topic)) {
@@ -108,6 +126,7 @@ function ForwardDeclareClasses(topics: readonly TypedTopic[]): ClassMap {
       wks.equivTo(topic.Subject)
     );
     if (allowString) cls.addTypedef(AliasBuiltin.Alias('string'));
+    if (IsDirectlyNamedClass(topic)) cls.markAsExplicitClass();
 
     classes.set(topic.Subject.toString(), cls);
   }
@@ -117,11 +136,15 @@ function ForwardDeclareClasses(topics: readonly TypedTopic[]): ClassMap {
 
 function BuildClasses(topics: readonly TypedTopic[], classes: ClassMap) {
   for (const topic of topics) {
-    if (!IsNamedClass(topic)) continue;
+    if (!IsDirectlyNamedClass(topic) && !IsSubclass(topic)) continue;
 
     const cls = classes.get(topic.Subject.toString());
     assert(cls);
     toClass(cls, topic, classes);
+  }
+
+  for (const cls of classes.values()) {
+    cls.validateClass();
   }
 }
 

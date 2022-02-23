@@ -53,7 +53,7 @@ function object(content: string) {
 }
 
 const totalRegex =
-  /\s*<([^<>]+)>\s*<([^<>]+)>\s*((?:<[^<>"]+>)|(?:"(?:[^"]|(?:\\"))+(?:[^\"]|\\")"(?:@[a-zA-Z]+)?))\s*\./;
+  /\s*<([^<>]+)>\s*<([^<>]+)>\s*((?:<[^<>"]+>)|(?:"(?:[^"]|(?:\\"))*(?:[^\"]|\\")"(?:@[a-zA-Z]+)?))\s*\./;
 export function toTripleStrings(data: string[]) {
   const linearTriples = data
     .join('')
@@ -215,7 +215,9 @@ export function* process(triples: string[][]): Iterable<Triple> {
     } catch (parseError) {
       const e = parseError as Error;
       throw new Error(
-        `ParseError: ${e.name}: ${e.message} while parsing line ${match}.\nOriginal Stack:\n${e.stack}\nRethrown from:`
+        `ParseError: ${e.name}: ${e.message} while parsing line ${match
+          .map(t => `\{${t}\}`)
+          .join(', ')}.\nOriginal Stack:\n${e.stack}\nRethrown from:`
       );
     }
   }

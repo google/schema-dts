@@ -1,4 +1,5 @@
 node_modules/
-dist
 coverage
 jest.config.js
+schema-dts/lib/
+schema-dts/dist/

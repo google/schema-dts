@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {Rdfs, SchemaString, UrlNode} from './types.js';
+import {NamedUrlNode, Rdfs, SchemaString, UrlNode} from './types.js';
 
 /** Represents a parsed Subject-Predicate-Object statement. */
 export interface Triple {
@@ -41,7 +41,7 @@ export interface ObjectPredicate {
  * A Node that can correspond to a "concept" in the ontology (class, property,
  * etc.).
  */
-export type TTypeName = UrlNode;
+export type TTypeName = NamedUrlNode;
 
 /** A set of statements applying to the same Subject. */
 export interface Topic {

@@ -16,7 +16,7 @@
 
 import ts from 'typescript';
 
-import {SchemaString, UrlNode} from '../../src/triples/types.js';
+import {NamedUrlNode, SchemaString, UrlNode} from '../../src/triples/types.js';
 import {
   AliasBuiltin,
   Class,
@@ -25,7 +25,7 @@ import {
   Builtin,
 } from '../../src/ts/class.js';
 import {Context} from '../../src/ts/context.js';
-import {makeClass, makeClassMap} from '../helpers/make_class.js';
+import {makeClass, makeClassMap, makeProperty} from '../helpers/make_class.js';
 
 describe('Class', () => {
   let cls: Class;
@@ -235,6 +235,36 @@ describe('Class', () => {
       ).toThrowError('unknown node type');
     });
   });
+
+  describe('property sorting', () => {
+    const ctx = new Context();
+    ctx.addNamedContext('schema', 'https://schema.org/');
+
+    it('alphabetic, respecting empty', () => {
+      const cls = makeClass('https://schema.org/A');
+      cls.addProp(makeProperty('https://schema.org/a'));
+      cls.addProp(makeProperty('https://schema.org/b'));
+      cls.addProp(makeProperty('https://schema.org/'));
+      cls.addProp(makeProperty('https://schema.org/c'));
+      cls.addProp(makeProperty('https://abc.com/e'));
+      cls.addProp(makeProperty('https://abc.com'));
+
+      expect(asString(cls, ctx)).toMatchInlineSnapshot(`
+"interface ABase extends Partial<IdReference> {
+    \\"https://abc.com/\\"?: SchemaValue<never>;
+    \\"schema:\\"?: SchemaValue<never>;
+    \\"schema:a\\"?: SchemaValue<never>;
+    \\"schema:b\\"?: SchemaValue<never>;
+    \\"schema:c\\"?: SchemaValue<never>;
+    \\"https://abc.com/e\\"?: SchemaValue<never>;
+}
+interface ALeaf extends ABase {
+    \\"@type\\": \\"schema:A\\";
+}
+export type A = ALeaf;"
+`);
+    });
+  });
 });
 
 describe('Sort(Class, Class)', () => {
@@ -362,7 +392,7 @@ describe('Sort(Class, Class)', () => {
       // Can be same as less specific builtins.
       expect(
         Sort(
-          new Builtin(UrlNode.Parse('https://schema.org/Boo')),
+          new Builtin(UrlNode.Parse('https://schema.org/Boo') as NamedUrlNode),
           new AliasBuiltin('https://schema.org/Boo', AliasBuiltin.Alias('Text'))
         )
       ).toBe(0);
