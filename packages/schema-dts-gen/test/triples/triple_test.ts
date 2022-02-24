@@ -15,46 +15,27 @@
  */
 
 import {Format, ObjectPredicate, Triple} from '../../src/triples/triple.js';
-import {Rdfs, SchemaString, UrlNode} from '../../src/triples/types.js';
+import {SchemaString, UrlNode} from '../../src/triples/types.js';
 
 describe('Format(Triple)', () => {
-  it('smoke test 1', () => {
+  it('smoke test', () => {
     const triple: Triple = {
       Subject: UrlNode.Parse('https://schema.org/Person'),
       Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-      Object: SchemaString.Parse('"food"')!,
+      Object: new SchemaString('food'),
     };
 
     expect(Format(triple)).toBe('(Person, knowsAbout, "food")');
   });
-
-  it('smoke test 2', () => {
-    const triple: Triple = {
-      Subject: UrlNode.Parse('https://schema.org/Organization'),
-      Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-      Object: Rdfs.Parse('rdfs:Class')!,
-    };
-
-    expect(Format(triple)).toBe('(Organization, knowsAbout, rdfs:Class)');
-  });
 });
 
 describe('Format(ObjectPredicate)', () => {
-  it('smoke test 1', () => {
+  it('smoke test', () => {
     const triple: ObjectPredicate = {
       Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-      Object: SchemaString.Parse('"food"')!,
+      Object: new SchemaString('food'),
     };
 
     expect(Format(triple)).toBe('(knowsAbout, "food")');
-  });
-
-  it('smoke test 2', () => {
-    const triple: ObjectPredicate = {
-      Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-      Object: Rdfs.Parse('rdfs:Class')!,
-    };
-
-    expect(Format(triple)).toBe('(knowsAbout, rdfs:Class)');
   });
 });

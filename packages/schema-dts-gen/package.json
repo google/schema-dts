@@ -25,19 +25,21 @@
     "@types/array.prototype.flatmap": "^1.2.2",
     "@types/diff": "^5.0.2",
     "@types/jest": "^27.4.1",
+    "@types/n3": "^1.10.4",
     "@types/node": "^17.0.21",
     "@types/unist": "^2.0.6",
     "cross-env": "^7.0.3"
   },
   "dependencies": {
     "argparse": "^2.0.1",
-    "rxjs": "^7.5.4",
+    "n3": "^1.13.0",
     "rehype-minify-whitespace": "^5.0.0",
     "rehype-parse": "^8.0.4",
     "rehype-raw": "^6.1.1",
     "remark-parse": "^10.0.1",
     "remark-rehype": "^10.1.0",
     "remark-wiki-link": "^1.0.4",
+    "rxjs": "^7.5.4",
     "unified": "^10.1.1"
   },
   "engines": {

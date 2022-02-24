@@ -75,7 +75,7 @@ export function GetSubClassOf(
   value: ObjectPredicate
 ): {subClassOf: TTypeName} | null {
   if (IsRdfSchema(value.Predicate) && value.Predicate.name === 'subClassOf') {
-    if (value.Object.type === 'SchemaString' || value.Object.type === 'Rdfs') {
+    if (value.Object.type === 'SchemaString') {
       throw new Error(
         `Unexpected object for predicate 'subClassOf': ${value.Object}.`
       );

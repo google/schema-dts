@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {Rdfs, SchemaString, UrlNode} from '../../src/triples/types.js';
+import {UrlNode} from '../../src/triples/types.js';
 
 describe('UrlNode', () => {
   it('parses rdf-syntax', () => {
@@ -168,49 +168,5 @@ describe('UrlNode', () => {
         )
       ).toBe(false);
     });
-  });
-});
-
-describe('SchemaString', () => {
-  it('parses regular strings', () => {
-    const node = SchemaString.Parse('"foo"');
-    expect(node).not.toBeUndefined();
-    expect(node!.language).toBeUndefined();
-    expect(node!.value).toBe('foo');
-  });
-
-  it('parses regular strings with escaped quotes', () => {
-    const node = SchemaString.Parse('"fo\\"o\\""');
-    expect(node).not.toBeUndefined();
-    expect(node!.language).toBeUndefined();
-    expect(node!.value).toBe('fo"o"');
-  });
-
-  it('parses strings with language', () => {
-    const node = SchemaString.Parse('"bar"@en');
-    expect(node).not.toBeUndefined();
-    expect(node!.language).toBe('en');
-    expect(node!.value).toBe('bar');
-  });
-
-  it('returns null when parsing invalid strings', () => {
-    expect(SchemaString.Parse('"foo')).toBeNull();
-    expect(SchemaString.Parse('foo"')).toBeNull();
-    expect(SchemaString.Parse('foo"@en')).toBeNull();
-    expect(SchemaString.Parse('"foo"@')).toBeNull();
-    expect(SchemaString.Parse('"fo"o"')).toBeNull();
-    expect(SchemaString.Parse('"fo"o"@en')).toBeNull();
-  });
-});
-
-describe('Rdfs', () => {
-  it('parses valid nodes', () => {
-    expect(Rdfs.Parse('rdfs:foo')).not.toBeUndefined();
-    expect(Rdfs.Parse('rdfs:bar')!.label).toBe('bar');
-  });
-
-  it('returns null when attempting to parse invalid nodes', () => {
-    expect(Rdfs.Parse('rdfs:')).toBeNull();
-    expect(Rdfs.Parse('rdf:foo')).toBeNull();
   });
 });

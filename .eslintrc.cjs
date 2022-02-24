@@ -105,7 +105,6 @@ module.exports = {
     '@typescript-eslint/semi': ['error', 'always'],
     '@typescript-eslint/triple-slash-reference': 'error',
     'arrow-body-style': 'error',
-    camelcase: 'error',
     curly: ['error', 'multi-line'],
     'default-case': 'error',
     eqeqeq: ['error', 'smart'],

@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {NamedUrlNode, Rdfs, SchemaString, UrlNode} from './types.js';
+import {NamedUrlNode, SchemaString, UrlNode} from './types.js';
 
 /** Represents a parsed Subject-Predicate-Object statement. */
 export interface Triple {
   readonly Subject: UrlNode;
   readonly Predicate: UrlNode;
-  readonly Object: UrlNode | SchemaString | Rdfs;
+  readonly Object: UrlNode | SchemaString;
 }
 
 export type TSubject = Triple['Subject'];
