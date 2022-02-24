@@ -29,7 +29,7 @@ test(`invalidSyntax_${basename(import.meta.url)}`, async () => {
     ['--ontology', `https://fake.com/${basename(import.meta.url)}.nt`]
   );
 
-  await expect(run).rejects.toThrowError('ParseError');
+  await expect(run).rejects.toThrowError('Unexpected');
 });
 
 test(`unnamedURLClass_${basename(import.meta.url)}`, async () => {

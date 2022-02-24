@@ -30,7 +30,7 @@ import {
 
 import type {Class, ClassMap} from './class.js';
 import {Context} from './context.js';
-import {appendLine, withComments} from './util/comments.js';
+import {appendParagraph, withComments} from './util/comments.js';
 import {IdReferenceName, SchemaValueReference} from './helper_types.js';
 import {typeUnion} from './util/union.js';
 
@@ -50,7 +50,7 @@ export class PropertyType {
       .map(o => o.toString())
       .join(' or ')} instead.`;
 
-    return appendLine(this._comment, deprecated);
+    return appendParagraph(this._comment, deprecated);
   }
 
   get deprecated() {

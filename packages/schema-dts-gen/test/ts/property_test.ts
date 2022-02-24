@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Rdfs, SchemaString, UrlNode} from '../../src/triples/types.js';
+import {SchemaString, UrlNode} from '../../src/triples/types.js';
 import {PropertyType} from '../../src/ts/property.js';
 import {makeClass, makeClassMap} from '../helpers/make_class.js';
 
@@ -40,15 +40,8 @@ describe('PropertyType', () => {
           prop.add(
             {
               Predicate: rangeIncludes(),
-              Object: new SchemaString('foo', 'en'),
+              Object: new SchemaString('foo'),
             },
-            new Map()
-          )
-        ).toThrowError('Type expected to be a UrlNode');
-
-        expect(() =>
-          prop.add(
-            {Predicate: rangeIncludes(), Object: new Rdfs('foo')},
             new Map()
           )
         ).toThrowError('Type expected to be a UrlNode');
@@ -134,7 +127,7 @@ describe('PropertyType', () => {
     it('works with string', () => {
       expect(
         prop.add(
-          {Predicate: comment(), Object: new SchemaString('foo', 'en')},
+          {Predicate: comment(), Object: new SchemaString('foo')},
           new Map()
         )
       ).toBe(true);

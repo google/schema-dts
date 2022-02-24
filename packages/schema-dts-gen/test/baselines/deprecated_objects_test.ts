@@ -111,6 +111,7 @@ interface ThingBase extends Partial<IdReference> {
     /**
      * Names are great!
      * {@link X Y}
+     *
      * @deprecated Consider using http://schema.org/name instead.
      */
     \\"names2\\"?: SchemaValue<Text>;

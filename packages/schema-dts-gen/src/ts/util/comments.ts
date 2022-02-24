@@ -49,9 +49,12 @@ export function withComments<T extends Node>(
   }
 }
 
-export function appendLine(first: string | undefined, next: string): string {
+export function appendParagraph(
+  first: string | undefined,
+  next: string
+): string {
   if (!first) return next;
-  if (shouldParseAsHtml(first)) return `${first}<br/>${next}`;
+  if (shouldParseAsHtml(first)) return `${first}<br/><br/>${next}`;
   return `${first}\n\n${next}`;
 }
 

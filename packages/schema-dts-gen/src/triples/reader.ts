@@ -22,51 +22,42 @@ import {Log} from '../logging/index.js';
 import {assert} from '../util/assert.js';
 
 import {Triple} from './triple.js';
-import {Rdfs, SchemaString, UrlNode} from './types.js';
+import {SchemaString, UrlNode} from './types.js';
 
-function unWrap<T>(
-  maker: (content: string) => T | null
-): (content: string) => T | null {
-  return (content: string) => {
-    const result = /^<([^<>]+)>$/.exec(content);
-    if (result) return maker(result[1]);
-    return null;
-  };
+import {Parser} from 'n3';
+import type {Quad, Quad_Subject, Quad_Predicate, Quad_Object} from 'n3';
+
+function subject(s: Quad_Subject) {
+  assert(
+    s.termType === 'NamedNode',
+    `Only NamedNode is supported for Subject. Saw ${s.termType}`
+  );
+  return UrlNode.Parse(s.value);
 }
 
-function subject(content: string) {
-  return UrlNode.Parse(content);
+function predicate(p: Quad_Predicate) {
+  assert(
+    p.termType === 'NamedNode',
+    `Only NamedNode is supported for Predicate. Saw ${p.termType}`
+  );
+  return UrlNode.Parse(p.value);
 }
 
-function predicate(content: string) {
-  return UrlNode.Parse(content);
+function object(o: Quad_Object) {
+  switch (o.termType) {
+    case 'NamedNode':
+      return UrlNode.Parse(o.value);
+    case 'Literal':
+      return new SchemaString(o.value);
+    case 'BlankNode':
+    case 'Variable':
+    default:
+      throw new Error(`Unexpected ${o.termType} for object ${o.toJSON()}`);
+  }
 }
 
-function object(content: string) {
-  const o =
-    unWrap(Rdfs.Parse)(content) ||
-    unWrap(UrlNode.Parse)(content) ||
-    SchemaString.Parse(content);
-
-  assert(o, `Unexpected: ${content}.`);
-  return o;
-}
-
-const totalRegex =
-  /\s*<([^<>]+)>\s*<([^<>]+)>\s*((?:<[^<>"]+>)|(?:"(?:[^"]|(?:\\"))*(?:[^\"]|\\")"(?:@[a-zA-Z]+)?))\s*\./;
-export function toTripleStrings(data: string[]) {
-  const linearTriples = data
-    .join('')
-    .split(totalRegex)
-    .map(s => s.trim())
-    .filter(s => s.length > 0);
-
-  return linearTriples.reduce((result, _, index, array) => {
-    if (index % 3 === 0) {
-      result.push(array.slice(index, index + 3));
-    }
-    return result;
-  }, [] as string[][]);
+function toTripleStrings(data: string[]): Quad[] {
+  return new Parser({}).parse(data.join(''));
 }
 
 /**
@@ -165,60 +156,25 @@ function handleUrl(url: string, subscriber: Subscriber<Triple>): TeardownLogic {
     .on('error', e => subscriber.error(e));
 }
 
-export function* process(triples: string[][]): Iterable<Triple> {
-  for (const match of triples) {
-    if (match.length !== 3) {
-      throw Error(`Unexpected ${match}`);
-    }
+export function process(quads: Quad[]): Triple[] {
+  return quads
+    .filter(quad => {
+      if (
+        quad.subject.termType === 'NamedNode' &&
+        quad.subject.value.includes('file:///')
+      ) {
+        // Inexplicably, local files end up in the public schema for
+        // certain layer overlays.
+        return false;
+      }
 
-    if (match[0].includes('file:///')) {
-      // Inexplicably, local files end up in the public schema for
-      // certain layer overlays.
-      continue;
-    }
-
-    // Schema.org 3.4 all-layers used to contain a test comment:
-    // (Subject:    <http://meta.schema.org/>
-    //  Predicate:  <http://www.w3.org/2000/01/rdf-schema#comment>
-    //  Object:     "A test comment.")
-    // We skip it manually.
-    if (/http[s]?:\/\/meta\.schema\.org\//.test(match[0])) {
-      continue;
-    }
-
-    if (
-      match[1] === 'http://www.w3.org/2002/07/owl#equivalentClass' ||
-      match[1] === 'http://www.w3.org/2002/07/owl#equivalentProperty' ||
-      match[1] === 'http://purl.org/dc/terms/source' ||
-      match[1] === 'http://www.w3.org/2000/01/rdf-schema#label' ||
-      match[1] === 'http://www.w3.org/2004/02/skos/core#closeMatch' ||
-      match[1] === 'http://www.w3.org/2004/02/skos/core#exactMatch'
-    ) {
-      // Skip Equivalent Classes & Properties
-      continue;
-    }
-
-    if (/http[s]?:\/\/schema.org\/isPartOf/.test(match[1])) {
-      // When isPartOf is used as a predicate, is a higher-order
-      // property describing if a Property or Class is part of a
-      // specific schema layer. We don't use that information yet,
-      // so discard it.
-      continue;
-    }
-
-    try {
-      yield {
-        Subject: subject(match[0]),
-        Predicate: predicate(match[1]),
-        Object: object(match[2]),
-      };
-    } catch (parseError) {
-      const e = parseError as Error;
-      throw new Error(
-        `ParseError: ${e.name}: ${e.message} while parsing line ${match
-          .map(t => `\{${t}\}`)
-          .join(', ')}.\nOriginal Stack:\n${e.stack}\nRethrown from:`
-      );
-    }
-  }
+      return true;
+    })
+    .map(
+      (quad: Quad): Triple => ({
+        Subject: subject(quad.subject),
+        Predicate: predicate(quad.predicate),
+        Object: object(quad.object),
+      })
+    );
 }

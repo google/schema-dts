@@ -13,12 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {
-  NamedUrlNode,
-  Rdfs,
-  SchemaString,
-  UrlNode,
-} from '../../src/triples/types.js';
+import {NamedUrlNode, SchemaString, UrlNode} from '../../src/triples/types.js';
 import {
   GetComment,
   GetSubClassOf,
@@ -35,7 +30,7 @@ describe('wellKnown', () => {
           Predicate: UrlNode.Parse(
             'http://www.w3.org/2000/01/rdf-schema#comment'
           ),
-          Object: new SchemaString('foo', 'en'),
+          Object: new SchemaString('foo'),
         })
       ).toEqual({comment: 'foo'});
     });
@@ -44,14 +39,14 @@ describe('wellKnown', () => {
       expect(
         GetComment({
           Predicate: UrlNode.Parse('http://www.w3.org/2000/01/rdf-schema#type'),
-          Object: new SchemaString('foo', 'en'),
+          Object: new SchemaString('foo'),
         })
       ).toBeNull();
 
       expect(
         GetComment({
           Predicate: UrlNode.Parse('http://schema.org/comment'),
-          Object: new SchemaString('foo', 'en'),
+          Object: new SchemaString('foo'),
         })
       ).toBeNull();
     });
@@ -95,7 +90,7 @@ describe('wellKnown', () => {
       expect(
         GetSubClassOf({
           Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-          Object: new SchemaString('foo', undefined),
+          Object: new SchemaString('foo'),
         })
       ).toBeNull();
 
@@ -115,16 +110,7 @@ describe('wellKnown', () => {
           Predicate: UrlNode.Parse(
             'http://www.w3.org/2000/01/rdf-schema#subClassOf'
           ),
-          Object: new SchemaString('foo', 'en'),
-        })
-      ).toThrowError('Unexpected object for predicate');
-
-      expect(() =>
-        GetSubClassOf({
-          Predicate: UrlNode.Parse(
-            'http://www.w3.org/2000/01/rdf-schema#subClassOf'
-          ),
-          Object: new Rdfs('foo'),
+          Object: new SchemaString('foo'),
         })
       ).toThrowError('Unexpected object for predicate');
     });
@@ -197,16 +183,7 @@ describe('wellKnown', () => {
           Predicate: UrlNode.Parse(
             'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
           ),
-          Object: new SchemaString('foo', undefined),
-        })
-      ).toThrowError('Unexpected type');
-
-      expect(() =>
-        GetType({
-          Predicate: UrlNode.Parse(
-            'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
-          ),
-          Object: new Rdfs('foo'),
+          Object: new SchemaString('foo'),
         })
       ).toThrowError('Unexpected type');
     });
@@ -226,7 +203,7 @@ describe('wellKnown', () => {
             Predicate: UrlNode.Parse(
               'http://www.w3.org/2000/01/rdf-schema#label'
             ),
-            Object: new SchemaString('Thing', undefined),
+            Object: new SchemaString('Thing'),
           },
         ])
       ).toEqual([UrlNode.Parse('http://www.w3.org/2000/01/rdf-schema#Class')]);
@@ -245,7 +222,7 @@ describe('wellKnown', () => {
             Predicate: UrlNode.Parse(
               'http://www.w3.org/2000/01/rdf-schema#label'
             ),
-            Object: new SchemaString('Thing', undefined),
+            Object: new SchemaString('Thing'),
           },
           {
             Predicate: UrlNode.Parse(

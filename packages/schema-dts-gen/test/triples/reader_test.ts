@@ -118,7 +118,7 @@ describe('load', () => {
         {
           Subject: UrlNode.Parse('https://schema.org/Person'),
           Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-          Object: SchemaString.Parse('"math"')!,
+          Object: new SchemaString('math'),
         },
       ]);
     });
@@ -137,39 +137,12 @@ describe('load', () => {
         {
           Subject: UrlNode.Parse('https://schema.org/Person'),
           Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-          Object: SchemaString.Parse('"math"')!,
+          Object: new SchemaString('math'),
         },
         {
           Subject: UrlNode.Parse('https://schema.org/Person'),
           Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-          Object: SchemaString.Parse('"science"')!,
-        },
-      ]);
-    });
-
-    it('Multiple (skip test comment)', async () => {
-      const control = fakeResponse(200, 'Ok');
-      control.data(
-        `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`
-      );
-      control.data(
-        `<http://meta.schema.org/> <http://www.w3.org/2000/01/rdf-schema#comment> "A test comment." .\n`
-      );
-      control.data(
-        `<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`
-      );
-      control.end();
-
-      await expect(triples).resolves.toEqual([
-        {
-          Subject: UrlNode.Parse('https://schema.org/Person'),
-          Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-          Object: SchemaString.Parse('"math"')!,
-        },
-        {
-          Subject: UrlNode.Parse('https://schema.org/Person'),
-          Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-          Object: SchemaString.Parse('"science"')!,
+          Object: new SchemaString('science'),
         },
       ]);
     });
@@ -188,14 +161,14 @@ describe('load', () => {
         {
           Subject: UrlNode.Parse('https://schema.org/Person'),
           Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-          Object: SchemaString.Parse('"math"')!,
+          Object: new SchemaString('math'),
         },
         {
           Subject: UrlNode.Parse('http://schema.org/'),
           Predicate: UrlNode.Parse(
             'http://www.w3.org/2000/01/rdf-schema#comment'
           ),
-          Object: SchemaString.Parse('"A test comment."')!,
+          Object: new SchemaString('A test comment.'),
         },
       ]);
     });
@@ -214,14 +187,14 @@ describe('load', () => {
         {
           Subject: UrlNode.Parse('https://schema.org/Person'),
           Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-          Object: SchemaString.Parse('"math"')!,
+          Object: new SchemaString('math'),
         },
         {
           Subject: UrlNode.Parse('https://schema.org/X?A=B'),
           Predicate: UrlNode.Parse(
             'http://www.w3.org/2000/01/rdf-schema#comment'
           ),
-          Object: SchemaString.Parse('"A test comment."')!,
+          Object: new SchemaString('A test comment.'),
         },
       ]);
     });
@@ -240,12 +213,12 @@ describe('load', () => {
         {
           Subject: UrlNode.Parse('https://schema.org/Person'),
           Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-          Object: SchemaString.Parse('"math"')!,
+          Object: new SchemaString('math'),
         },
         {
           Subject: UrlNode.Parse('http://schema.org/A'),
           Predicate: UrlNode.Parse('https://schema.org'),
-          Object: SchemaString.Parse('"A test comment."')!,
+          Object: new SchemaString('A test comment.'),
         },
       ]);
     });
@@ -262,12 +235,12 @@ describe('load', () => {
         {
           Subject: UrlNode.Parse('https://schema.org/Person'),
           Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-          Object: SchemaString.Parse('"math"')!,
+          Object: new SchemaString('math'),
         },
         {
           Subject: UrlNode.Parse('https://schema.org/Person'),
           Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-          Object: SchemaString.Parse('"science"')!,
+          Object: new SchemaString('science'),
         },
       ]);
     });
@@ -284,29 +257,21 @@ describe('load', () => {
         {
           Subject: UrlNode.Parse('https://schema.org/Person'),
           Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-          Object: SchemaString.Parse('"math"')!,
+          Object: new SchemaString('math'),
         },
       ]);
     });
 
-    it('Skips schema layer attributions', async () => {
-      const control = fakeResponse(200, 'Ok');
-      control.data(`<https://schema.org/knowsAbout> <https://sc`);
-      control.data(
-        `hema.org/domainIncludes> <https://schema.org/Thing> .\n<https://schema.`
-      );
-      control.data(
-        `org/knowsAbout> <http://schema.org/isPartOf> <http://pending.schema.org> .\n`
-      );
-      control.end();
+    describe('not yet supported', () => {
+      it('blank node objects', async () => {
+        const control = fakeResponse(200, 'Ok');
+        control.data(
+          `<https://schema.org/Person> <https://schema.org/knowsAbout> _:a .\n`
+        );
+        control.end();
 
-      await expect(triples).resolves.toEqual([
-        {
-          Subject: UrlNode.Parse('https://schema.org/knowsAbout'),
-          Predicate: UrlNode.Parse('https://schema.org/domainIncludes'),
-          Object: UrlNode.Parse('https://schema.org/Thing'),
-        },
-      ]);
+        await expect(triples).rejects.toThrow('Unexpected BlankNode');
+      });
     });
 
     describe('.nt syntax errors', () => {
@@ -314,14 +279,14 @@ describe('load', () => {
         const control = fakeResponse(200, 'Ok');
         control.data(`<https://schema.org/knowsAbout> <https://sc`);
         control.end();
-        await expect(triples).rejects.toThrow('Unexpected');
+        await expect(triples).rejects.toThrow();
       });
 
       it('only two datums', async () => {
         const control = fakeResponse(200, 'Ok');
         control.data(`<https://schema.org/knowsAbout> <https://sc> .`);
         control.end();
-        await expect(triples).rejects.toThrow('Unexpected');
+        await expect(triples).rejects.toThrow();
       });
 
       it('missing dot', async () => {
@@ -330,35 +295,35 @@ describe('load', () => {
           `<https://schema.org/knowsAbout> <https://scema.org/domainIncludes> "a"`
         );
         control.end();
-        await expect(triples).rejects.toThrow('Unexpected');
+        await expect(triples).rejects.toThrow();
       });
 
       it('Non-IRI Subject', async () => {
         const control = fakeResponse(200, 'Ok');
         control.data(`"knowsAbout" <https://scema.org/domainIncludes> "a" .`);
         control.end();
-        await expect(triples).rejects.toThrow('Unexpected');
+        await expect(triples).rejects.toThrow();
       });
 
       it('Non-IRI Predicate', async () => {
         const control = fakeResponse(200, 'Ok');
         control.data(`<https://schema.org/knowsAbout> "domainIncludes" "a"`);
         control.end();
-        await expect(triples).rejects.toThrow('Unexpected');
+        await expect(triples).rejects.toThrow();
       });
 
       it('Invalid object', async () => {
         const control = fakeResponse(200, 'Ok');
         control.data(`<https://schema.org/a> <https://schema.org/b> 'c`);
         control.end();
-        await expect(triples).rejects.toThrow('Unexpected');
+        await expect(triples).rejects.toThrow();
       });
 
       it('Domain only', async () => {
         const control = fakeResponse(200, 'Ok');
         control.data(`<https://schema.org/> <https://schema.org/b> "c"`);
         control.end();
-        await expect(triples).rejects.toThrow('Unexpected');
+        await expect(triples).rejects.toThrow();
       });
     });
 
@@ -416,7 +381,7 @@ describe('load', () => {
           {
             Subject: UrlNode.Parse('https://schema.org/Person'),
             Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-            Object: SchemaString.Parse('"math"')!,
+            Object: new SchemaString('math'),
           },
         ]);
       });
@@ -435,12 +400,12 @@ describe('load', () => {
           {
             Subject: UrlNode.Parse('https://schema.org/Person'),
             Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-            Object: SchemaString.Parse('"math"')!,
+            Object: new SchemaString('math'),
           },
           {
             Subject: UrlNode.Parse('https://schema.org/Person'),
             Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-            Object: SchemaString.Parse('"science"')!,
+            Object: new SchemaString('science'),
           },
         ]);
       });
@@ -457,12 +422,12 @@ describe('load', () => {
           {
             Subject: UrlNode.Parse('https://schema.org/Person'),
             Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-            Object: SchemaString.Parse('"math"')!,
+            Object: new SchemaString('math'),
           },
           {
             Subject: UrlNode.Parse('https://schema.org/Person'),
             Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-            Object: SchemaString.Parse('"science"')!,
+            Object: new SchemaString('science'),
           },
         ]);
       });

@@ -189,7 +189,7 @@ describe('Class', () => {
         cls.add(
           {
             Predicate: comment(),
-            Object: new SchemaString('Fantastic', 'en'),
+            Object: new SchemaString('Fantastic'),
           },
           new Map()
         )
@@ -222,8 +222,7 @@ describe('Class', () => {
                 '<table>' +
                 '<tr><td>XYZ</td><td>ABC</td></tr>' +
                 '<tr><td>123</td><td>234</td></tr>' +
-                '</table>',
-              undefined
+                '</table>'
             ),
           },
           new Map()

@@ -38,7 +38,7 @@ import {Context} from './context.js';
 import {EnumValue} from './enum.js';
 import {Property, TypeProperty} from './property.js';
 import {arrayOf} from './util/arrayof.js';
-import {appendLine, withComments} from './util/comments.js';
+import {appendParagraph, withComments} from './util/comments.js';
 import {toClassName} from './util/names.js';
 import {assert, asserted} from '../util/assert.js';
 import {IdReferenceName} from './helper_types.js';
@@ -95,7 +95,7 @@ export class Class {
       .map(c => c.className())
       .join(' or ')} instead.`;
 
-    return appendLine(this._comment, deprecated);
+    return appendParagraph(this._comment, deprecated);
   }
 
   protected get typedefs(): TypeNode[] {

@@ -132,35 +132,8 @@ export type NamedUrlNode = UrlNode & {name: string};
  */
 export class SchemaString {
   readonly type = 'SchemaString';
-  constructor(readonly value: string, readonly language: string | undefined) {}
+  constructor(readonly value: string) {}
   toString() {
-    return this.language
-      ? `"${this.value}@${this.language}`
-      : `"${this.value}"`;
-  }
-  static Parse(content: string): SchemaString | null {
-    const result = /^"(([^"]|(\\"))+)"(?:@([a-zA-Z]+))?$/.exec(content);
-    if (result) {
-      return new SchemaString(result[1].replace(/\\"/g, '"'), result[4]);
-    }
-    return null;
-  }
-}
-
-/**
- * In-memory representation of a compact Node corresponding to a relative RDFS
- * reference.
- *
- * @example <rdfs:label>
- */
-export class Rdfs {
-  readonly type = 'Rdfs';
-  constructor(readonly label: string) {}
-  toString() {
-    return `rdfs:${this.label}`;
-  }
-  static Parse(content: string): Rdfs | null {
-    const result = /^rdfs:(.+)$/.exec(content);
-    return result && new Rdfs(result[1]);
+    return `"${this.value}"`;
   }
 }
