@@ -3,10 +3,11 @@
   "version": "1.1.0",
   "displayName": "schema-dts: Strongly-typed Schema.org vocabulary declarations",
   "description": "A TypeScript package with latest Schema.org Schema Typings",
-  "authors": [
-    "Eyas Sharaiha <eyas@google.com> (https://eyas.sh/)"
-  ],
+  "author": "Eyas Sharaiha <eyas@google.com> (https://eyas.sh/)",
   "maintainers": [
+    "Eyas Sharaiha <npm@eyas.sh> (https://eyas.sh/)"
+  ],
+  "contributors": [
     "Eyas Sharaiha <npm@eyas.sh> (https://eyas.sh/)"
   ],
   "files": [

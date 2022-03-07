@@ -1,9 +1,7 @@
 {
   "name": "monorepo",
   "private": "true",
-  "authors": [
-    "Eyas Sharaiha <eyas@google.com> (https://eyas.sh/)"
-  ],
+  "author": "Eyas Sharaiha <eyas@google.com> (https://eyas.sh/)",
   "maintainers": [
     "Eyas Sharaiha <npm@eyas.sh> (https://eyas.sh/)"
   ],
