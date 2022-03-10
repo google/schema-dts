@@ -71,7 +71,7 @@ export type Thing = \\"http://schema.org/a\\" | \\"https://schema.org/a\\" | \\"
     "Loading Ontology from URL: https://fake.com/enum_skipped_test.ts.nt
     Got Response 200: Ok.
     For Enum Item c, did not process:
-    	(category, \\"issue-1156\\")
+    	(category, issue-1156)
     "
   `);
 });

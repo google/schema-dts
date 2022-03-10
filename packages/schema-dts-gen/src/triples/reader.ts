@@ -17,42 +17,9 @@ import https from 'https';
 import fs from 'fs/promises';
 
 import {Log} from '../logging/index.js';
-import {assert} from '../util/assert.js';
 
-import {Triple} from './triple.js';
-import {SchemaString, UrlNode} from './types.js';
-
-import {Parser} from 'n3';
-import type {Quad, Quad_Subject, Quad_Predicate, Quad_Object} from 'n3';
-
-function subject(s: Quad_Subject) {
-  assert(
-    s.termType === 'NamedNode',
-    `Only NamedNode is supported for Subject. Saw ${s.termType}`
-  );
-  return UrlNode.Parse(s.value);
-}
-
-function predicate(p: Quad_Predicate) {
-  assert(
-    p.termType === 'NamedNode',
-    `Only NamedNode is supported for Predicate. Saw ${p.termType}`
-  );
-  return UrlNode.Parse(p.value);
-}
-
-function object(o: Quad_Object) {
-  switch (o.termType) {
-    case 'NamedNode':
-      return UrlNode.Parse(o.value);
-    case 'Literal':
-      return new SchemaString(o.value);
-    case 'BlankNode':
-    case 'Variable':
-    default:
-      throw new Error(`Unexpected ${o.termType} for object ${o.toJSON()}`);
-  }
-}
+import {Parser, Store} from 'n3';
+import type {Quad} from 'n3';
 
 function asQuads(data: string): Quad[] {
   return new Parser({}).parse(data);
@@ -61,7 +28,7 @@ function asQuads(data: string): Quad[] {
 /**
  * Loads schema all Triples from a given Schema file and version.
  */
-export async function load(url: string): Promise<Triple[]> {
+export async function load(url: string): Promise<Store> {
   const quads = await handleUrl(url);
   return process(quads);
 }
@@ -69,7 +36,7 @@ export async function load(url: string): Promise<Triple[]> {
 /**
  * does the same as load(), but for a local file
  */
-export async function loadFile(path: string): Promise<Triple[]> {
+export async function loadFile(path: string): Promise<Store> {
   const quads = await handleFile(path);
   return process(quads);
 }
@@ -128,25 +95,18 @@ function handleUrl(url: string): Promise<Quad[]> {
   });
 }
 
-export function process(quads: Quad[]): Triple[] {
-  return quads
-    .filter(quad => {
-      if (
-        quad.subject.termType === 'NamedNode' &&
-        quad.subject.value.includes('file:///')
-      ) {
-        // Inexplicably, local files end up in the public schema for
-        // certain layer overlays.
-        return false;
-      }
+export function process(quads: Quad[]): Store {
+  const filtered = quads.filter(quad => {
+    if (
+      quad.subject.termType === 'NamedNode' &&
+      quad.subject.value.includes('file:///')
+    ) {
+      // Inexplicably, local files end up in the public schema for
+      // certain layer overlays.
+      return false;
+    }
 
-      return true;
-    })
-    .map(
-      (quad: Quad): Triple => ({
-        Subject: subject(quad.subject),
-        Predicate: predicate(quad.predicate),
-        Object: object(quad.object),
-      })
-    );
+    return true;
+  });
+  return new Store(filtered);
 }

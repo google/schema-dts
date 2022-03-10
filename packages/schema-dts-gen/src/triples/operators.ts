@@ -14,39 +14,20 @@
  * limitations under the License.
  */
 
-import type {ObjectPredicate, Topic, Triple, TypedTopic} from './triple.js';
+import {Store} from 'n3';
 import {GetTypes, IsType} from './wellKnown.js';
+import type {TypedTopic} from './wellKnown.js';
 
-function asTopics(triples: Triple[]): Topic[] {
-  interface MutableTopic extends Topic {
-    values: ObjectPredicate[];
-  }
-  const map = new Map<string, MutableTopic>();
-
-  for (const triple of triples) {
-    const subjectKey = triple.Subject.toString();
-    let topic = map.get(subjectKey);
-    if (!topic) {
-      topic = {
-        Subject: triple.Subject,
-        values: [],
-      };
-      map.set(subjectKey, topic);
-    }
-    topic.values.push({Object: triple.Object, Predicate: triple.Predicate});
-  }
-
-  return Array.from(map.values());
-}
-
-function asTypedTopic(topic: Topic): TypedTopic {
-  return {
-    Subject: topic.Subject,
-    types: GetTypes(topic.Subject, topic.values),
-    values: topic.values.filter(value => !IsType(value.Predicate)),
-  };
-}
-
-export function asTopicArray(triples: Triple[]): TypedTopic[] {
-  return asTopics(triples).map(asTypedTopic);
+export function asTopicArray(store: Store): TypedTopic[] {
+  return store
+    .getSubjects(null, null, null)
+    .map(subject => ({
+      subject,
+      quads: store.getQuads(subject, null, null, null),
+    }))
+    .map(topic => ({
+      subject: topic.subject,
+      quads: topic.quads.filter(value => !IsType(value.predicate)),
+      types: GetTypes(topic.quads),
+    }));
 }

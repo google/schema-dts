@@ -30,12 +30,3 @@ export function assertIs<T, U extends T>(
 ): asserts item is U {
   ok(assertion(item), message);
 }
-
-export function asserted<T, U extends T>(
-  item: T,
-  assertion: (i: T) => i is U,
-  message?: string
-): U {
-  assertIs(item, assertion, message);
-  return item;
-}

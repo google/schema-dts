@@ -24,14 +24,14 @@ import type {
 const {factory, ModifierFlags, SyntaxKind} = ts;
 
 import {Log} from '../logging/index.js';
-import {TObject, TPredicate, TSubject, TTypeName} from '../triples/triple.js';
-import {UrlNode} from '../triples/types.js';
+
+import {namedPortion, namedPortionOrEmpty} from '../triples/term_utils.js';
+
 import {
   GetComment,
   GetSubClassOf,
   IsSupersededBy,
   IsClassType,
-  IsNamedUrl,
 } from '../triples/wellKnown.js';
 
 import {Context} from './context.js';
@@ -40,9 +40,10 @@ import {Property, TypeProperty} from './property.js';
 import {arrayOf} from './util/arrayof.js';
 import {appendParagraph, withComments} from './util/comments.js';
 import {toClassName} from './util/names.js';
-import {assert, asserted} from '../util/assert.js';
+import {assert} from '../util/assert.js';
 import {IdReferenceName} from './helper_types.js';
 import {typeUnion} from './util/union.js';
+import {NamedNode, Quad} from 'n3';
 
 /** Maps fully qualified IDs of each Class to the class itself. */
 export type ClassMap = Map<string, Class>;
@@ -152,16 +153,13 @@ export class Class {
     return toClassName(this.subject);
   }
 
-  constructor(readonly subject: TTypeName) {}
-  add(
-    value: {Predicate: TPredicate; Object: TObject},
-    classMap: ClassMap
-  ): boolean {
+  constructor(readonly subject: NamedNode) {}
+  add(value: Quad, classMap: ClassMap): boolean {
     const c = GetComment(value);
     if (c) {
       if (this._comment) {
         Log(
-          `Duplicate comments provided on class ${this.subject.toString()}. It will be overwritten.`
+          `Duplicate comments provided on class ${this.subject.id}. It will be overwritten.`
         );
       }
       this._comment = c.comment;
@@ -173,27 +171,25 @@ export class Class {
       // We don't represent this well right now, but we want to skip it.
       if (IsClassType(s.subClassOf)) return false;
 
-      const parentClass = classMap.get(s.subClassOf.toString());
+      const parentClass = classMap.get(s.subClassOf.id);
       if (parentClass) {
         this._parents.push(parentClass);
         parentClass.children.push(this);
       } else {
         throw new Error(
-          `Couldn't find parent of ${
-            this.subject.name
-          }, ${s.subClassOf.toString()}`
+          `Couldn't find parent of ${this.subject.value}, ${
+            s.subClassOf.value
+          } (available: ${Array.from(classMap.keys()).join(', ')})`
         );
       }
       return true;
     }
 
-    if (IsSupersededBy(value.Predicate)) {
-      const supersededBy = classMap.get(value.Object.toString());
+    if (IsSupersededBy(value.predicate)) {
+      const supersededBy = classMap.get(value.object.value);
       if (!supersededBy) {
         throw new Error(
-          `Couldn't find class ${value.Object.toString()}, which supersedes class ${
-            this.subject.name
-          }`
+          `Couldn't find class ${value.object.value}, which supersedes class ${this.subject.value}`
         );
       }
       this._supersededBy.add(supersededBy);
@@ -404,7 +400,7 @@ export class Class {
  * Represents a DataType.
  */
 export class Builtin extends Class {
-  constructor(subject: TTypeName) {
+  constructor(subject: NamedNode) {
     super(subject);
     this.markAsExplicitClass();
   }
@@ -415,8 +411,8 @@ export class Builtin extends Class {
  * in JSON-LD and JavaScript as a typedef to a native type.
  */
 export class AliasBuiltin extends Builtin {
-  constructor(url: string, ...equivTo: TypeNode[]) {
-    super(asserted(UrlNode.Parse(url), IsNamedUrl));
+  constructor(subject: NamedNode, ...equivTo: TypeNode[]) {
+    super(subject);
     for (const t of equivTo) this.addTypedef(t);
   }
 
@@ -532,8 +528,8 @@ export class RoleBuiltin extends Builtin {
 }
 
 export class DataTypeUnion extends Builtin {
-  constructor(url: string, readonly wk: Builtin[]) {
-    super(asserted(UrlNode.Parse(url), IsNamedUrl));
+  constructor(subject: NamedNode, readonly wk: Builtin[]) {
+    super(subject);
   }
 
   toNode(): DeclarationStatement[] {
@@ -545,12 +541,12 @@ export class DataTypeUnion extends Builtin {
         factory.createTypeAliasDeclaration(
           /*decorators=*/ [],
           factory.createModifiersFromModifierFlags(ModifierFlags.Export),
-          this.subject.name,
+          namedPortion(this.subject),
           /*typeParameters=*/ [],
           factory.createUnionTypeNode(
             this.wk.map(wk =>
               factory.createTypeReferenceNode(
-                wk.subject.name,
+                namedPortion(wk.subject),
                 /*typeArguments=*/ []
               )
             )
@@ -587,9 +583,11 @@ export function Sort(a: Class, b: Class): number {
   }
 }
 
-function CompareKeys(a: TSubject, b: TSubject): number {
-  const byName = (a.name || '').localeCompare(b.name || '');
+function CompareKeys(a: NamedNode, b: NamedNode): number {
+  const byName = (namedPortionOrEmpty(a) || '').localeCompare(
+    namedPortionOrEmpty(b) || ''
+  );
   if (byName !== 0) return byName;
 
-  return a.href.localeCompare(b.href);
+  return a.id.localeCompare(b.id);
 }

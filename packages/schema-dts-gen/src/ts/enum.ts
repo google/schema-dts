@@ -18,12 +18,13 @@ import type {TypeNode} from 'typescript';
 const {factory} = ts;
 
 import {Log} from '../logging/index.js';
-import {ObjectPredicate, TSubject} from '../triples/triple.js';
+
 import {GetComment, IsClassType, IsDataType} from '../triples/wellKnown.js';
 
 import {ClassMap} from './class.js';
 import {Context} from './context.js';
-import {UrlNode} from '../index.js';
+
+import type {NamedNode, Quad} from 'n3';
 
 /**
  * Corresponds to a value that belongs to an Enumeration.
@@ -33,8 +34,8 @@ export class EnumValue {
 
   private comment?: string;
   constructor(
-    readonly value: TSubject,
-    types: readonly UrlNode[],
+    readonly value: NamedNode,
+    types: readonly NamedNode[],
     map: ClassMap
   ) {
     for (const type of types) {
@@ -64,20 +65,20 @@ export class EnumValue {
       //     being an enum value for some other type (if it has one).
       if (IsClassType(type) || IsDataType(type)) continue;
 
-      const enumObject = map.get(type.toString());
+      const enumObject = map.get(type.id);
       if (!enumObject) {
-        throw new Error(`Couldn't find ${type.toString()} in classes.`);
+        throw new Error(`Couldn't find ${type.id} in classes.`);
       }
       enumObject.addEnum(this);
     }
   }
 
-  add(value: ObjectPredicate) {
+  add(value: Quad) {
     const comment = GetComment(value);
     if (comment) {
       if (this.comment) {
         Log(
-          `Duplicate comments provided on ${this.value.toString()} enum but one already exists. It will be overwritten.`
+          `Duplicate comments provided on ${this.value.id} enum but one already exists. It will be overwritten.`
         );
       }
       this.comment = comment.comment;
@@ -88,28 +89,19 @@ export class EnumValue {
   }
 
   toTypeLiteral(context: Context): TypeNode[] {
-    const types = [
-      factory.createLiteralTypeNode(
-        factory.createStringLiteral(this.value.toString())
-      ),
-    ];
-    if (this.value.context.protocol === 'http:') {
-      types.push(
-        factory.createLiteralTypeNode(
-          factory.createStringLiteral(
-            this.value.toString().replace(/^http:/, 'https:')
-          )
-        )
-      );
+    const types = [this.value.id];
+
+    if (this.value.id.startsWith('http:')) {
+      types.push(this.value.id.replace(/^http:/, 'https:'));
     }
 
     const scoped = context.getScopedName(this.value);
-    if (scoped !== this.value.href) {
-      types.push(
-        factory.createLiteralTypeNode(factory.createStringLiteral(scoped))
-      );
+    if (scoped !== this.value.id) {
+      types.push(scoped);
     }
 
-    return types;
+    return types.map(t =>
+      factory.createLiteralTypeNode(factory.createStringLiteral(t))
+    );
   }
 }

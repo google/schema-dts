@@ -73,7 +73,7 @@ export type Thing = ThingLeaf;
     "Loading Ontology from URL: https://fake.com/property_edge_cases_test.ts.nt
     Got Response 200: Ok.
     Still unadded for property: name:
-    	(sameAs, http://www.w3.org/1999/02/22-rdf-syntax-ns#name)
+    	(sameAs name)
     "
   `);
 });

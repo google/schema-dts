@@ -154,6 +154,7 @@ test(`baseline_OWLenum_${basename(import.meta.url)}`, async () => {
    <http://www.w3.org/2002/07/owl#MyEnum> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
    <http://www.w3.org/2002/07/owl#EnumValueA> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#MyEnum> .
    <http://www.w3.org/2002/07/owl#EnumValueB> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#MyEnum> .
+   <https://gs1.org/voc/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
          `,
     ['--ontology', `https://fake.com/${basename(import.meta.url)}.nt`]
   );

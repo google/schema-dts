@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {NamedUrlNode, UrlNode} from '../../src/triples/types.js';
+import {NamedNode} from 'n3';
 import {toClassName} from '../../src/ts/util/names.js';
 
-function parseNamed(url: string): NamedUrlNode {
-  return UrlNode.Parse(url) as NamedUrlNode;
+function parseNamed(url: string) {
+  return new NamedNode(url);
 }
 
 describe('toClassName', () => {

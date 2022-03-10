@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Triple} from '../..';
+import {Store} from 'n3';
 import {Log, SetOptions} from '../../logging/index.js';
 import {WriteDeclarations} from '../../transform/transform.js';
 import {load, loadFile} from '../../triples/reader.js';
@@ -28,7 +28,7 @@ export async function main(write: (s: string) => void, args?: string[]) {
 
   const ontologyUrl = options.ontology;
   const filePath = options.file;
-  let result: Triple[];
+  let result: Store;
 
   if (filePath) {
     Log(`Loading Ontology from path: ${filePath}`);

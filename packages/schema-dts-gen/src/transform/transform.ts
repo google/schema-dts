@@ -24,7 +24,6 @@ const {
 } = ts;
 
 import {asTopicArray} from '../triples/operators.js';
-import {Triple} from '../triples/triple.js';
 import {Sort} from '../ts/class.js';
 import {Context} from '../ts/context.js';
 
@@ -32,6 +31,8 @@ import {ProcessClasses} from './toClass.js';
 import {ProcessEnums} from './toEnum.js';
 import {ProcessProperties} from './toProperty.js';
 import {HelperTypes} from '../ts/helper_types.js';
+
+import {Store} from 'n3';
 
 /**
  * Writes TypeScript declarations for all Classes, Typedefs, and Enums
@@ -47,12 +48,12 @@ import {HelperTypes} from '../ts/helper_types.js';
  * @returns Promise indicating completion.
  */
 export async function WriteDeclarations(
-  triples: Triple[],
+  graph: Store,
   includeDeprecated: boolean,
   context: Context,
   write: (content: string) => Promise<void> | void
 ) {
-  const topics = asTopicArray(triples);
+  const topics = asTopicArray(graph);
 
   const classes = ProcessClasses(topics);
   ProcessProperties(topics, classes);

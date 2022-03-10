@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
+import {NamedNode} from 'n3';
 import ts from 'typescript';
 
-import {UrlNode} from '../../src/triples/types.js';
 import {Context} from '../../src/ts/context.js';
 
 function asString(node: ts.Node): string {
@@ -131,24 +131,24 @@ describe('Context.getScopedName', () => {
     const ctx = new Context();
     ctx.setUrlContext('https://schema.org');
 
-    expect(ctx.getScopedName(UrlNode.Parse('https://schema.org/Thing'))).toBe(
+    expect(ctx.getScopedName(new NamedNode('https://schema.org/Thing'))).toBe(
       'Thing'
     );
     expect(
-      ctx.getScopedName(UrlNode.Parse('https://schema.org/rangeIncludes'))
+      ctx.getScopedName(new NamedNode('https://schema.org/rangeIncludes'))
     ).toBe('rangeIncludes');
-    expect(ctx.getScopedName(UrlNode.Parse('http://schema.org/Door'))).toBe(
+    expect(ctx.getScopedName(new NamedNode('http://schema.org/Door'))).toBe(
       'Door'
     );
-    expect(ctx.getScopedName(UrlNode.Parse('https://foo.org/Door'))).toBe(
+    expect(ctx.getScopedName(new NamedNode('https://foo.org/Door'))).toBe(
       'https://foo.org/Door'
     );
 
-    expect(ctx.getScopedName(UrlNode.Parse('https://schema.org/'))).toBe(
+    expect(ctx.getScopedName(new NamedNode('https://schema.org/'))).toBe(
       'https://schema.org/'
     );
-    expect(ctx.getScopedName(UrlNode.Parse('https://schema.org'))).toBe(
-      'https://schema.org/'
+    expect(ctx.getScopedName(new NamedNode('https://schema.org'))).toBe(
+      'https://schema.org'
     );
   });
 
@@ -156,16 +156,16 @@ describe('Context.getScopedName', () => {
     const ctx = new Context();
     ctx.setUrlContext('http://schema.org');
 
-    expect(ctx.getScopedName(UrlNode.Parse('http://schema.org/Thing'))).toBe(
+    expect(ctx.getScopedName(new NamedNode('http://schema.org/Thing'))).toBe(
       'Thing'
     );
     expect(
-      ctx.getScopedName(UrlNode.Parse('http://schema.org/rangeIncludes'))
+      ctx.getScopedName(new NamedNode('http://schema.org/rangeIncludes'))
     ).toBe('rangeIncludes');
-    expect(ctx.getScopedName(UrlNode.Parse('https://schema.org/Door'))).toBe(
+    expect(ctx.getScopedName(new NamedNode('https://schema.org/Door'))).toBe(
       'https://schema.org/Door'
     );
-    expect(ctx.getScopedName(UrlNode.Parse('http://foo.org/Door'))).toBe(
+    expect(ctx.getScopedName(new NamedNode('http://foo.org/Door'))).toBe(
       'http://foo.org/Door'
     );
   });
@@ -176,26 +176,40 @@ describe('Context.getScopedName', () => {
     ctx.addNamedContext('rdfs', 'http://www.w3.org/2000/01/rdf-schema#');
     ctx.addNamedContext('schema', 'http://schema.org/');
 
-    expect(ctx.getScopedName(UrlNode.Parse('http://schema.org/Thing'))).toBe(
+    expect(ctx.getScopedName(new NamedNode('http://schema.org/Thing'))).toBe(
       'schema:Thing'
     );
     expect(
       ctx.getScopedName(
-        UrlNode.Parse('http://www.w3.org/1999/02/22-rdf-syntax-ns#type')
+        new NamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type')
       )
     ).toBe('rdf:type');
     expect(
       ctx.getScopedName(
-        UrlNode.Parse('http://www.w3.org/2000/01/rdf-schema#subClassOf')
+        new NamedNode('http://www.w3.org/2000/01/rdf-schema#subClassOf')
       )
     ).toBe('rdfs:subClassOf');
-    expect(ctx.getScopedName(UrlNode.Parse('http://foo.org/Door'))).toBe(
+    expect(ctx.getScopedName(new NamedNode('http://foo.org/Door'))).toBe(
       'http://foo.org/Door'
     );
-    expect(ctx.getScopedName(UrlNode.Parse('http://schema.org/'))).toBe(
+    expect(ctx.getScopedName(new NamedNode('http://schema.org/'))).toBe(
       'schema:'
     );
-    expect(ctx.getScopedName(UrlNode.Parse('http://schema.org'))).toBe(
+    expect(ctx.getScopedName(new NamedNode('http://schema.org'))).toBe(
+      'http://schema.org'
+    );
+  });
+
+  it('with multiple URLs', () => {
+    const ctx = new Context();
+    ctx.addNamedContext('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#');
+    ctx.addNamedContext('rdfs', 'http://www.w3.org/2000/01/rdf-schema#');
+    ctx.addNamedContext('schema', 'http://schema.org');
+
+    expect(ctx.getScopedName(new NamedNode('http://schema.org/'))).toBe(
+      'schema:'
+    );
+    expect(ctx.getScopedName(new NamedNode('http://schema.org'))).toBe(
       'schema:'
     );
   });

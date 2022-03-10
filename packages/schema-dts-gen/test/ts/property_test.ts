@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {SchemaString, UrlNode} from '../../src/triples/types.js';
+import {Literal, NamedNode, Quad} from 'n3';
 import {PropertyType} from '../../src/ts/property.js';
 import {makeClass, makeClassMap} from '../helpers/make_class.js';
 
@@ -22,7 +22,7 @@ describe('PropertyType', () => {
   let prop: PropertyType;
 
   beforeEach(() => {
-    prop = new PropertyType(UrlNode.Parse('https://schema.org/name'));
+    prop = new PropertyType(new NamedNode('https://schema.org/name'));
   });
 
   it('initial properties when empty', () => {
@@ -33,15 +33,16 @@ describe('PropertyType', () => {
   describe('add', () => {
     describe('rangeIncludes', () => {
       const rangeIncludes = () =>
-        UrlNode.Parse('https://schema.org/rangeIncludes');
+        new NamedNode('https://schema.org/rangeIncludes');
 
       it('non-type rangeIncludes object fails', () => {
         expect(() =>
           prop.add(
-            {
-              Predicate: rangeIncludes(),
-              Object: new SchemaString('foo'),
-            },
+            new Quad(
+              new NamedNode('https://schema.org/Foo'),
+              rangeIncludes(),
+              new Literal('"foo"')
+            ),
             new Map()
           )
         ).toThrowError('Type expected to be a UrlNode');
@@ -50,10 +51,11 @@ describe('PropertyType', () => {
       it("type rangeIncludes object fails when class doesn't exist", () => {
         expect(() =>
           prop.add(
-            {
-              Predicate: rangeIncludes(),
-              Object: UrlNode.Parse('https://schema.org/Thing'),
-            },
+            new Quad(
+              new NamedNode('https://schema.org/Foo'),
+              rangeIncludes(),
+              new NamedNode('https://schema.org/Thing')
+            ),
             new Map()
           )
         ).toThrowError('Could not find class for https://schema.org/Thing');
@@ -62,10 +64,11 @@ describe('PropertyType', () => {
       it('type rangeIncludes object succeeds', () => {
         expect(
           prop.add(
-            {
-              Predicate: rangeIncludes(),
-              Object: UrlNode.Parse('https://schema.org/Thing'),
-            },
+            new Quad(
+              new NamedNode('https://schema.org/Foo'),
+              rangeIncludes(),
+              new NamedNode('https://schema.org/Thing')
+            ),
             makeClassMap(makeClass('https://schema.org/Thing'))
           )
         ).toBe(true);
@@ -75,15 +78,16 @@ describe('PropertyType', () => {
 
   describe('domainIncludes', () => {
     const domainIncludes = () =>
-      UrlNode.Parse('https://schema.org/domainIncludes');
+      new NamedNode('https://schema.org/domainIncludes');
     it('failed lookup throws', () => {
       const classes = makeClassMap(makeClass('https://schema.org/Person'));
       expect(() =>
         prop.add(
-          {
-            Predicate: domainIncludes(),
-            Object: UrlNode.Parse('https://schema.org/Thing'),
-          },
+          new Quad(
+            new NamedNode('https://schema.org/Foo'),
+            domainIncludes(),
+            new NamedNode('https://schema.org/Thing')
+          ),
           classes
         )
       ).toThrowError('Could not find class');
@@ -93,10 +97,11 @@ describe('PropertyType', () => {
       const classes = makeClassMap(makeClass('https://schema.org/Person'));
       expect(
         prop.add(
-          {
-            Predicate: domainIncludes(),
-            Object: UrlNode.Parse('https://schema.org/Person'),
-          },
+          new Quad(
+            new NamedNode('https://schema.org/Foo'),
+            domainIncludes(),
+            new NamedNode('https://schema.org/Person')
+          ),
           classes
         )
       ).toBe(true);
@@ -107,10 +112,11 @@ describe('PropertyType', () => {
     it('always works', () => {
       expect(
         prop.add(
-          {
-            Predicate: UrlNode.Parse('https://schema.org/supersededBy'),
-            Object: UrlNode.Parse('https://schema.org/Person'),
-          },
+          new Quad(
+            new NamedNode('https://schema.org/Foo'),
+            new NamedNode('https://schema.org/supersededBy'),
+            new NamedNode('https://schema.org/Person')
+          ),
           new Map()
         )
       ).toBe(true);
@@ -122,12 +128,16 @@ describe('PropertyType', () => {
 
   describe('comment', () => {
     const comment = () =>
-      UrlNode.Parse('http://www.w3.org/2000/01/rdf-schema#comment');
+      new NamedNode('http://www.w3.org/2000/01/rdf-schema#comment');
 
     it('works with string', () => {
       expect(
         prop.add(
-          {Predicate: comment(), Object: new SchemaString('foo')},
+          new Quad(
+            new NamedNode('https://schema.org/Foo'),
+            comment(),
+            new Literal('"foo"')
+          ),
           new Map()
         )
       ).toBe(true);
@@ -138,10 +148,11 @@ describe('PropertyType', () => {
     it('only supports strings as comments', () => {
       expect(() =>
         prop.add(
-          {
-            Predicate: comment(),
-            Object: UrlNode.Parse('http://schema.org/Amazing'),
-          },
+          new Quad(
+            new NamedNode('https://schema.org/Foo'),
+            comment(),
+            new NamedNode('http://schema.org/Amazing')
+          ),
           new Map()
         )
       ).toThrowError('non-string object');
