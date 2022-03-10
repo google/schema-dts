@@ -16,8 +16,7 @@
  */
 import {jest} from '@jest/globals';
 
-import {Readable} from 'stream';
-import fs from 'fs';
+import fs from 'fs/promises';
 import {main} from '../../src/cli/internal/main.js';
 import {SetLogger} from '../../src/logging/index.js';
 
@@ -27,11 +26,9 @@ describe('main Args logs', () => {
 
   beforeEach(() => {
     const mockFileLine = `<http://schema.org/Thing> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .\n`;
-    const mockedStream = Readable.from([mockFileLine]);
     jest
-      .spyOn(fs, 'createReadStream')
-      //@ts-ignore
-      .mockImplementation(path => mockedStream);
+      .spyOn(fs, 'readFile')
+      .mockImplementation(_ => Promise.resolve(mockFileLine));
 
     logs = [];
     ResetLogger = SetLogger(msg => logs.push(msg));

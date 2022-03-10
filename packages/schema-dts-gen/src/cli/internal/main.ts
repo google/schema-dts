@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import {Observable} from 'rxjs';
 import {Triple} from '../..';
 import {Log, SetOptions} from '../../logging/index.js';
 import {WriteDeclarations} from '../../transform/transform.js';
@@ -29,14 +28,14 @@ export async function main(write: (s: string) => void, args?: string[]) {
 
   const ontologyUrl = options.ontology;
   const filePath = options.file;
-  let result: Observable<Triple>;
+  let result: Triple[];
 
   if (filePath) {
     Log(`Loading Ontology from path: ${filePath}`);
-    result = loadFile(filePath);
+    result = await loadFile(filePath);
   } else {
     Log(`Loading Ontology from URL: ${ontologyUrl}`);
-    result = load(ontologyUrl);
+    result = await load(ontologyUrl);
   }
   const context = Context.Parse(options.context);
   await WriteDeclarations(result, options.deprecated, context, write);
