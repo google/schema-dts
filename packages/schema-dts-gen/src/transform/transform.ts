@@ -23,8 +23,6 @@ const {
   ScriptTarget,
 } = ts;
 
-import {firstValueFrom, Observable} from 'rxjs';
-
 import {asTopicArray} from '../triples/operators.js';
 import {Triple} from '../triples/triple.js';
 import {Sort} from '../ts/class.js';
@@ -49,12 +47,12 @@ import {HelperTypes} from '../ts/helper_types.js';
  * @returns Promise indicating completion.
  */
 export async function WriteDeclarations(
-  triples: Observable<Triple>,
+  triples: Triple[],
   includeDeprecated: boolean,
   context: Context,
   write: (content: string) => Promise<void> | void
 ) {
-  const topics = await firstValueFrom(triples.pipe(asTopicArray()));
+  const topics = asTopicArray(triples);
 
   const classes = ProcessClasses(topics);
   ProcessProperties(topics, classes);

@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 import https from 'https';
-import fs from 'fs';
-import readline from 'readline';
-import {Observable, Subscriber, TeardownLogic} from 'rxjs';
+import fs from 'fs/promises';
 
 import {Log} from '../logging/index.js';
 import {assert} from '../util/assert.js';
@@ -56,104 +54,78 @@ function object(o: Quad_Object) {
   }
 }
 
-function toTripleStrings(data: string[]): Quad[] {
-  return new Parser({}).parse(data.join(''));
+function asQuads(data: string): Quad[] {
+  return new Parser({}).parse(data);
 }
 
 /**
  * Loads schema all Triples from a given Schema file and version.
  */
-export function load(url: string): Observable<Triple> {
-  return new Observable<Triple>(subscriber => {
-    handleUrl(url, subscriber);
-  });
+export async function load(url: string): Promise<Triple[]> {
+  const quads = await handleUrl(url);
+  return process(quads);
 }
 
 /**
  * does the same as load(), but for a local file
  */
-export function loadFile(path: string): Observable<Triple> {
-  return new Observable<Triple>(subscriber => {
-    handleFile(path, subscriber);
-  });
+export async function loadFile(path: string): Promise<Triple[]> {
+  const quads = await handleFile(path);
+  return process(quads);
 }
 
-function handleFile(
-  path: string,
-  subscriber: Subscriber<Triple>
-): TeardownLogic {
-  const rl = readline.createInterface({
-    input: fs.createReadStream(path),
-    crlfDelay: Infinity,
-  });
-
-  const data: string[] = [];
-
-  rl.on('line', (line: string) => {
-    data.push(line);
-  });
-
-  rl.on('close', () => {
-    try {
-      const triples = toTripleStrings(data);
-      for (const triple of process(triples)) {
-        subscriber.next(triple);
-      }
-    } catch (error) {
-      Log(`Caught Error on end: ${error}`);
-      subscriber.error(error);
-    }
-    subscriber.complete();
-  });
+async function handleFile(path: string): Promise<Quad[]> {
+  const fileStr = await fs.readFile(path, {encoding: 'utf8'});
+  return asQuads(fileStr);
 }
 
-function handleUrl(url: string, subscriber: Subscriber<Triple>): TeardownLogic {
-  https
-    .get(url, response => {
-      Log(`Got Response ${response.statusCode}: ${response.statusMessage}.`);
-      if (response.statusCode !== 200) {
-        const location =
-          response.headers['location'] || response.headers['content-location'];
+function handleUrl(url: string): Promise<Quad[]> {
+  return new Promise<Quad[]>((resolve, reject) => {
+    https
+      .get(url, response => {
+        Log(`Got Response ${response.statusCode}: ${response.statusMessage}.`);
+        if (response.statusCode !== 200) {
+          const location =
+            response.headers['location'] ||
+            response.headers['content-location'];
 
-        if (location) {
-          Log(`Handling redirect to ${location}...`);
-          handleUrl(location, subscriber);
+          if (location) {
+            Log(`Handling redirect to ${location}...`);
+            resolve(handleUrl(location));
+            return;
+          }
+
+          reject(
+            new Error(
+              `Got Errored Response ${response.statusCode}: ${response.statusMessage}.`
+            )
+          );
           return;
         }
 
-        subscriber.error(
-          `Got Errored Response ${response.statusCode}: ${response.statusMessage}.`
-        );
-        return;
-      }
+        const data: string[] = [];
 
-      const data: string[] = [];
+        response.on('data', (chunkB: Buffer) => {
+          const chunk = chunkB.toString('utf-8');
+          data.push(chunk);
+        });
 
-      response.on('data', (chunkB: Buffer) => {
-        const chunk = chunkB.toString('utf-8');
-        data.push(chunk);
-      });
-
-      response.on('end', () => {
-        try {
-          const triples = toTripleStrings(data);
-          for (const triple of process(triples)) {
-            subscriber.next(triple);
+        response.on('end', () => {
+          try {
+            resolve(asQuads(data.join('')));
+          } catch (error) {
+            Log(`Caught Error on end: ${error}`);
+            reject(error);
           }
-        } catch (error) {
-          Log(`Caught Error on end: ${error}`);
-          subscriber.error(error);
-        }
+        });
 
-        subscriber.complete();
-      });
-
-      response.on('error', error => {
-        Log(`Saw error: ${error}`);
-        subscriber.error(error);
-      });
-    })
-    .on('error', e => subscriber.error(e));
+        response.on('error', error => {
+          Log(`Saw error: ${error}`);
+          reject(error);
+        });
+      })
+      .on('error', reject);
+  });
 }
 
 export function process(quads: Quad[]): Triple[] {

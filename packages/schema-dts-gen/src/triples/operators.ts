@@ -13,39 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {OperatorFunction} from 'rxjs';
-import {groupBy, map, mergeMap, toArray} from 'rxjs/operators';
 
-import {Topic, Triple, TypedTopic} from './triple.js';
+import type {ObjectPredicate, Topic, Triple, TypedTopic} from './triple.js';
 import {GetTypes, IsType} from './wellKnown.js';
 
-function groupBySubject(): OperatorFunction<Triple, Topic> {
-  return observable =>
-    observable.pipe(
-      groupBy(triple => triple.Subject.toString()),
-      mergeMap(group =>
-        group.pipe(
-          toArray(),
-          map(array => ({
-            Subject: array[0].Subject, // All are the same
-            values: array.map(({Object, Predicate}) => ({
-              Predicate,
-              Object,
-            })),
-          }))
-        )
-      )
-    );
+function asTopics(triples: Triple[]): Topic[] {
+  interface MutableTopic extends Topic {
+    values: ObjectPredicate[];
+  }
+  const map = new Map<string, MutableTopic>();
+
+  for (const triple of triples) {
+    const subjectKey = triple.Subject.toString();
+    let topic = map.get(subjectKey);
+    if (!topic) {
+      topic = {
+        Subject: triple.Subject,
+        values: [],
+      };
+      map.set(subjectKey, topic);
+    }
+    topic.values.push({Object: triple.Object, Predicate: triple.Predicate});
+  }
+
+  return Array.from(map.values());
 }
 
-function asTopic(): OperatorFunction<Topic, TypedTopic> {
-  return map(bySubject => ({
-    Subject: bySubject.Subject,
-    types: GetTypes(bySubject.Subject, bySubject.values),
-    values: bySubject.values.filter(value => !IsType(value.Predicate)),
-  }));
+function asTypedTopic(topic: Topic): TypedTopic {
+  return {
+    Subject: topic.Subject,
+    types: GetTypes(topic.Subject, topic.values),
+    values: topic.values.filter(value => !IsType(value.Predicate)),
+  };
 }
 
-export function asTopicArray(): OperatorFunction<Triple, TypedTopic[]> {
-  return observable => observable.pipe(groupBySubject(), asTopic(), toArray());
+export function asTopicArray(triples: Triple[]): TypedTopic[] {
+  return asTopics(triples).map(asTypedTopic);
 }

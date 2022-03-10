@@ -17,15 +17,13 @@ import {jest} from '@jest/globals';
 
 import {ClientRequest, IncomingMessage} from 'http';
 import https from 'https';
-import {toArray} from 'rxjs/operators';
-import {PassThrough, Readable, Writable} from 'stream';
+import {PassThrough, Writable} from 'stream';
 
-import fs from 'fs';
+import fs from 'fs/promises';
 import {load, loadFile} from '../../src/triples/reader.js';
 import {Triple} from '../../src/triples/triple.js';
 import {SchemaString, UrlNode} from '../../src/triples/types.js';
 import {flush} from '../helpers/async.js';
-import {firstValueFrom} from 'rxjs';
 import {Mocked, SpiedFunction} from '../helpers/jest-types.js';
 
 describe('load', () => {
@@ -42,19 +40,12 @@ describe('load', () => {
     https.get = ogGet;
   });
 
-  it('is lazy', () => {
-    load('https://schema.org');
-    expect(get).not.toBeCalled();
-  });
-
   it('total fail', async () => {
-    const triples$ = load('https://schema.org/');
-
     const firstReturn = passThrough();
     get.mockReturnValueOnce(firstReturn);
     firstReturn.destroy(new Error('Bad!!!'));
 
-    await expect(firstValueFrom(triples$)).rejects.toThrow('Bad!!!');
+    await expect(load('https://schema.org/')).rejects.toThrow('Bad!!!');
 
     expect(get).toBeCalledTimes(1);
   });
@@ -64,7 +55,6 @@ describe('load', () => {
     let fakeResponse: FakeResponseFunc;
 
     beforeEach(async () => {
-      const triples$ = load('https://schema.org/');
       get.mockImplementationOnce((_, cb) => {
         // Unfortunately, we use another overload that doesn't appear here.
         const callback = cb as unknown as (inc: IncomingMessage) => void;
@@ -74,7 +64,7 @@ describe('load', () => {
       });
 
       // toPromise makes Observables un-lazy, so we can just go ahead.
-      triples = firstValueFrom(triples$.pipe(toArray()));
+      triples = load('https://schema.org/');
 
       await flush();
     });
@@ -90,7 +80,7 @@ describe('load', () => {
     it('First response fails at status', async () => {
       fakeResponse(500, 'So Sad!');
 
-      await expect(triples).rejects.toMatch('So Sad!');
+      await expect(triples).rejects.toThrow('So Sad!');
     });
 
     it('First response fails at error', async () => {
@@ -353,7 +343,7 @@ describe('load', () => {
       it('Post Redirect response fails at status', async () => {
         fakeResponse2(500, 'So Sad!');
 
-        await expect(triples).rejects.toMatch('So Sad!');
+        await expect(triples).rejects.toThrow('So Sad!');
       });
 
       it('Post Redirect response fails at error', async () => {
@@ -433,36 +423,33 @@ describe('load', () => {
       });
     });
     describe('local file', () => {
-      let readStreamCreatorFn: SpiedFunction<typeof fs.createReadStream>;
+      let readFileFn: SpiedFunction<typeof fs['readFile']>;
       beforeEach(() => {
         const mockFileLine = `<https://schema.org/Person> <https://schema.org/knowsAbout> <https://schema.org/Event> .\n`;
-        const mockedStream = Readable.from([mockFileLine]);
-        readStreamCreatorFn = jest
-          .spyOn(fs, 'createReadStream')
-          .mockImplementation(path => mockedStream as fs.ReadStream);
+        readFileFn = jest
+          .spyOn(fs, 'readFile')
+          .mockImplementation(path => Promise.resolve(mockFileLine));
       });
       it('fails loading a file (containing .nt syntax errors)', async () => {
         const failingMockPath = './bad-ontology.nt';
         const failingMockLine = `<https://schema.org/knowsAbout> <https://sc`;
-        const failingMockedStream = Readable.from([failingMockLine]);
-        readStreamCreatorFn.mockImplementation(
-          path => failingMockedStream as fs.ReadStream
-        );
+        readFileFn.mockImplementation(path => Promise.resolve(failingMockLine));
 
-        const fileTriples = firstValueFrom(loadFile(failingMockPath));
+        const fileTriples = loadFile(failingMockPath);
         await expect(fileTriples).rejects.toThrow('Unexpected');
       });
       it('loads a file from the correct path', async () => {
         const mockFilePath = './ontology.nt';
 
-        const fileTriples = firstValueFrom(loadFile(mockFilePath));
+        const fileTriples = loadFile(mockFilePath);
 
-        expect(readStreamCreatorFn).toBeCalledWith(mockFilePath);
-        await expect(fileTriples).resolves.toEqual({
-          Subject: UrlNode.Parse('https://schema.org/Person'),
-          Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-          Object: UrlNode.Parse('https://schema.org/Event')!,
-        });
+        await expect(fileTriples).resolves.toEqual([
+          {
+            Subject: UrlNode.Parse('https://schema.org/Person'),
+            Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
+            Object: UrlNode.Parse('https://schema.org/Event')!,
+          },
+        ]);
       });
     });
   });
