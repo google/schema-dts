@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type {TTypeName} from '../../triples/triple';
+
+import type {NamedNode} from 'n3';
+import {namedPortion} from '../../triples/term_utils.js';
 
 function decodeOr(component: string) {
   try {
@@ -23,8 +25,11 @@ function decodeOr(component: string) {
   }
 }
 
-export function toClassName(subject: TTypeName): string {
-  let sanitizedName = decodeOr(subject.name).replace(/[^A-Za-z0-9_]/g, '_');
+export function toClassName(subject: NamedNode): string {
+  let sanitizedName = decodeOr(namedPortion(subject)).replace(
+    /[^A-Za-z0-9_]/g,
+    '_'
+  );
 
   // No leading numbers.
   if (/^[0-9]/g.test(sanitizedName)) {

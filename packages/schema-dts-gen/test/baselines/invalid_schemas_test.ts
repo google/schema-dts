@@ -40,7 +40,7 @@ test(`unnamedURLClass_${basename(import.meta.url)}`, async () => {
     ['--ontology', `https://fake.com/${basename(import.meta.url)}.nt`]
   );
 
-  await expect(run).rejects.toThrowError('Unexpected unnamed URL');
+  await expect(run).rejects.toThrowError('to have a short name');
 });
 
 test(`notMarkedAsClass_cycle_${basename(import.meta.url)}`, async () => {

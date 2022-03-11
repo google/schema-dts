@@ -21,10 +21,10 @@ import {PassThrough, Writable} from 'stream';
 
 import fs from 'fs/promises';
 import {load, loadFile} from '../../src/triples/reader.js';
-import {Triple} from '../../src/triples/triple.js';
-import {SchemaString, UrlNode} from '../../src/triples/types.js';
+
 import {flush} from '../helpers/async.js';
 import {Mocked, SpiedFunction} from '../helpers/jest-types.js';
+import {Literal, NamedNode, Quad, Store} from 'n3';
 
 describe('load', () => {
   let get: Mocked<typeof https.get>;
@@ -51,7 +51,7 @@ describe('load', () => {
   });
 
   describe('with one or more message', () => {
-    let triples: Promise<Triple[]>;
+    let store: Promise<Store>;
     let fakeResponse: FakeResponseFunc;
 
     beforeEach(async () => {
@@ -64,7 +64,7 @@ describe('load', () => {
       });
 
       // toPromise makes Observables un-lazy, so we can just go ahead.
-      triples = load('https://schema.org/');
+      store = load('https://schema.org/');
 
       await flush();
     });
@@ -73,28 +73,28 @@ describe('load', () => {
       // Make sure our test machinery works. If the METATEST fails, then
       // the test code itself broke.
       expect(get).toBeCalled();
-      expect(triples).not.toBeUndefined();
+      expect(store).not.toBeUndefined();
       expect(fakeResponse).toBeInstanceOf(Function);
     });
 
     it('First response fails at status', async () => {
       fakeResponse(500, 'So Sad!');
 
-      await expect(triples).rejects.toThrow('So Sad!');
+      await expect(store).rejects.toThrow('So Sad!');
     });
 
     it('First response fails at error', async () => {
       const control = fakeResponse(200, 'Ok');
       control.error('So BAD!');
 
-      await expect(triples).rejects.toThrow('So BAD!');
+      await expect(store).rejects.toThrow('So BAD!');
     });
 
     it('Immediate success (empty)', async () => {
       const control = fakeResponse(200, 'Ok');
       control.end();
 
-      await expect(triples).resolves.toEqual([]);
+      expect((await store).size).toEqual(0);
     });
 
     it('Oneshot', async () => {
@@ -104,12 +104,13 @@ describe('load', () => {
       );
       control.end();
 
-      await expect(triples).resolves.toEqual([
-        {
-          Subject: UrlNode.Parse('https://schema.org/Person'),
-          Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-          Object: new SchemaString('math'),
-        },
+      expect((await store).size).toEqual(1);
+      expect((await store).getQuads(null, null, null, null)).toEqual([
+        new Quad(
+          new NamedNode('https://schema.org/Person'),
+          new NamedNode('https://schema.org/knowsAbout'),
+          new Literal('"math"')
+        ),
       ]);
     });
 
@@ -123,18 +124,7 @@ describe('load', () => {
       );
       control.end();
 
-      await expect(triples).resolves.toEqual([
-        {
-          Subject: UrlNode.Parse('https://schema.org/Person'),
-          Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-          Object: new SchemaString('math'),
-        },
-        {
-          Subject: UrlNode.Parse('https://schema.org/Person'),
-          Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-          Object: new SchemaString('science'),
-        },
-      ]);
+      expect((await store).size).toEqual(2);
     });
 
     it('Multiple (works with unnamed URL: subject)', async () => {
@@ -147,19 +137,18 @@ describe('load', () => {
       );
       control.end();
 
-      await expect(triples).resolves.toEqual([
-        {
-          Subject: UrlNode.Parse('https://schema.org/Person'),
-          Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-          Object: new SchemaString('math'),
-        },
-        {
-          Subject: UrlNode.Parse('http://schema.org/'),
-          Predicate: UrlNode.Parse(
-            'http://www.w3.org/2000/01/rdf-schema#comment'
-          ),
-          Object: new SchemaString('A test comment.'),
-        },
+      expect((await store).size).toEqual(2);
+      expect((await store).getQuads(null, null, null, null)).toEqual([
+        new Quad(
+          new NamedNode('https://schema.org/Person'),
+          new NamedNode('https://schema.org/knowsAbout'),
+          new Literal('"math"')
+        ),
+        new Quad(
+          new NamedNode('http://schema.org/'),
+          new NamedNode('http://www.w3.org/2000/01/rdf-schema#comment'),
+          new Literal('"A test comment."')
+        ),
       ]);
     });
 
@@ -173,19 +162,17 @@ describe('load', () => {
       );
       control.end();
 
-      await expect(triples).resolves.toEqual([
-        {
-          Subject: UrlNode.Parse('https://schema.org/Person'),
-          Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-          Object: new SchemaString('math'),
-        },
-        {
-          Subject: UrlNode.Parse('https://schema.org/X?A=B'),
-          Predicate: UrlNode.Parse(
-            'http://www.w3.org/2000/01/rdf-schema#comment'
-          ),
-          Object: new SchemaString('A test comment.'),
-        },
+      expect((await store).getQuads(null, null, null, null)).toEqual([
+        new Quad(
+          new NamedNode('https://schema.org/Person'),
+          new NamedNode('https://schema.org/knowsAbout'),
+          new Literal('"math"')
+        ),
+        new Quad(
+          new NamedNode('https://schema.org/X?A=B'),
+          new NamedNode('http://www.w3.org/2000/01/rdf-schema#comment'),
+          new Literal('"A test comment."')
+        ),
       ]);
     });
 
@@ -199,18 +186,7 @@ describe('load', () => {
       );
       control.end();
 
-      await expect(triples).resolves.toEqual([
-        {
-          Subject: UrlNode.Parse('https://schema.org/Person'),
-          Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-          Object: new SchemaString('math'),
-        },
-        {
-          Subject: UrlNode.Parse('http://schema.org/A'),
-          Predicate: UrlNode.Parse('https://schema.org'),
-          Object: new SchemaString('A test comment.'),
-        },
-      ]);
+      expect((await store).size).toEqual(2);
     });
 
     it('Multiple (dirty broken)', async () => {
@@ -221,17 +197,17 @@ describe('load', () => {
       );
       control.end();
 
-      await expect(triples).resolves.toEqual([
-        {
-          Subject: UrlNode.Parse('https://schema.org/Person'),
-          Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-          Object: new SchemaString('math'),
-        },
-        {
-          Subject: UrlNode.Parse('https://schema.org/Person'),
-          Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-          Object: new SchemaString('science'),
-        },
+      expect((await store).getQuads(null, null, null, null)).toEqual([
+        new Quad(
+          new NamedNode('https://schema.org/Person'),
+          new NamedNode('https://schema.org/knowsAbout'),
+          new Literal('"math"')
+        ),
+        new Quad(
+          new NamedNode('https://schema.org/Person'),
+          new NamedNode('https://schema.org/knowsAbout'),
+          new Literal('"science"')
+        ),
       ]);
     });
 
@@ -243,25 +219,7 @@ describe('load', () => {
       );
       control.end();
 
-      await expect(triples).resolves.toEqual([
-        {
-          Subject: UrlNode.Parse('https://schema.org/Person'),
-          Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-          Object: new SchemaString('math'),
-        },
-      ]);
-    });
-
-    describe('not yet supported', () => {
-      it('blank node objects', async () => {
-        const control = fakeResponse(200, 'Ok');
-        control.data(
-          `<https://schema.org/Person> <https://schema.org/knowsAbout> _:a .\n`
-        );
-        control.end();
-
-        await expect(triples).rejects.toThrow('Unexpected BlankNode');
-      });
+      expect((await store).size).toEqual(1);
     });
 
     describe('.nt syntax errors', () => {
@@ -269,14 +227,14 @@ describe('load', () => {
         const control = fakeResponse(200, 'Ok');
         control.data(`<https://schema.org/knowsAbout> <https://sc`);
         control.end();
-        await expect(triples).rejects.toThrow();
+        await expect(store).rejects.toThrow();
       });
 
       it('only two datums', async () => {
         const control = fakeResponse(200, 'Ok');
         control.data(`<https://schema.org/knowsAbout> <https://sc> .`);
         control.end();
-        await expect(triples).rejects.toThrow();
+        await expect(store).rejects.toThrow();
       });
 
       it('missing dot', async () => {
@@ -285,35 +243,35 @@ describe('load', () => {
           `<https://schema.org/knowsAbout> <https://scema.org/domainIncludes> "a"`
         );
         control.end();
-        await expect(triples).rejects.toThrow();
+        await expect(store).rejects.toThrow();
       });
 
       it('Non-IRI Subject', async () => {
         const control = fakeResponse(200, 'Ok');
         control.data(`"knowsAbout" <https://scema.org/domainIncludes> "a" .`);
         control.end();
-        await expect(triples).rejects.toThrow();
+        await expect(store).rejects.toThrow();
       });
 
       it('Non-IRI Predicate', async () => {
         const control = fakeResponse(200, 'Ok');
         control.data(`<https://schema.org/knowsAbout> "domainIncludes" "a"`);
         control.end();
-        await expect(triples).rejects.toThrow();
+        await expect(store).rejects.toThrow();
       });
 
       it('Invalid object', async () => {
         const control = fakeResponse(200, 'Ok');
         control.data(`<https://schema.org/a> <https://schema.org/b> 'c`);
         control.end();
-        await expect(triples).rejects.toThrow();
+        await expect(store).rejects.toThrow();
       });
 
       it('Domain only', async () => {
         const control = fakeResponse(200, 'Ok');
         control.data(`<https://schema.org/> <https://schema.org/b> "c"`);
         control.end();
-        await expect(triples).rejects.toThrow();
+        await expect(store).rejects.toThrow();
       });
     });
 
@@ -343,21 +301,21 @@ describe('load', () => {
       it('Post Redirect response fails at status', async () => {
         fakeResponse2(500, 'So Sad!');
 
-        await expect(triples).rejects.toThrow('So Sad!');
+        await expect(store).rejects.toThrow('So Sad!');
       });
 
       it('Post Redirect response fails at error', async () => {
         const control = fakeResponse2(200, 'Ok');
         control.error('So BAD!');
 
-        await expect(triples).rejects.toThrow('So BAD!');
+        await expect(store).rejects.toThrow('So BAD!');
       });
 
       it('Post Redirect (empty)', async () => {
         const control = fakeResponse2(200, 'Ok');
         control.end();
 
-        await expect(triples).resolves.toEqual([]);
+        expect((await store).size).toEqual(0);
       });
 
       it('Post Redirect Oneshot', async () => {
@@ -367,13 +325,7 @@ describe('load', () => {
         );
         control.end();
 
-        await expect(triples).resolves.toEqual([
-          {
-            Subject: UrlNode.Parse('https://schema.org/Person'),
-            Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-            Object: new SchemaString('math'),
-          },
-        ]);
+        expect((await store).size).toEqual(1);
       });
 
       it('Post Redirect Multiple (clean broken)', async () => {
@@ -386,18 +338,7 @@ describe('load', () => {
         );
         control.end();
 
-        await expect(triples).resolves.toEqual([
-          {
-            Subject: UrlNode.Parse('https://schema.org/Person'),
-            Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-            Object: new SchemaString('math'),
-          },
-          {
-            Subject: UrlNode.Parse('https://schema.org/Person'),
-            Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-            Object: new SchemaString('science'),
-          },
-        ]);
+        expect((await store).size).toEqual(2);
       });
 
       it('Post Redirect Multiple (dirty broken)', async () => {
@@ -408,18 +349,7 @@ describe('load', () => {
         );
         control.end();
 
-        await expect(triples).resolves.toEqual([
-          {
-            Subject: UrlNode.Parse('https://schema.org/Person'),
-            Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-            Object: new SchemaString('math'),
-          },
-          {
-            Subject: UrlNode.Parse('https://schema.org/Person'),
-            Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-            Object: new SchemaString('science'),
-          },
-        ]);
+        expect((await store).size).toEqual(2);
       });
     });
     describe('local file', () => {
@@ -441,14 +371,14 @@ describe('load', () => {
       it('loads a file from the correct path', async () => {
         const mockFilePath = './ontology.nt';
 
-        const fileTriples = loadFile(mockFilePath);
+        const fileStore = loadFile(mockFilePath);
 
-        await expect(fileTriples).resolves.toEqual([
-          {
-            Subject: UrlNode.Parse('https://schema.org/Person'),
-            Predicate: UrlNode.Parse('https://schema.org/knowsAbout'),
-            Object: UrlNode.Parse('https://schema.org/Event')!,
-          },
+        expect((await fileStore).getQuads(null, null, null, null)).toEqual([
+          new Quad(
+            new NamedNode('https://schema.org/Person'),
+            new NamedNode('https://schema.org/knowsAbout'),
+            new NamedNode('https://schema.org/Event')!
+          ),
         ]);
       });
     });

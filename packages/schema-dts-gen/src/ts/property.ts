@@ -19,7 +19,6 @@ import type {PropertySignature} from 'typescript';
 const {factory, SyntaxKind} = ts;
 
 import {Log} from '../logging/index.js';
-import {Format, ObjectPredicate, TObject, TSubject} from '../triples/triple.js';
 import {
   GetComment,
   IsDomainIncludes,
@@ -34,20 +33,23 @@ import {appendParagraph, withComments} from './util/comments.js';
 import {IdReferenceName, SchemaValueReference} from './helper_types.js';
 import {typeUnion} from './util/union.js';
 
+import type {NamedNode, Quad} from 'n3';
+import {assertIs} from '../util/assert.js';
+
 /**
  * A "class" of properties, not associated with any particuar object.
  */
 export class PropertyType {
   private readonly types: Class[] = [];
   private _comment?: string;
-  private readonly _supersededBy: TObject[] = [];
+  private readonly _supersededBy: NamedNode[] = [];
 
-  constructor(private readonly subject: TSubject) {}
+  constructor(private readonly subject: NamedNode) {}
 
   get comment() {
     if (!this.deprecated) return this._comment;
     const deprecated = `@deprecated Consider using ${this._supersededBy
-      .map(o => o.toString())
+      .map(o => o.id)
       .join(' or ')} instead.`;
 
     return appendParagraph(this._comment, deprecated);
@@ -57,47 +59,56 @@ export class PropertyType {
     return this._supersededBy.length > 0;
   }
 
-  add(value: ObjectPredicate, classes: ClassMap): boolean {
+  add(value: Quad, classes: ClassMap): boolean {
     const c = GetComment(value);
     if (c) {
       if (this._comment) {
         Log(
-          `Duplicate comments provided on property ${this.subject.toString()}. It will be overwritten.`
+          `Duplicate comments provided on property ${this.subject.id}. It will be overwritten.`
         );
       }
       this._comment = c.comment;
       return true;
     }
 
-    if (IsRangeIncludes(value.Predicate)) {
-      if (!IsTypeName(value.Object)) {
+    if (IsRangeIncludes(value.predicate)) {
+      if (!IsTypeName(value.object)) {
         throw new Error(
-          `Type expected to be a UrlNode always. When adding ${Format(
-            value
-          )} to ${this.subject.toString()}.`
+          `Type expected to be a UrlNode always. When adding ${JSON.stringify(
+            value.toJSON(),
+            undefined,
+            2
+          )}.`
         );
       }
-      const cls = classes.get(value.Object.toString());
+      const cls = classes.get(value.object.id);
       if (!cls) {
-        throw new Error(`Could not find class for ${value.Object.toString()}`);
+        throw new Error(
+          `Could not find class for ${value.object.id} [only foud: ${Array.from(
+            classes.keys()
+          ).join(', ')}]`
+        );
       }
       this.types.push(cls);
       return true;
     }
 
-    if (IsDomainIncludes(value.Predicate)) {
-      const cls = classes.get(value.Object.toString());
+    if (IsDomainIncludes(value.predicate)) {
+      const cls = classes.get(value.object.id);
       if (!cls) {
         throw new Error(
-          `Could not find class for ${this.subject.name}, ${Format(value)}.`
+          `Could not find class for ${
+            value.object.id
+          }. [only foud: ${Array.from(classes.keys()).join(', ')}]`
         );
       }
       cls.addProp(new Property(this.subject, this));
       return true;
     }
 
-    if (IsSupersededBy(value.Predicate)) {
-      this._supersededBy.push(value.Object);
+    if (IsSupersededBy(value.predicate)) {
+      assertIs(value.object, (o): o is NamedNode => o.termType === 'NamedNode');
+      this._supersededBy.push(value.object);
       return true;
     }
 
@@ -122,7 +133,7 @@ export class PropertyType {
  * A Property on a particular object.
  */
 export class Property {
-  constructor(readonly key: TSubject, private readonly type: PropertyType) {}
+  constructor(readonly key: NamedNode, private readonly type: PropertyType) {}
 
   get deprecated() {
     return this.type.deprecated;
@@ -150,7 +161,7 @@ export class Property {
 }
 
 export class TypeProperty {
-  constructor(private readonly className: TSubject) {}
+  constructor(private readonly className: NamedNode) {}
 
   toNode(context: Context) {
     return factory.createPropertySignature(

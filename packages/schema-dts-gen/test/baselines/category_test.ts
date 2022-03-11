@@ -80,7 +80,7 @@ test(`baseline_${basename(import.meta.url)}`, async () => {
   expect(actualLogs).toMatchInlineSnapshot(`
     "Loading Ontology from URL: https://fake.com/category_test.ts.nt
     Got Response 200: Ok.
-    Class Distillery: Did not add [(source https://github.com/schemaorg/schemaorg/issues/743),(category \\"issue-743\\"),(label \\"Distillery\\")]
+    Class Distillery: Did not add [(source 743),(category issue-743),(label Distillery)]
     "
   `);
 });

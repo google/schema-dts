@@ -18,7 +18,8 @@ import ts from 'typescript';
 import type {PropertySignature} from 'typescript';
 const {factory} = ts;
 
-import {TSubject} from '../triples/triple.js';
+import {NamedNode} from 'n3';
+import {nameFromContext} from '../triples/term_utils.js';
 
 export class Context {
   private readonly context: Array<readonly [string, string]> = [];
@@ -54,21 +55,20 @@ export class Context {
     }
   }
 
-  getScopedName(node: TSubject): string {
-    for (const [name, url] of this.context) {
-      if (node.matchesContext(url)) {
+  getScopedName(node: NamedNode): string {
+    for (const [ctxName, url] of this.context) {
+      const name = nameFromContext(node, url);
+      if (name !== null) {
         // Valid possibilities:
         // - "schema:Foo"  when name == schema && node.name == Foo.
         // - "schema:"     when name == schema && node.name is undefined.
         // - "Foo"         when name is empty and node.name is Foo.
         //
         // Don't allow "" when name is empty and  node.name is undefined.
-        return name === ''
-          ? node.name ?? node.toString()
-          : `${name}:${node.name || ''}`;
+        return ctxName === '' ? name || node.id : `${ctxName}:${name}`;
       }
     }
-    return node.toString();
+    return node.id;
   }
 
   private typeNode() {

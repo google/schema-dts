@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 import {jest} from '@jest/globals';
+import {NamedNode} from 'n3';
 
-import {UrlNode} from '../../src/triples/types.js';
 import {EnumValue} from '../../src/ts/enum.js';
 import {makeClass, makeClassMap} from '../helpers/make_class.js';
 
@@ -30,8 +30,8 @@ describe('EnumValue', () => {
       expect(
         () =>
           new EnumValue(
-            UrlNode.Parse('https://schema.org/Wednesday'),
-            [UrlNode.Parse('https://schema.org/DayOfWeek')],
+            new NamedNode('https://schema.org/Wednesday'),
+            [new NamedNode('https://schema.org/DayOfWeek')],
             map
           )
       ).toThrowError("Couldn't find");
@@ -49,8 +49,8 @@ describe('EnumValue', () => {
       );
 
       const myEnum = new EnumValue(
-        UrlNode.Parse('https://schema.org/Wednesday'),
-        [UrlNode.Parse('https://schema.org/DayOfWeek')],
+        new NamedNode('https://schema.org/Wednesday'),
+        [new NamedNode('https://schema.org/DayOfWeek')],
         map
       );
 
@@ -71,10 +71,10 @@ describe('EnumValue', () => {
       );
 
       const myEnum = new EnumValue(
-        UrlNode.Parse('https://schema.org/SurgicalProcedure'),
+        new NamedNode('https://schema.org/SurgicalProcedure'),
         [
-          UrlNode.Parse('https://schema.org/MedicalProcedureType'),
-          UrlNode.Parse('http://www.w3.org/2000/01/rdf-schema#Class'),
+          new NamedNode('https://schema.org/MedicalProcedureType'),
+          new NamedNode('http://www.w3.org/2000/01/rdf-schema#Class'),
         ],
         map
       );
