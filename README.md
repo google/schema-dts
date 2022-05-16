@@ -44,7 +44,7 @@ You will usually want your top-level item to include a `@context`, like
 can augment it with `WithContext`, e.g.:
 
 ```ts
-import {Person, WithContext} from 'schema-dts';
+import type {Person, WithContext} from 'schema-dts';
 
 const p: WithContext<Person> = {
   '@context': 'https://schema.org',
@@ -75,7 +75,7 @@ their parent. Other objects are defined at the top-level with an `@id`, because
 multiple nodes refer to them.
 
 ```ts
-import {Graph} from 'schema-dts';
+import type {Graph} from 'schema-dts';
 
 const graph: Graph = {
   '@context': 'https://schema.org',

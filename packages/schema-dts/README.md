@@ -31,7 +31,7 @@ Then you can use it by importing `"schema-dts"`.
 ### Defining Simple Properties
 
 ```ts
-import {Person} from 'schema-dts';
+import type {Person} from 'schema-dts';
 
 const inventor: Person = {
   '@type': 'Person',
@@ -54,7 +54,7 @@ to describe the URIs represeting the types and properties being referenced.
 schema-dts provides the `WithContext<T>` type to facilitate this.
 
 ```ts
-import {Organization, Thing, WithContext} from 'schema-dts';
+import type {Organization, Thing, WithContext} from 'schema-dts';
 
 export function JsonLd<T extends Thing>(json: WithContext<T>): string {
   return `<script type="application/ld+json">
@@ -87,7 +87,7 @@ their parent. Other objects are defined at the top-level with an `@id`, because
 multiple nodes refer to them.
 
 ```ts
-import {Graph} from 'schema-dts';
+import type {Graph} from 'schema-dts';
 
 const graph: Graph = {
   '@context': 'https://schema.org',

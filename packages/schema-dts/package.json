@@ -22,9 +22,6 @@
     "mkdirp": "^1.0.4",
     "schema-dts-gen": "*"
   },
-  "peerDependencies": {
-    "typescript": ">=4.1.0"
-  },
   "keywords": [
     "typescript",
     "tsd",
