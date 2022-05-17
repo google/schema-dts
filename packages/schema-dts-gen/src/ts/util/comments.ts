@@ -113,11 +113,19 @@ function parseCommentInternal<P extends Processor>(
 // without line break tags as a strong indication to use Markdown (even if other
 //  HTML exists). Othrewise, we simply test for the existence of any HTML tag.
 function shouldParseAsHtml(s: string): boolean {
-  const BR = /<[Bb][Rr]\s*\/?>/g;
-  const NL = /\/*n/g;
+  const BR = /<br\s*\/?>/gi;
+  const NL = /\n/gi;
   if (NL.test(s) && !BR.test(s)) return false;
 
-  return /<[A-Za-z][A-Za-z0-9-]*[^>]*>/g.test(s);
+  // Any part of the string that is _not_ escaped in (`) cannot contain HTML in
+  // a Markdown comment.
+  //
+  // Similarly, strip all `<code>` blocks entirely. These are somehow still
+  // included in Markdown comments.
+  const stripped = s
+    .replace(/<code[^<>]*>((?!<\/code>).)*<\/code\s*>/gi, '')
+    .replace(/(?!^)(`+)((?!\1).)+\1/g, '');
+  return /<[A-Za-z][A-Za-z0-9-]*(\s[^<>]*)?>/g.test(stripped);
 }
 
 interface ParseContext {
@@ -169,11 +177,17 @@ const universalHandlers: OnTagBuilder[] = [
 const htmlHandlers: OnTagBuilder[] = [
   [
     'p',
-    {open: ({isFirstChild}) => (isFirstChild ? '' : '\n'), close: () => '\n'},
+    {
+      open: ({isFirstChild}) => (isFirstChild ? '' : '\n'),
+      close: () => '\n',
+    },
   ],
   [
     'a',
-    {open: ({node}) => `{@link ${node.properties!['href']} `, close: () => '}'},
+    {
+      open: ({node}) => `{@link ${node.properties!['href']} `,
+      close: () => '}',
+    },
   ],
   ['em', em],
   ['i', em],
