@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-import ts from 'typescript';
-import type {Node} from 'typescript';
-const {setSyntheticLeadingComments, SyntaxKind} = ts;
+import ts from "typescript";
+import type { Node } from "typescript";
+const { setSyntheticLeadingComments, SyntaxKind } = ts;
 
-import {unified} from 'unified';
-import type {Processor} from 'unified';
-import markdown from 'remark-parse';
-import html from 'rehype-parse';
-import type {Literal, Node as AstNode, Parent} from 'unist';
-import wikiLinkPlugin from 'remark-wiki-link';
-import mdastToHast from 'remark-rehype';
-import stripWhitespace from 'rehype-minify-whitespace';
-import raw from 'rehype-raw';
+import { unified } from "unified";
+import type { Processor } from "unified";
+import markdown from "remark-parse";
+import html from "rehype-parse";
+import type { Literal, Node as AstNode, Parent } from "unist";
+import wikiLinkPlugin from "remark-wiki-link";
+import mdastToHast from "remark-rehype";
+import stripWhitespace from "rehype-minify-whitespace";
+import raw from "rehype-raw";
 
 export function withComments<T extends Node>(
   comment: string | undefined,
@@ -62,15 +62,15 @@ function parseComment(comment: string): string {
   const parseAsHtml = shouldParseAsHtml(comment);
   const commentToParse = unescape(comment);
   const processor = parseAsHtml
-    ? unified().use(html, {fragment: true}).use(stripWhitespace)
+    ? unified().use(html, { fragment: true }).use(stripWhitespace)
     : unified()
         .use(markdown)
         .use(wikiLinkPlugin, {
-          hrefTemplate: s => `https://schema.org/${s}`,
-          pageResolver: s => [s],
-          aliasDivider: '|',
+          hrefTemplate: (s) => `https://schema.org/${s}`,
+          pageResolver: (s) => [s],
+          aliasDivider: "|",
         })
-        .use(mdastToHast, {allowDangerousHtml: true})
+        .use(mdastToHast, { allowDangerousHtml: true })
         .use(raw)
         .use(stripWhitespace);
 
@@ -87,12 +87,12 @@ function parseComment(comment: string): string {
     parent: undefined,
   });
 
-  const lines = context.result.join('').trim().split('\n');
+  const lines = context.result.join("").trim().split("\n");
 
   // Hack to get JSDOCs working. Microsoft does not expose JSDOC-creation API.
   return lines.length === 1
     ? `* ${lines[0]} `
-    : '*\n * ' + lines.join('\n * ') + '\n ';
+    : "*\n * " + lines.join("\n * ") + "\n ";
 }
 
 function parseCommentInternal<P extends Processor>(
@@ -119,7 +119,12 @@ function shouldParseAsHtml(s: string): boolean {
 
   // Any part of the string that is _not_ escaped in (`) cannot contain HTML in
   // a Markdown comment.
-  const stripped = s.replace(/(?!^)(`+)((?!\1).)+\1/g, '');
+  //
+  // Similarly, strip all `<code>` blocks entirely. These are somehow still
+  // included in Markdown comments.
+  const stripped = s
+    .replace(/<code[^<>]*>((?!<\/code>).)*<\/code\s*>/gi, "")
+    .replace(/(?!^)(`+)((?!\1).)+\1/g, "");
   return /<[A-Za-z][A-Za-z0-9-]*(\s[^<>]*)?>/g.test(stripped);
 }
 
@@ -145,7 +150,7 @@ interface TagContext {
 }
 
 interface FriendlyNode {
-  properties?: {[attribute: string]: string};
+  properties?: { [attribute: string]: string };
   url?: string;
   data: {
     alias?: string;
@@ -155,69 +160,75 @@ interface FriendlyNode {
 
 // Some handlers for behaviors that apply to multiple tags:
 const em: OnTag = {
-  open: () => '_',
-  close: () => '_',
+  open: () => "_",
+  close: () => "_",
 };
 const strong: OnTag = {
-  open: () => '__',
-  close: () => '__',
+  open: () => "__",
+  close: () => "__",
 };
 
 // Our top-level tag handler.
 const universalHandlers: OnTagBuilder[] = [
-  ['root', {}],
-  ['text', {value: v => v}],
+  ["root", {}],
+  ["text", { value: (v) => v }],
 ];
 
 const htmlHandlers: OnTagBuilder[] = [
   [
-    'p',
-    {open: ({isFirstChild}) => (isFirstChild ? '' : '\n'), close: () => '\n'},
+    "p",
+    {
+      open: ({ isFirstChild }) => (isFirstChild ? "" : "\n"),
+      close: () => "\n",
+    },
   ],
   [
-    'a',
-    {open: ({node}) => `{@link ${node.properties!['href']} `, close: () => '}'},
+    "a",
+    {
+      open: ({ node }) => `{@link ${node.properties!["href"]} `,
+      close: () => "}",
+    },
   ],
-  ['em', em],
-  ['i', em],
-  ['strong', strong],
-  ['b', strong],
-  ['br', {open: () => '\n' /* Ignore closing of <BR> */}],
-  ['li', {open: () => '- ', close: () => '\n'}],
+  ["em", em],
+  ["i", em],
+  ["strong", strong],
+  ["b", strong],
+  ["br", { open: () => "\n" /* Ignore closing of <BR> */ }],
+  ["li", { open: () => "- ", close: () => "\n" }],
   [
-    'ul',
+    "ul",
     {
       /* Ignore <UL> entirely. */
     },
   ],
   [
-    'code',
+    "code",
     {
-      open({isFirstChild, isLastChild, parent}) {
+      open({ isFirstChild, isLastChild, parent }) {
         if (
           parent &&
           isFirstChild &&
           isLastChild &&
-          getNodeType(parent as AstNode) === 'pre'
+          getNodeType(parent as AstNode) === "pre"
         ) {
-          return '';
+          return "";
         }
-        return '`';
+        return "`";
       },
-      close({isFirstChild, isLastChild, parent}) {
+      close({ isFirstChild, isLastChild, parent }) {
         if (
           parent &&
           isFirstChild &&
           isLastChild &&
-          getNodeType(parent as AstNode) === 'pre'
+          getNodeType(parent as AstNode) === "pre"
         ) {
-          return '';
+          return "";
         }
-        return '`';
+        return "`";
       },
     },
   ],
-  ['pre', {open: () => '```\n', close: () => '\n```\n'}],
+  ["pre", { open: () => "```\n", close: () => "\n```\n" }],
 ];
 
 function one(
@@ -240,7 +251,7 @@ function one(
 
   if (handler.open) {
     context.result.push(
-      handler.open({...nodeContext, node: node as FriendlyNode})
+      handler.open({ ...nodeContext, node: node as FriendlyNode })
     );
   }
 
@@ -262,24 +273,24 @@ function one(
 
   if (handler.close) {
     context.result.push(
-      handler.close({...nodeContext, node: node as FriendlyNode})
+      handler.close({ ...nodeContext, node: node as FriendlyNode })
     );
   }
 }
 
 function getNodeType(node: AstNode): string {
-  return node.type === 'element'
-    ? (node as unknown as {tagName: string}).tagName
+  return node.type === "element"
+    ? (node as unknown as { tagName: string }).tagName
     : node.type;
 }
 
 // String Replacement: make sure we replace unicode strings as needed, wherever
 // they show up as text.
 const replacer: Array<[RegExp, string]> = [
-  [/\\?\\n/g, '\n'],
-  [/\\?\\u2014/gi, '\u2014'],
-  [/\\?\\u2019/gi, '\u2019'],
-  [/\\?\\u00A3/gi, '\u00A3'],
+  [/\\?\\n/g, "\n"],
+  [/\\?\\u2014/gi, "\u2014"],
+  [/\\?\\u2019/gi, "\u2019"],
+  [/\\?\\u00A3/gi, "\u00A3"],
 ];
 function unescape(str: string): string {
   for (const [regexp, replacement] of replacer) {
