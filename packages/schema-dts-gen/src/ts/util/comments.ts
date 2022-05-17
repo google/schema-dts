@@ -114,10 +114,10 @@ function parseCommentInternal<P extends Processor>(
 //  HTML exists). Othrewise, we simply test for the existence of any HTML tag.
 function shouldParseAsHtml(s: string): boolean {
   const BR = /<[Bb][Rr]\s*\/?>/g;
-  const NL = /\/*n/g;
+  const NL = /\/n/g;
   if (NL.test(s) && !BR.test(s)) return false;
 
-  return /<[A-Za-z][A-Za-z0-9-]*[^>]*>/g.test(s);
+  return /<[A-Za-z][A-Za-z0-9-]*(\s[^>]*)?>/g.test(s);
 }
 
 interface ParseContext {
