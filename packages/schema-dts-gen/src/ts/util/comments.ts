@@ -117,7 +117,7 @@ function shouldParseAsHtml(s: string): boolean {
   const NL = /\/n/g;
   if (NL.test(s) && !BR.test(s)) return false;
 
-  return /<[A-Za-z][A-Za-z0-9-]*(\s[^>]*)?>/g.test(s);
+  return /<[A-Za-z][A-Za-z0-9-]*(\s[^<>]*)?>/g.test(s);
 }
 
 interface ParseContext {
