@@ -113,8 +113,8 @@ function parseCommentInternal<P extends Processor>(
 // without line break tags as a strong indication to use Markdown (even if other
 //  HTML exists). Othrewise, we simply test for the existence of any HTML tag.
 function shouldParseAsHtml(s: string): boolean {
-  const BR = /<[Bb][Rr]\s*\/?>/g;
-  const NL = /\/n/g;
+  const BR = /<br\s*\/?>/gi;
+  const NL = /\n/gi;
   if (NL.test(s) && !BR.test(s)) return false;
 
   // Any part of the string that is _not_ escaped in (`) cannot contain HTML in
