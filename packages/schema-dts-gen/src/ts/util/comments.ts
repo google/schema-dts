@@ -117,7 +117,10 @@ function shouldParseAsHtml(s: string): boolean {
   const NL = /\/n/g;
   if (NL.test(s) && !BR.test(s)) return false;
 
-  return /<[A-Za-z][A-Za-z0-9-]*(\s[^<>]*)?>/g.test(s);
+  // Any part of the string that is _not_ escaped in (`) cannot contain HTML in
+  // a Markdown comment.
+  const stripped = s.replace(/`[^`]+`/, '');
+  return /<[A-Za-z][A-Za-z0-9-]*(\s[^<>]*)?>/g.test(stripped);
 }
 
 interface ParseContext {
