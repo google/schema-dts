@@ -119,7 +119,7 @@ function shouldParseAsHtml(s: string): boolean {
 
   // Any part of the string that is _not_ escaped in (`) cannot contain HTML in
   // a Markdown comment.
-  const stripped = s.replace(/`[^`]+`/, '');
+  const stripped = s.replace(/`[^`]+`/g, '');
   return /<[A-Za-z][A-Za-z0-9-]*(\s[^<>]*)?>/g.test(stripped);
 }
 
