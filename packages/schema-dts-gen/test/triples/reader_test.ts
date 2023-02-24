@@ -28,7 +28,7 @@ import {Literal, NamedNode, Quad, Store} from 'n3';
 
 describe('load', () => {
   let get: Mock<typeof https.get>;
-  let ogGet: typeof https['get'];
+  let ogGet: (typeof https)['get'];
 
   beforeEach(() => {
     get = jest.fn();
@@ -353,7 +353,7 @@ describe('load', () => {
       });
     });
     describe('local file', () => {
-      let readFileFn: SpiedFunction<typeof fs['readFile']>;
+      let readFileFn: SpiedFunction<(typeof fs)['readFile']>;
       beforeEach(() => {
         const mockFileLine = `<https://schema.org/Person> <https://schema.org/knowsAbout> <https://schema.org/Event> .\n`;
         readFileFn = jest
