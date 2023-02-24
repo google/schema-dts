@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 import {jest} from '@jest/globals';
+import type {Mock} from 'jest-mock';
 
 import {Log, SetLogger, SetOptions} from '../../src/logging/index.js';
-import {Mocked} from '../helpers/jest-types.js';
 
 describe('Log', () => {
-  let logErr: Mocked<Console['error']>;
+  let logErr: Mock<Console['error']>;
   let ResetLogger: undefined | (() => void) = undefined;
 
   beforeEach(() => {

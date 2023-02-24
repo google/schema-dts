@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import {jest} from '@jest/globals';
+import type {Mock, SpiedFunction} from 'jest-mock';
 
 import {ClientRequest, IncomingMessage} from 'http';
 import https from 'https';
@@ -23,11 +24,10 @@ import fs from 'fs/promises';
 import {load, loadFile} from '../../src/triples/reader.js';
 
 import {flush} from '../helpers/async.js';
-import {Mocked, SpiedFunction} from '../helpers/jest-types.js';
 import {Literal, NamedNode, Quad, Store} from 'n3';
 
 describe('load', () => {
-  let get: Mocked<typeof https.get>;
+  let get: Mock<typeof https.get>;
   let ogGet: typeof https['get'];
 
   beforeEach(() => {

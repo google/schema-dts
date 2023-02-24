@@ -273,7 +273,6 @@ export class Class {
       .map(prop => prop.toNode(context, properties));
 
     return factory.createInterfaceDeclaration(
-      /*decorators=*/ [],
       /*modifiers=*/ [],
       baseName,
       /*typeParameters=*/ [],
@@ -294,7 +293,6 @@ export class Class {
     assert(baseName, 'Expect baseName to exist when leafName exists.');
 
     return factory.createInterfaceDeclaration(
-      /*decorators=*/ [],
       /*modifiers=*/ [],
       leafName,
       /*typeParameters=*/ [],
@@ -366,7 +364,6 @@ export class Class {
     const declaration = withComments(
       this.comment,
       factory.createTypeAliasDeclaration(
-        /* decorators = */ [],
         factory.createModifiersFromModifierFlags(ModifierFlags.Export),
         this.className(),
         this.typeParameters(),
@@ -440,11 +437,13 @@ export class RoleBuiltin extends Builtin {
   protected typeParameters(): readonly TypeParameterDeclaration[] {
     return [
       factory.createTypeParameterDeclaration(
+        /*modifiers=*/ [],
         /*name=*/ RoleBuiltin.kContentTypename,
         /*constraint=*/ undefined,
         /*default=*/ factory.createTypeReferenceNode('never')
       ),
       factory.createTypeParameterDeclaration(
+        /*modifiers=*/ [],
         /*name=*/ RoleBuiltin.kPropertyTypename,
         /*constraint=*/ factory.createTypeReferenceNode('string'),
         /*default=*/ factory.createTypeReferenceNode('never')
@@ -489,15 +488,16 @@ export class RoleBuiltin extends Builtin {
     assert(baseName, 'Role must have Base Name.');
 
     return factory.createTypeAliasDeclaration(
-      /*decorators=*/ [],
       /*modifiers=*/ [],
       leafName,
       /*typeParameters=*/ [
         factory.createTypeParameterDeclaration(
+          /*modifiers=*/ [],
           /*name=*/ RoleBuiltin.kContentTypename,
           /*constraint=*/ undefined
         ),
         factory.createTypeParameterDeclaration(
+          /*modifiers=*/ [],
           /*name=*/ RoleBuiltin.kPropertyTypename,
           /*constraint=*/ factory.createTypeReferenceNode('string')
         ),
@@ -511,6 +511,7 @@ export class RoleBuiltin extends Builtin {
         factory.createMappedTypeNode(
           /*initialToken=*/ undefined,
           /*typeParameter=*/ factory.createTypeParameterDeclaration(
+            /*modifiers=*/ [],
             'key',
             /*constraint=*/ factory.createTypeReferenceNode(
               RoleBuiltin.kPropertyTypename
@@ -520,7 +521,8 @@ export class RoleBuiltin extends Builtin {
           /*questionToken=*/ undefined,
           /*type=*/ factory.createTypeReferenceNode(
             RoleBuiltin.kContentTypename
-          )
+          ),
+          /*members=*/ undefined
         ),
       ])
     );
@@ -539,7 +541,6 @@ export class DataTypeUnion extends Builtin {
       withComments(
         this.comment,
         factory.createTypeAliasDeclaration(
-          /*decorators=*/ [],
           factory.createModifiersFromModifierFlags(ModifierFlags.Export),
           namedPortion(this.subject),
           /*typeParameters=*/ [],
