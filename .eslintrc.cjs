@@ -76,6 +76,10 @@ module.exports = {
         selector: 'typeLike',
         format: ['PascalCase'],
       },
+      {
+        selector: ['typeProperty', 'objectLiteralProperty'],
+        format: null,
+      },
     ],
     '@typescript-eslint/consistent-type-assertions': 'error',
     '@typescript-eslint/consistent-type-definitions': 'error',

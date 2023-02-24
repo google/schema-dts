@@ -28,11 +28,11 @@ function WithContextType(context: Context) {
       'objects used. The context provided in this type is compatible ' +
       'with the keys and URLs in the rest of this generated file.',
     factory.createTypeAliasDeclaration(
-      /*decorators=*/ [],
       factory.createModifiersFromModifierFlags(ModifierFlags.Export),
       'WithContext',
       [
         factory.createTypeParameterDeclaration(
+          /*modifiers=*/ [],
           'T' /*constraint=*/,
           factory.createTypeReferenceNode('Thing', /*typeArguments=*/ undefined)
         ),
@@ -49,7 +49,6 @@ function GraphType(context: Context) {
   return withComments(
     '',
     factory.createInterfaceDeclaration(
-      /*decorators=*/ [],
       factory.createModifiersFromModifierFlags(ModifierFlags.Export),
       GraphTypeName,
       /*typeParameters=*/ undefined,
@@ -99,13 +98,13 @@ export function HelperTypes(context: Context, {hasRole}: {hasRole: boolean}) {
     WithContextType(context),
     GraphType(context),
     factory.createTypeAliasDeclaration(
-      /*decorators=*/ [],
       /*modifiers=*/ [],
       SchemaValueName,
       arrayOf(
-        factory.createTypeParameterDeclaration('T'),
+        factory.createTypeParameterDeclaration(/*modifiers=*/ [], 'T'),
         hasRole &&
           factory.createTypeParameterDeclaration(
+            /*modifiers=*/ [],
             'TProperty',
             /*constraint=*/ factory.createTypeReferenceNode('string')
           )
@@ -135,7 +134,6 @@ export function HelperTypes(context: Context, {hasRole}: {hasRole: boolean}) {
       )
     ),
     factory.createTypeAliasDeclaration(
-      /*decorators=*/ [],
       /*modifiers=*/ [],
       IdReferenceName,
       /*typeParameters=*/ [],

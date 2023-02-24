@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ export function ParseFlags(args?: string[]): Options {
     dest: 'context',
   });
   parser.add_argument('--ontology', {
-    default: 'https://schema.org/version/latest/schemaorg-current-https.nt',
+    default: 'https://schema.org/version/latest/schemaorg-all-https.nt',
     help:
       'HTTPS URL to a custom .nt file defining an entirely self-' +
       'sufficient schema. The schema must still be described in terms of ' +

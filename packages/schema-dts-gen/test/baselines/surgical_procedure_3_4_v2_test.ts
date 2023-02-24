@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,58 +49,58 @@ test(`baseline_${basename(import.meta.url)}`, async () => {
   );
 
   expect(actual).toMatchInlineSnapshot(`
-"/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
-export type WithContext<T extends Thing> = T & {
-    \\"@context\\": \\"https://schema.org\\";
-};
-export interface Graph {
-    \\"@context\\": \\"https://schema.org\\";
-    \\"@graph\\": readonly Thing[];
-}
-type SchemaValue<T> = T | readonly T[];
-type IdReference = {
-    /** IRI identifying the canonical address of this object. */
-    \\"@id\\": string;
-};
+    "/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
+    export type WithContext<T extends Thing> = T & {
+        "@context": "https://schema.org";
+    };
+    export interface Graph {
+        "@context": "https://schema.org";
+        "@graph": readonly Thing[];
+    }
+    type SchemaValue<T> = T | readonly T[];
+    type IdReference = {
+        /** IRI identifying the canonical address of this object. */
+        "@id": string;
+    };
 
-interface EnumerationLeaf extends ThingBase {
-    \\"@type\\": \\"Enumeration\\";
-}
-export type Enumeration = EnumerationLeaf | MedicalEnumeration;
+    interface EnumerationLeaf extends ThingBase {
+        "@type": "Enumeration";
+    }
+    export type Enumeration = EnumerationLeaf | MedicalEnumeration;
 
-interface IntangibleLeaf extends ThingBase {
-    \\"@type\\": \\"Intangible\\";
-}
-export type Intangible = IntangibleLeaf | Enumeration;
+    interface IntangibleLeaf extends ThingBase {
+        "@type": "Intangible";
+    }
+    export type Intangible = IntangibleLeaf | Enumeration;
 
-interface MedicalEnumerationLeaf extends ThingBase {
-    \\"@type\\": \\"MedicalEnumeration\\";
-}
-export type MedicalEnumeration = MedicalEnumerationLeaf | MedicalProcedureType;
+    interface MedicalEnumerationLeaf extends ThingBase {
+        "@type": "MedicalEnumeration";
+    }
+    export type MedicalEnumeration = MedicalEnumerationLeaf | MedicalProcedureType;
 
-interface MedicalProcedureLeaf extends ThingBase {
-    \\"@type\\": \\"MedicalProcedure\\";
-}
-export type MedicalProcedure = MedicalProcedureLeaf | SurgicalProcedure;
+    interface MedicalProcedureLeaf extends ThingBase {
+        "@type": "MedicalProcedure";
+    }
+    export type MedicalProcedure = MedicalProcedureLeaf | SurgicalProcedure;
 
-interface MedicalProcedureTypeLeaf extends ThingBase {
-    \\"@type\\": \\"MedicalProcedureType\\";
-}
-export type MedicalProcedureType = \\"http://schema.org/SurgicalProcedure\\" | \\"https://schema.org/SurgicalProcedure\\" | \\"SurgicalProcedure\\" | MedicalProcedureTypeLeaf;
+    interface MedicalProcedureTypeLeaf extends ThingBase {
+        "@type": "MedicalProcedureType";
+    }
+    export type MedicalProcedureType = "http://schema.org/SurgicalProcedure" | "https://schema.org/SurgicalProcedure" | "SurgicalProcedure" | MedicalProcedureTypeLeaf;
 
-interface SurgicalProcedureLeaf extends ThingBase {
-    \\"@type\\": \\"SurgicalProcedure\\";
-}
-/** A type of medical procedure that involves invasive surgical techniques. */
-export type SurgicalProcedure = SurgicalProcedureLeaf;
+    interface SurgicalProcedureLeaf extends ThingBase {
+        "@type": "SurgicalProcedure";
+    }
+    /** A type of medical procedure that involves invasive surgical techniques. */
+    export type SurgicalProcedure = SurgicalProcedureLeaf;
 
-interface ThingBase extends Partial<IdReference> {
-}
-interface ThingLeaf extends ThingBase {
-    \\"@type\\": \\"Thing\\";
-}
-export type Thing = ThingLeaf | Intangible | MedicalProcedure;
+    interface ThingBase extends Partial<IdReference> {
+    }
+    interface ThingLeaf extends ThingBase {
+        "@type": "Thing";
+    }
+    export type Thing = ThingLeaf | Intangible | MedicalProcedure;
 
-"
-`);
+    "
+  `);
 });

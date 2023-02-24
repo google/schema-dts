@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,40 +42,40 @@ test(`baseline_${basename(import.meta.url)}`, async () => {
   );
 
   expect(actual).toMatchInlineSnapshot(`
-"/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
-export type WithContext<T extends Thing> = T & {
-    \\"@context\\": \\"https://schema.org\\";
-};
-export interface Graph {
-    \\"@context\\": \\"https://schema.org\\";
-    \\"@graph\\": readonly Thing[];
-}
-type SchemaValue<T> = T | readonly T[];
-type IdReference = {
-    /** IRI identifying the canonical address of this object. */
-    \\"@id\\": string;
-};
+    "/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
+    export type WithContext<T extends Thing> = T & {
+        "@context": "https://schema.org";
+    };
+    export interface Graph {
+        "@context": "https://schema.org";
+        "@graph": readonly Thing[];
+    }
+    type SchemaValue<T> = T | readonly T[];
+    type IdReference = {
+        /** IRI identifying the canonical address of this object. */
+        "@id": string;
+    };
 
-export type Number = number | \`\${number}\`;
+    export type Number = number | \`\${number}\`;
 
-export type Text = string;
+    export type Text = string;
 
-interface PersonLikeBase extends ThingBase {
-    \\"height\\"?: SchemaValue<Number>;
-}
-interface PersonLikeLeaf extends PersonLikeBase {
-    \\"@type\\": \\"PersonLike\\";
-}
-export type PersonLike = PersonLikeLeaf;
+    interface PersonLikeBase extends ThingBase {
+        "height"?: SchemaValue<Number>;
+    }
+    interface PersonLikeLeaf extends PersonLikeBase {
+        "@type": "PersonLike";
+    }
+    export type PersonLike = PersonLikeLeaf;
 
-interface ThingBase extends Partial<IdReference> {
-    \\"name\\"?: SchemaValue<Text>;
-}
-interface ThingLeaf extends ThingBase {
-    \\"@type\\": \\"Thing\\";
-}
-export type Thing = ThingLeaf | PersonLike;
+    interface ThingBase extends Partial<IdReference> {
+        "name"?: SchemaValue<Text>;
+    }
+    interface ThingLeaf extends ThingBase {
+        "@type": "Thing";
+    }
+    export type Thing = ThingLeaf | PersonLike;
 
-"
-`);
+    "
+  `);
 });

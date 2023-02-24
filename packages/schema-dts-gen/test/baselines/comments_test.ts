@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,87 +65,87 @@ test(`baseline_${basename(import.meta.url)}`, async () => {
   );
 
   expect(actual).toMatchInlineSnapshot(`
-"/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
-export type WithContext<T extends Thing> = T & {
-    \\"@context\\": \\"https://schema.org\\";
-};
-export interface Graph {
-    \\"@context\\": \\"https://schema.org\\";
-    \\"@graph\\": readonly Thing[];
-}
-type SchemaValue<T> = T | readonly T[];
-type IdReference = {
-    /** IRI identifying the canonical address of this object. */
-    \\"@id\\": string;
-};
+    "/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
+    export type WithContext<T extends Thing> = T & {
+        "@context": "https://schema.org";
+    };
+    export interface Graph {
+        "@context": "https://schema.org";
+        "@graph": readonly Thing[];
+    }
+    type SchemaValue<T> = T | readonly T[];
+    type IdReference = {
+        /** IRI identifying the canonical address of this object. */
+        "@id": string;
+    };
 
-/**
- * Data type: Number.
- *
- * Usage guidelines:
- * - Use values from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE' (U+0039)) rather than superficially similiar Unicode symbols.
- * - Use '.' (Unicode 'FULL STOP' (U+002E)) rather than ',' to indicate a decimal point. Avoid using these symbols as a readability separator.
- */
-export type Number = number | \`\${number}\`;
+    /**
+     * Data type: Number.
+     *
+     * Usage guidelines:
+     * - Use values from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE' (U+0039)) rather than superficially similiar Unicode symbols.
+     * - Use '.' (Unicode 'FULL STOP' (U+002E)) rather than ',' to indicate a decimal point. Avoid using these symbols as a readability separator.
+     */
+    export type Number = number | \`\${number}\`;
 
-/** Data type: Text. */
-export type Text = string;
+    /** Data type: Text. */
+    export type Text = string;
 
-interface ThingBase extends Partial<IdReference> {
+    interface ThingBase extends Partial<IdReference> {
+        /**
+         * Media type typically expressed using a MIME format (see {@link http://www.iana.org/assignments/media-types/media-types.xhtml IANA site} and {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types MDN reference}) e.g. application/zip for a SoftwareApplication binary, audio/mpeg for .mp3 etc.).
+         *
+         * In cases where a {@link https://schema.org/CreativeWork CreativeWork} has several media type representations, {@link https://schema.org/encoding encoding} can be used to indicate each {@link https://schema.org/MediaObject MediaObject} alongside particular {@link https://schema.org/encodingFormat encodingFormat} information.
+         *
+         * Unregistered or niche encoding and file formats can be indicated instead via the most appropriate URL, e.g. defining Web page or a Wikipedia/Wikidata entry.
+         */
+        "encodingFormat"?: SchemaValue<Text>;
+        /**
+         * Reminds me of this quote:
+         * \`Foo Bar\`
+         *
+         * \`\`\`
+         * Hey!
+         * \`\`\`
+         * this.
+         */
+        "knows"?: SchemaValue<Text>;
+        /** Names are great! {@link X Y} */
+        "name"?: SchemaValue<Text>;
+        /** Names are great! {@link X Y} */
+        "name2"?: SchemaValue<Text>;
+        /** {@link https://schema.org/Link Link}s {@link https://schema.org/URL Aliased} */
+        "name3"?: SchemaValue<Text>;
+        /**
+         * \`\`\`
+         * Some code block
+         *
+         * \`\`\`
+         *
+         * Text.
+         */
+        "name4"?: SchemaValue<Text>;
+        /**
+         * The general opening hours for a business. Opening hours can be specified as a weekly time range, starting with days, then times per day. Multiple days can be listed with commas ',' separating each day. Day or time ranges are specified using a hyphen '-'.
+         * - Days are specified using the following two-letter combinations: \`Mo\`, \`Tu\`, \`We\`, \`Th\`, \`Fr\`, \`Sa\`, \`Su\`.
+         * - Times are specified using 24:00 format. For example, 3pm is specified as \`15:00\`, 10am as \`10:00\`.
+         * - Here is an example: \`<time itemprop="openingHours" datetime="Tu,Th 16:00-20:00">Tuesdays and Thursdays 4-8pm</time>\`.
+         * - If a business is open 7 days a week, then it can be specified as \`<time itemprop="openingHours" datetime="Mo-Su">Monday through Sunday, all day</time>\`.
+         */
+        "openingHours"?: SchemaValue<Text>;
+    }
+    interface ThingLeaf extends ThingBase {
+        "@type": "Thing";
+    }
     /**
-     * Media type typically expressed using a MIME format (see {@link http://www.iana.org/assignments/media-types/media-types.xhtml IANA site} and {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types MDN reference}) e.g. application/zip for a SoftwareApplication binary, audio/mpeg for .mp3 etc.).
+     * Things are amazing!
      *
-     * In cases where a {@link https://schema.org/CreativeWork CreativeWork} has several media type representations, {@link https://schema.org/encoding encoding} can be used to indicate each {@link https://schema.org/MediaObject MediaObject} alongside particular {@link https://schema.org/encodingFormat encodingFormat} information.
-     *
-     * Unregistered or niche encoding and file formats can be indicated instead via the most appropriate URL, e.g. defining Web page or a Wikipedia/Wikidata entry.
+     * - Foo
+     * - Bar
+     * - _Baz_, and __Bat__
      */
-    \\"encodingFormat\\"?: SchemaValue<Text>;
-    /**
-     * Reminds me of this quote:
-     * \`Foo Bar\`
-     *
-     * \`\`\`
-     * Hey!
-     * \`\`\`
-     * this.
-     */
-    \\"knows\\"?: SchemaValue<Text>;
-    /** Names are great! {@link X Y} */
-    \\"name\\"?: SchemaValue<Text>;
-    /** Names are great! {@link X Y} */
-    \\"name2\\"?: SchemaValue<Text>;
-    /** {@link https://schema.org/Link Link}s {@link https://schema.org/URL Aliased} */
-    \\"name3\\"?: SchemaValue<Text>;
-    /**
-     * \`\`\`
-     * Some code block
-     *
-     * \`\`\`
-     *
-     * Text.
-     */
-    \\"name4\\"?: SchemaValue<Text>;
-    /**
-     * The general opening hours for a business. Opening hours can be specified as a weekly time range, starting with days, then times per day. Multiple days can be listed with commas ',' separating each day. Day or time ranges are specified using a hyphen '-'.
-     * - Days are specified using the following two-letter combinations: \`Mo\`, \`Tu\`, \`We\`, \`Th\`, \`Fr\`, \`Sa\`, \`Su\`.
-     * - Times are specified using 24:00 format. For example, 3pm is specified as \`15:00\`, 10am as \`10:00\`.
-     * - Here is an example: \`<time itemprop=\\"openingHours\\" datetime=\\"Tu,Th 16:00-20:00\\">Tuesdays and Thursdays 4-8pm</time>\`.
-     * - If a business is open 7 days a week, then it can be specified as \`<time itemprop=\\"openingHours\\" datetime=\\"Mo-Su\\">Monday through Sunday, all day</time>\`.
-     */
-    \\"openingHours\\"?: SchemaValue<Text>;
-}
-interface ThingLeaf extends ThingBase {
-    \\"@type\\": \\"Thing\\";
-}
-/**
- * Things are amazing!
- *
- * - Foo
- * - Bar
- * - _Baz_, and __Bat__
- */
-export type Thing = ThingLeaf;
+    export type Thing = ThingLeaf;
 
-"
-`);
+    "
+  `);
 });

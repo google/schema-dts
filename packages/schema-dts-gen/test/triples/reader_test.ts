@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import {jest} from '@jest/globals';
+import type {Mock, SpiedFunction} from 'jest-mock';
 
 import {ClientRequest, IncomingMessage} from 'http';
 import https from 'https';
@@ -23,12 +24,11 @@ import fs from 'fs/promises';
 import {load, loadFile} from '../../src/triples/reader.js';
 
 import {flush} from '../helpers/async.js';
-import {Mocked, SpiedFunction} from '../helpers/jest-types.js';
 import {Literal, NamedNode, Quad, Store} from 'n3';
 
 describe('load', () => {
-  let get: Mocked<typeof https.get>;
-  let ogGet: typeof https['get'];
+  let get: Mock<typeof https.get>;
+  let ogGet: (typeof https)['get'];
 
   beforeEach(() => {
     get = jest.fn();
@@ -353,7 +353,7 @@ describe('load', () => {
       });
     });
     describe('local file', () => {
-      let readFileFn: SpiedFunction<typeof fs['readFile']>;
+      let readFileFn: SpiedFunction<(typeof fs)['readFile']>;
       beforeEach(() => {
         const mockFileLine = `<https://schema.org/Person> <https://schema.org/knowsAbout> <https://schema.org/Event> .\n`;
         readFileFn = jest

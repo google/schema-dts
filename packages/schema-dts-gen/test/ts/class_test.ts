@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ describe('Class', () => {
         "interface PersonBase extends Partial<IdReference> {
         }
         interface PersonLeaf extends PersonBase {
-            \\"@type\\": \\"Person\\";
+            "@type": "Person";
         }
         export type Person = PersonLeaf;"
       `);
@@ -87,7 +87,7 @@ describe('Class', () => {
 
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
         "interface PersonLeaf extends ThingBase {
-            \\"@type\\": \\"Person\\";
+            "@type": "Person";
         }
         export type Person = PersonLeaf;"
       `);
@@ -103,7 +103,7 @@ describe('Class', () => {
         "interface PersonBase extends Thing1Base, Thing2Base {
         }
         interface PersonLeaf extends PersonBase {
-            \\"@type\\": \\"Person\\";
+            "@type": "Person";
         }
         export type Person = PersonLeaf;"
       `);
@@ -127,7 +127,7 @@ describe('Class', () => {
 
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
         "interface PersonLeaf extends ThingBase {
-            \\"@type\\": \\"Person\\";
+            "@type": "Person";
         }
         /** @deprecated Use CoolPerson instead. */
         export type Person = PersonLeaf;"
@@ -169,7 +169,7 @@ describe('Class', () => {
 
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
         "interface PersonLeaf extends ThingBase {
-            \\"@type\\": \\"Person\\";
+            "@type": "Person";
         }
         /** @deprecated Use APerson or CoolPerson instead. */
         export type Person = PersonLeaf;"
@@ -200,7 +200,7 @@ describe('Class', () => {
 
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
         "interface PersonLeaf extends ThingBase {
-            \\"@type\\": \\"Person\\";
+            "@type": "Person";
         }
         /**
          * Fantastic
@@ -253,19 +253,19 @@ describe('Class', () => {
       cls.addProp(makeProperty('https://abc.com'));
 
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
-"interface ABase extends Partial<IdReference> {
-    \\"https://abc.com\\"?: SchemaValue<never>;
-    \\"schema:\\"?: SchemaValue<never>;
-    \\"schema:a\\"?: SchemaValue<never>;
-    \\"schema:b\\"?: SchemaValue<never>;
-    \\"schema:c\\"?: SchemaValue<never>;
-    \\"https://abc.com/e\\"?: SchemaValue<never>;
-}
-interface ALeaf extends ABase {
-    \\"@type\\": \\"schema:A\\";
-}
-export type A = ALeaf;"
-`);
+        "interface ABase extends Partial<IdReference> {
+            "https://abc.com"?: SchemaValue<never>;
+            "schema:"?: SchemaValue<never>;
+            "schema:a"?: SchemaValue<never>;
+            "schema:b"?: SchemaValue<never>;
+            "schema:c"?: SchemaValue<never>;
+            "https://abc.com/e"?: SchemaValue<never>;
+        }
+        interface ALeaf extends ABase {
+            "@type": "schema:A";
+        }
+        export type A = ALeaf;"
+      `);
     });
   });
 });
