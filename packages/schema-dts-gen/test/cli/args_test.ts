@@ -28,7 +28,7 @@ describe('ParseFlags', () => {
     expect(options.file).toBeUndefined();
 
     expect(options.ontology).toBe(
-      'https://schema.org/version/latest/schemaorg-current-https.nt'
+      'https://schema.org/version/latest/schemaorg-all-https.nt'
     );
   });
 
