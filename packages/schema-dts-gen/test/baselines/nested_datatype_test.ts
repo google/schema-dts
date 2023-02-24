@@ -57,57 +57,57 @@ test(`baseline_${basename(import.meta.url)}`, async () => {
   );
 
   expect(actual).toMatchInlineSnapshot(`
-"/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
-export type WithContext<T extends Thing> = T & {
-    \\"@context\\": \\"https://schema.org\\";
-};
-export interface Graph {
-    \\"@context\\": \\"https://schema.org\\";
-    \\"@graph\\": readonly Thing[];
-}
-type SchemaValue<T> = T | readonly T[];
-type IdReference = {
-    /** IRI identifying the canonical address of this object. */
-    \\"@id\\": string;
-};
+    "/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
+    export type WithContext<T extends Thing> = T & {
+        "@context": "https://schema.org";
+    };
+    export interface Graph {
+        "@context": "https://schema.org";
+        "@graph": readonly Thing[];
+    }
+    type SchemaValue<T> = T | readonly T[];
+    type IdReference = {
+        /** IRI identifying the canonical address of this object. */
+        "@id": string;
+    };
 
-export type Text = PronounceableText | URL | string;
+    export type Text = PronounceableText | URL | string;
 
-interface ArabicTextBase extends PronounceableTextBase {
-    \\"arabicPhoneticText\\"?: SchemaValue<Text>;
-}
-interface ArabicTextLeaf extends ArabicTextBase {
-    \\"@type\\": \\"ArabicText\\";
-}
-export type ArabicText = ArabicTextLeaf | string;
+    interface ArabicTextBase extends PronounceableTextBase {
+        "arabicPhoneticText"?: SchemaValue<Text>;
+    }
+    interface ArabicTextLeaf extends ArabicTextBase {
+        "@type": "ArabicText";
+    }
+    export type ArabicText = ArabicTextLeaf | string;
 
-interface EnglishTextLeaf extends PronounceableTextBase {
-    \\"@type\\": \\"EnglishText\\";
-}
-export type EnglishText = EnglishTextLeaf | string;
+    interface EnglishTextLeaf extends PronounceableTextBase {
+        "@type": "EnglishText";
+    }
+    export type EnglishText = EnglishTextLeaf | string;
 
-export type FancyURL = string;
+    export type FancyURL = string;
 
-interface PronounceableTextBase extends Partial<IdReference> {
-    \\"phoneticText\\"?: SchemaValue<Text>;
-}
-interface PronounceableTextLeaf extends PronounceableTextBase {
-    \\"@type\\": \\"PronounceableText\\";
-}
-export type PronounceableText = PronounceableTextLeaf | ArabicText | EnglishText | string;
+    interface PronounceableTextBase extends Partial<IdReference> {
+        "phoneticText"?: SchemaValue<Text>;
+    }
+    interface PronounceableTextLeaf extends PronounceableTextBase {
+        "@type": "PronounceableText";
+    }
+    export type PronounceableText = PronounceableTextLeaf | ArabicText | EnglishText | string;
 
-interface ThingBase extends Partial<IdReference> {
-    \\"name\\"?: SchemaValue<Text>;
-    \\"pronunciation\\"?: SchemaValue<PronounceableText | IdReference>;
-    \\"website\\"?: SchemaValue<URL>;
-}
-interface ThingLeaf extends ThingBase {
-    \\"@type\\": \\"Thing\\";
-}
-export type Thing = ThingLeaf;
+    interface ThingBase extends Partial<IdReference> {
+        "name"?: SchemaValue<Text>;
+        "pronunciation"?: SchemaValue<PronounceableText | IdReference>;
+        "website"?: SchemaValue<URL>;
+    }
+    interface ThingLeaf extends ThingBase {
+        "@type": "Thing";
+    }
+    export type Thing = ThingLeaf;
 
-export type URL = FancyURL | string;
+    export type URL = FancyURL | string;
 
-"
-`);
+    "
+  `);
 });

@@ -52,40 +52,40 @@ test(`baseline_${basename(import.meta.url)}`, async () => {
   );
 
   expect(actual).toMatchInlineSnapshot(`
-"/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
-export type WithContext<T extends Thing> = T & {
-    \\"@context\\": \\"https://schema.org\\";
-};
-export interface Graph {
-    \\"@context\\": \\"https://schema.org\\";
-    \\"@graph\\": readonly Thing[];
-}
-type SchemaValue<T> = T | readonly T[];
-type IdReference = {
-    /** IRI identifying the canonical address of this object. */
-    \\"@id\\": string;
-};
+    "/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
+    export type WithContext<T extends Thing> = T & {
+        "@context": "https://schema.org";
+    };
+    export interface Graph {
+        "@context": "https://schema.org";
+        "@graph": readonly Thing[];
+    }
+    type SchemaValue<T> = T | readonly T[];
+    type IdReference = {
+        /** IRI identifying the canonical address of this object. */
+        "@id": string;
+    };
 
-export type Boolean = \\"http://schema.org/False\\" | \\"https://schema.org/False\\" | \\"False\\" | \\"http://schema.org/True\\" | \\"https://schema.org/True\\" | \\"True\\" | boolean;
+    export type Boolean = "http://schema.org/False" | "https://schema.org/False" | "False" | "http://schema.org/True" | "https://schema.org/True" | "True" | boolean;
 
-export type Date = string;
+    export type Date = string;
 
-export type DateTime = string;
+    export type DateTime = string;
 
-export type Number = number | \`\${number}\`;
+    export type Number = number | \`\${number}\`;
 
-export type Text = string;
+    export type Text = string;
 
-export type Time = string;
+    export type Time = string;
 
-interface ThingBase extends Partial<IdReference> {
-    \\"a\\"?: SchemaValue<Boolean | Date | DateTime | Number | Text | Time>;
-}
-interface ThingLeaf extends ThingBase {
-    \\"@type\\": \\"Thing\\";
-}
-export type Thing = ThingLeaf;
+    interface ThingBase extends Partial<IdReference> {
+        "a"?: SchemaValue<Boolean | Date | DateTime | Number | Text | Time>;
+    }
+    interface ThingLeaf extends ThingBase {
+        "@type": "Thing";
+    }
+    export type Thing = ThingLeaf;
 
-"
-`);
+    "
+  `);
 });

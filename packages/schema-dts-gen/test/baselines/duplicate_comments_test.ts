@@ -47,43 +47,43 @@ test(`baseline_${basename(import.meta.url)}`, async () => {
   );
 
   expect(actual).toMatchInlineSnapshot(`
-"/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
-export type WithContext<T extends Thing> = T & {
-    \\"@context\\": \\"https://schema.org\\";
-};
-export interface Graph {
-    \\"@context\\": \\"https://schema.org\\";
-    \\"@graph\\": readonly Thing[];
-}
-type SchemaValue<T> = T | readonly T[];
-type IdReference = {
-    /** IRI identifying the canonical address of this object. */
-    \\"@id\\": string;
-};
+    "/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
+    export type WithContext<T extends Thing> = T & {
+        "@context": "https://schema.org";
+    };
+    export interface Graph {
+        "@context": "https://schema.org";
+        "@graph": readonly Thing[];
+    }
+    type SchemaValue<T> = T | readonly T[];
+    type IdReference = {
+        /** IRI identifying the canonical address of this object. */
+        "@id": string;
+    };
 
-export type Text = string;
+    export type Text = string;
 
-interface ThingBase extends Partial<IdReference> {
+    interface ThingBase extends Partial<IdReference> {
+        /**
+         * Names are great!
+         * {@link X Y}
+         */
+        "name"?: SchemaValue<Text>;
+    }
+    interface ThingLeaf extends ThingBase {
+        "@type": "Thing";
+    }
     /**
-     * Names are great!
-     * {@link X Y}
+     * Things are amazing!
+     *
+     * - Foo
+     * - Bar
+     * - _Baz_, and __Bat__
      */
-    \\"name\\"?: SchemaValue<Text>;
-}
-interface ThingLeaf extends ThingBase {
-    \\"@type\\": \\"Thing\\";
-}
-/**
- * Things are amazing!
- *
- * - Foo
- * - Bar
- * - _Baz_, and __Bat__
- */
-export type Thing = \\"http://schema.org/Gadget\\" | \\"https://schema.org/Gadget\\" | \\"Gadget\\" | \\"http://schema.org/Widget\\" | \\"https://schema.org/Widget\\" | \\"Widget\\" | ThingLeaf;
+    export type Thing = "http://schema.org/Gadget" | "https://schema.org/Gadget" | "Gadget" | "http://schema.org/Widget" | "https://schema.org/Widget" | "Widget" | ThingLeaf;
 
-"
-`);
+    "
+  `);
   expect(actualLogs).toMatchInlineSnapshot(`
     "Loading Ontology from URL: https://fake.com/duplicate_comments_test.ts.nt
     Got Response 200: Ok.
