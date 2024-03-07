@@ -293,7 +293,7 @@ export class Class {
     assert(baseName, 'Expect baseName to exist when leafName exists.');
 
     return factory.createInterfaceDeclaration(
-      /*modifiers=*/ [],
+      factory.createModifiersFromModifierFlags(ModifierFlags.Export),
       leafName,
       /*typeParameters=*/ [],
       /*heritage=*/ [
