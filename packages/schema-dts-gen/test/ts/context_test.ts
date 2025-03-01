@@ -26,7 +26,7 @@ function asString(node: ts.Node): string {
     '',
     ts.ScriptTarget.Latest,
     /*setParentNodes=*/ false,
-    ts.ScriptKind.TS
+    ts.ScriptKind.TS,
   );
   return printer.printNode(ts.EmitHint.Unspecified, node, source);
 }
@@ -37,7 +37,7 @@ describe('WithContext generation', () => {
     ctx.setUrlContext('https://foo.com');
 
     expect(asString(ctx.contextProperty())).toBe(
-      `"@context": "https://foo.com";`
+      `"@context": "https://foo.com";`,
     );
   });
 
@@ -50,7 +50,7 @@ describe('WithContext generation', () => {
       `"@context": {
     "a": "https://foo.com";
     "b": "https://bar.com";
-};`
+};`,
     );
   });
 });
@@ -79,7 +79,7 @@ describe('Context.validate', () => {
       ctx.addNamedContext('', 'bar.com');
       ctx.validate();
     }).toThrowError(
-      'Context with multiple named contexts includes unnamed URL.'
+      'Context with multiple named contexts includes unnamed URL.',
     );
   });
 
@@ -90,7 +90,7 @@ describe('Context.validate', () => {
       ctx.addNamedContext('eys', 'https://eyas.sh/foo');
       ctx.validate();
     }).toThrowError(
-      'Context with multiple named contexts includes unnamed URL.'
+      'Context with multiple named contexts includes unnamed URL.',
     );
   });
 
@@ -98,7 +98,7 @@ describe('Context.validate', () => {
     const ctx = new Context();
     ctx.addNamedContext('eys', 'https://eyas.sh/foo');
     expect(() => ctx.setUrlContext('https://schema.org')).toThrowError(
-      'Attempting to set a default URL context'
+      'Attempting to set a default URL context',
     );
   });
 
@@ -132,23 +132,23 @@ describe('Context.getScopedName', () => {
     ctx.setUrlContext('https://schema.org');
 
     expect(ctx.getScopedName(new NamedNode('https://schema.org/Thing'))).toBe(
-      'Thing'
+      'Thing',
     );
     expect(
-      ctx.getScopedName(new NamedNode('https://schema.org/rangeIncludes'))
+      ctx.getScopedName(new NamedNode('https://schema.org/rangeIncludes')),
     ).toBe('rangeIncludes');
     expect(ctx.getScopedName(new NamedNode('http://schema.org/Door'))).toBe(
-      'Door'
+      'Door',
     );
     expect(ctx.getScopedName(new NamedNode('https://foo.org/Door'))).toBe(
-      'https://foo.org/Door'
+      'https://foo.org/Door',
     );
 
     expect(ctx.getScopedName(new NamedNode('https://schema.org/'))).toBe(
-      'https://schema.org/'
+      'https://schema.org/',
     );
     expect(ctx.getScopedName(new NamedNode('https://schema.org'))).toBe(
-      'https://schema.org'
+      'https://schema.org',
     );
   });
 
@@ -157,16 +157,16 @@ describe('Context.getScopedName', () => {
     ctx.setUrlContext('http://schema.org');
 
     expect(ctx.getScopedName(new NamedNode('http://schema.org/Thing'))).toBe(
-      'Thing'
+      'Thing',
     );
     expect(
-      ctx.getScopedName(new NamedNode('http://schema.org/rangeIncludes'))
+      ctx.getScopedName(new NamedNode('http://schema.org/rangeIncludes')),
     ).toBe('rangeIncludes');
     expect(ctx.getScopedName(new NamedNode('https://schema.org/Door'))).toBe(
-      'https://schema.org/Door'
+      'https://schema.org/Door',
     );
     expect(ctx.getScopedName(new NamedNode('http://foo.org/Door'))).toBe(
-      'http://foo.org/Door'
+      'http://foo.org/Door',
     );
   });
 
@@ -177,26 +177,26 @@ describe('Context.getScopedName', () => {
     ctx.addNamedContext('schema', 'http://schema.org/');
 
     expect(ctx.getScopedName(new NamedNode('http://schema.org/Thing'))).toBe(
-      'schema:Thing'
+      'schema:Thing',
     );
     expect(
       ctx.getScopedName(
-        new NamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type')
-      )
+        new NamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+      ),
     ).toBe('rdf:type');
     expect(
       ctx.getScopedName(
-        new NamedNode('http://www.w3.org/2000/01/rdf-schema#subClassOf')
-      )
+        new NamedNode('http://www.w3.org/2000/01/rdf-schema#subClassOf'),
+      ),
     ).toBe('rdfs:subClassOf');
     expect(ctx.getScopedName(new NamedNode('http://foo.org/Door'))).toBe(
-      'http://foo.org/Door'
+      'http://foo.org/Door',
     );
     expect(ctx.getScopedName(new NamedNode('http://schema.org/'))).toBe(
-      'schema:'
+      'schema:',
     );
     expect(ctx.getScopedName(new NamedNode('http://schema.org'))).toBe(
-      'http://schema.org'
+      'http://schema.org',
     );
   });
 
@@ -207,10 +207,10 @@ describe('Context.getScopedName', () => {
     ctx.addNamedContext('schema', 'http://schema.org');
 
     expect(ctx.getScopedName(new NamedNode('http://schema.org/'))).toBe(
-      'schema:'
+      'schema:',
     );
     expect(ctx.getScopedName(new NamedNode('http://schema.org'))).toBe(
-      'schema:'
+      'schema:',
     );
   });
 });
@@ -218,31 +218,31 @@ describe('Context.getScopedName', () => {
 describe('Context.Parse', () => {
   it('one default', () => {
     expect(Context.Parse('https://myschema.org/')).toEqual(
-      ctx(c => c.setUrlContext('https://myschema.org/'))
+      ctx(c => c.setUrlContext('https://myschema.org/')),
     );
   });
 
   it('one default -- leading comma', () => {
     expect(Context.Parse(',https://myschema.org/')).toEqual(
-      ctx(c => c.setUrlContext('https://myschema.org/'))
+      ctx(c => c.setUrlContext('https://myschema.org/')),
     );
   });
 
   it('one default -- trailing comma', () => {
     expect(Context.Parse('https://myschema.org/,')).toEqual(
-      ctx(c => c.setUrlContext('https://myschema.org/'))
+      ctx(c => c.setUrlContext('https://myschema.org/')),
     );
   });
 
   it('one default -- whitespace', () => {
     expect(Context.Parse('  https://myschema.org/\t')).toEqual(
-      ctx(c => c.setUrlContext('https://myschema.org/'))
+      ctx(c => c.setUrlContext('https://myschema.org/')),
     );
   });
 
   it('one default -- commas andwhitespace', () => {
     expect(Context.Parse(' , https://myschema.org/,\t')).toEqual(
-      ctx(c => c.setUrlContext('https://myschema.org/'))
+      ctx(c => c.setUrlContext('https://myschema.org/')),
     );
   });
 
@@ -250,48 +250,48 @@ describe('Context.Parse', () => {
 
   it('two named', () => {
     expect(
-      Context.Parse('a:https://schema.org/A,b:https://schema.org/B')
+      Context.Parse('a:https://schema.org/A,b:https://schema.org/B'),
     ).toEqual(
       ctx(c => {
         c.addNamedContext('a', 'https://schema.org/A');
         c.addNamedContext('b', 'https://schema.org/B');
-      })
+      }),
     );
   });
 
   it('two named, whitespace', () => {
     expect(
-      Context.Parse('a:https://schema.org/A ,\tb:https://schema.org/B')
+      Context.Parse('a:https://schema.org/A ,\tb:https://schema.org/B'),
     ).toEqual(
       ctx(c => {
         c.addNamedContext('a', 'https://schema.org/A');
         c.addNamedContext('b', 'https://schema.org/B');
-      })
+      }),
     );
   });
 
   it('two named, extra commas', () => {
     expect(
-      Context.Parse(',a:https://schema.org/A ,, ,\tb:https://schema.org/B,,')
+      Context.Parse(',a:https://schema.org/A ,, ,\tb:https://schema.org/B,,'),
     ).toEqual(
       ctx(c => {
         c.addNamedContext('a', 'https://schema.org/A');
         c.addNamedContext('b', 'https://schema.org/B');
-      })
+      }),
     );
   });
 
   it('unexpected lone URL', () => {
     expect(() =>
       Context.Parse(
-        'a:https://schema.org/A,http://www.com,b:https://schema.org/B'
-      )
+        'a:https://schema.org/A,http://www.com,b:https://schema.org/B',
+      ),
     ).toThrowError();
   });
 
   it('unexpected totally off', () => {
     expect(() =>
-      Context.Parse('a:https://schema.org/A,a=b,b:https://schema.org/B')
+      Context.Parse('a:https://schema.org/A,a=b,b:https://schema.org/B'),
     ).toThrowError();
   });
 });

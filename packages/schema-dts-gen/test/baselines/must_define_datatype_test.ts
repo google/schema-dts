@@ -30,7 +30,7 @@ test(`baseline_${basename(import.meta.url)}`, async () => {
 <http://schema.org/name> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
 <http://schema.org/Thing> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
       `,
-      ['--ontology', `https://fake.com/${basename(import.meta.url)}.nt`]
-    )
+      ['--ontology', `https://fake.com/${basename(import.meta.url)}.nt`],
+    ),
   ).rejects.toThrow('Could not find class for http://schema.org/Text');
 });

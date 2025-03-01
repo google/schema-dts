@@ -18,7 +18,7 @@ import {ok} from 'assert';
 
 export function assert<T>(
   item: T | null | undefined,
-  message?: string | Error
+  message?: string | Error,
 ): asserts item is T {
   ok(item, message);
 }
@@ -26,7 +26,7 @@ export function assert<T>(
 export function assertIs<T, U extends T>(
   item: T,
   assertion: (i: T) => i is U,
-  message?: string
+  message?: string,
 ): asserts item is U {
   ok(assertion(item), message);
 }

@@ -20,7 +20,7 @@ import {ArgumentParser} from 'argparse';
 
 describe('ParseFlags', () => {
   it('defaults', () => {
-    const options = ParseFlags([])!;
+    const options = ParseFlags([]);
     expect(options).not.toBeUndefined();
     expect(options.context).toBe('https://schema.org');
     expect(options.deprecated).toBe(true);
@@ -28,19 +28,19 @@ describe('ParseFlags', () => {
     expect(options.file).toBeUndefined();
 
     expect(options.ontology).toBe(
-      'https://schema.org/version/latest/schemaorg-all-https.nt'
+      'https://schema.org/version/latest/schemaorg-all-https.nt',
     );
   });
 
   it('custom ontology', () => {
-    const options = ParseFlags(['--ontology', 'https://google.com/foo'])!;
+    const options = ParseFlags(['--ontology', 'https://google.com/foo']);
     expect(options).not.toBeUndefined();
 
     expect(options.ontology).toBe('https://google.com/foo');
   });
 
   it('custom file', () => {
-    const options = ParseFlags(['--file', './ontology.nt'])!;
+    const options = ParseFlags(['--file', './ontology.nt']);
     expect(options).not.toBeUndefined();
 
     expect(options.file).toBe('./ontology.nt');

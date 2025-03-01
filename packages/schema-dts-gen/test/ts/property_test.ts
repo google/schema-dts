@@ -41,10 +41,10 @@ describe('PropertyType', () => {
             new Quad(
               new NamedNode('https://schema.org/Foo'),
               rangeIncludes(),
-              new Literal('"foo"')
+              new Literal('"foo"'),
             ),
-            new Map()
-          )
+            new Map(),
+          ),
         ).toThrowError('Type expected to be a UrlNode');
       });
 
@@ -54,10 +54,10 @@ describe('PropertyType', () => {
             new Quad(
               new NamedNode('https://schema.org/Foo'),
               rangeIncludes(),
-              new NamedNode('https://schema.org/Thing')
+              new NamedNode('https://schema.org/Thing'),
             ),
-            new Map()
-          )
+            new Map(),
+          ),
         ).toThrowError('Could not find class for https://schema.org/Thing');
       });
 
@@ -67,10 +67,10 @@ describe('PropertyType', () => {
             new Quad(
               new NamedNode('https://schema.org/Foo'),
               rangeIncludes(),
-              new NamedNode('https://schema.org/Thing')
+              new NamedNode('https://schema.org/Thing'),
             ),
-            makeClassMap(makeClass('https://schema.org/Thing'))
-          )
+            makeClassMap(makeClass('https://schema.org/Thing')),
+          ),
         ).toBe(true);
       });
     });
@@ -86,10 +86,10 @@ describe('PropertyType', () => {
           new Quad(
             new NamedNode('https://schema.org/Foo'),
             domainIncludes(),
-            new NamedNode('https://schema.org/Thing')
+            new NamedNode('https://schema.org/Thing'),
           ),
-          classes
-        )
+          classes,
+        ),
       ).toThrowError('Could not find class');
     });
 
@@ -100,10 +100,10 @@ describe('PropertyType', () => {
           new Quad(
             new NamedNode('https://schema.org/Foo'),
             domainIncludes(),
-            new NamedNode('https://schema.org/Person')
+            new NamedNode('https://schema.org/Person'),
           ),
-          classes
-        )
+          classes,
+        ),
       ).toBe(true);
     });
   });
@@ -115,10 +115,10 @@ describe('PropertyType', () => {
           new Quad(
             new NamedNode('https://schema.org/Foo'),
             new NamedNode('https://schema.org/supersededBy'),
-            new NamedNode('https://schema.org/Person')
+            new NamedNode('https://schema.org/Person'),
           ),
-          new Map()
-        )
+          new Map(),
+        ),
       ).toBe(true);
 
       expect(prop.comment).toMatch(/@deprecated/g);
@@ -136,10 +136,10 @@ describe('PropertyType', () => {
           new Quad(
             new NamedNode('https://schema.org/Foo'),
             comment(),
-            new Literal('"foo"')
+            new Literal('"foo"'),
           ),
-          new Map()
-        )
+          new Map(),
+        ),
       ).toBe(true);
 
       expect(prop.comment).toMatch(/foo/g);
@@ -151,10 +151,10 @@ describe('PropertyType', () => {
           new Quad(
             new NamedNode('https://schema.org/Foo'),
             comment(),
-            new NamedNode('http://schema.org/Amazing')
+            new NamedNode('http://schema.org/Amazing'),
           ),
-          new Map()
-        )
+          new Map(),
+        ),
       ).toThrowError('non-string object');
     });
   });

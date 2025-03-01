@@ -25,15 +25,15 @@ describe('EnumValue', () => {
       const map = makeClassMap(
         makeClass('https://schema.org/Foo'),
         makeClass('https://schema.org/Bar'),
-        makeClass('https://schema.org/Baz')
+        makeClass('https://schema.org/Baz'),
       );
       expect(
         () =>
           new EnumValue(
             new NamedNode('https://schema.org/Wednesday'),
             [new NamedNode('https://schema.org/DayOfWeek')],
-            map
-          )
+            map,
+          ),
       ).toThrowError("Couldn't find");
     });
 
@@ -45,13 +45,13 @@ describe('EnumValue', () => {
       const map = makeClassMap(
         makeClass('https://schema.org/Foo'),
         makeClass('https://schema.org/Bar'),
-        dayOfWeek
+        dayOfWeek,
       );
 
       const myEnum = new EnumValue(
         new NamedNode('https://schema.org/Wednesday'),
         [new NamedNode('https://schema.org/DayOfWeek')],
-        map
+        map,
       );
 
       expect(addEnum).toBeCalledWith(myEnum);
@@ -59,7 +59,7 @@ describe('EnumValue', () => {
 
     it('Works fine when called for an enum/class', () => {
       const medicalProcedureType = makeClass(
-        'https://schema.org/MedicalProcedureType'
+        'https://schema.org/MedicalProcedureType',
       );
       const addEnum = jest.fn();
       medicalProcedureType.addEnum = addEnum;
@@ -67,7 +67,7 @@ describe('EnumValue', () => {
       const map = makeClassMap(
         makeClass('https://schema.org/Foo'),
         makeClass('https://schema.org/Bar'),
-        medicalProcedureType
+        medicalProcedureType,
       );
 
       const myEnum = new EnumValue(
@@ -76,7 +76,7 @@ describe('EnumValue', () => {
           new NamedNode('https://schema.org/MedicalProcedureType'),
           new NamedNode('http://www.w3.org/2000/01/rdf-schema#Class'),
         ],
-        map
+        map,
       );
 
       expect(addEnum).toBeCalledWith(myEnum);

@@ -1,7 +1,7 @@
 import {Thing} from '../dist/schema';
 
 // Strings & Roles work
-const x1: Thing = {
+const _1: Thing = {
   '@type': 'Person',
   knowsAbout: [
     {'@id': 'A'},
@@ -12,7 +12,7 @@ const x1: Thing = {
 };
 
 // Numbers work
-const x2: Thing = {
+const _2: Thing = {
   '@type': 'Accommodation',
   numberOfBedrooms: 5,
   numberOfBathroomsTotal: '6',
@@ -20,7 +20,7 @@ const x2: Thing = {
 };
 
 // Numbers work in Roles
-const x3: Thing = {
+const _3: Thing = {
   '@type': 'Accommodation',
   numberOfBedrooms: {'@type': 'Role', numberOfBedrooms: 5},
   numberOfBathroomsTotal: {'@type': 'Role', numberOfBathroomsTotal: '6'},
@@ -28,37 +28,36 @@ const x3: Thing = {
 };
 
 // Numbers work in strings
-const x4: Thing = {
+const _4: Thing = {
   '@type': 'Accommodation',
   numberOfBedrooms: [5, '6', '555'],
   numberOfBathroomsTotal: ['6'],
 };
 
 // Numbers must be valid
-const x5: Thing = {
+const _5: Thing = {
   '@type': 'Accommodation',
   numberOfBedrooms: [
     5,
-    // @ts-expect-error
+    // @ts-expect-error Invalid number
     '6abc',
     '555',
   ],
-  // @ts-expect-error
+  // @ts-expect-error Invalid number in array
   numberOfBathroomsTotal: ['6def'],
-  // @ts-expect-error
+  // @ts-expect-error Invalid number
   numberOfFullBathrooms: '55ggg5.3',
 };
 
 // Roles must be valid
-const x6: Thing = {
+const _6: Thing = {
   '@type': 'Person',
   knowsAbout: [
-    // @ts-expect-error
+    // @ts-expect-error Invalid role
     {'@type': 'Role', knowsAbourt: {'@id': 'A'}, roleName: 'abc'},
+    // @ts-expect-error Invalid role
     {
-      // @ts-expect-error
       '@type': 'Role',
-      // @ts-expect-error
       knowsAbout: {},
       roleName: 'bce',
     },

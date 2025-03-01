@@ -30,7 +30,7 @@ import {assertIs} from '../util/assert.js';
  */
 export function ProcessProperties(
   topics: readonly TypedTopic[],
-  classes: ClassMap
+  classes: ClassMap,
 ) {
   for (const topic of topics) {
     // Skip Topics that have no 'Property' Type.
@@ -50,7 +50,7 @@ export function ProcessProperties(
       Log(
         `Still unadded for property: ${shortStr(topic.subject)}:\n\t${rest
           .map(q => `(${shortStr(q.predicate)} ${shortStr(q.object)})`)
-          .join('\n\t')}`
+          .join('\n\t')}`,
       );
     }
   }

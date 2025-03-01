@@ -48,7 +48,7 @@ function toClass(cls: Class, topic: TypedTopic, map: ClassMap): Class {
     Log(
       `Class ${shortStr(cls.subject)}: Did not add [${rest
         .map(r => `(${shortStr(r.predicate)} ${shortStr(r.object)})`)
-        .join(',')}]`
+        .join(',')}]`,
     );
   }
   return cls;
@@ -58,11 +58,11 @@ function buildAlias(name: string, alias: string): AliasBuiltin[] {
   return [
     new AliasBuiltin(
       new NamedNode(`http://schema.org/${name}`),
-      AliasBuiltin.Alias(alias)
+      AliasBuiltin.Alias(alias),
     ),
     new AliasBuiltin(
       new NamedNode(`https://schema.org/${name}`),
-      AliasBuiltin.Alias(alias)
+      AliasBuiltin.Alias(alias),
     ),
   ];
 }
@@ -73,12 +73,12 @@ const wellKnownTypes = [
   new AliasBuiltin(
     new NamedNode('http://schema.org/Number'),
     AliasBuiltin.Alias('number'),
-    AliasBuiltin.NumberStringLiteral()
+    AliasBuiltin.NumberStringLiteral(),
   ),
   new AliasBuiltin(
     new NamedNode('https://schema.org/Number'),
     AliasBuiltin.Alias('number'),
-    AliasBuiltin.NumberStringLiteral()
+    AliasBuiltin.NumberStringLiteral(),
   ),
   ...buildAlias('Time', 'string'),
   ...buildAlias('Date', 'string'),
@@ -114,7 +114,7 @@ function ForwardDeclareClasses(topics: readonly TypedTopic[]): ClassMap {
   const classes = new Map<string, Class>();
   const dataType = new DataTypeUnion(
     new NamedNode('http://schema.org/DataType'),
-    []
+    [],
   );
 
   for (const topic of topics) {
@@ -127,7 +127,7 @@ function ForwardDeclareClasses(topics: readonly TypedTopic[]): ClassMap {
     if (ClassIsDataType(topic)) {
       assert(
         wk,
-        `${topic.subject.value} must have corresponding well-known type.`
+        `${topic.subject.value} must have corresponding well-known type.`,
       );
       dataType.wk.push(wk);
 

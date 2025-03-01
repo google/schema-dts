@@ -64,7 +64,7 @@ export class PropertyType {
     if (c) {
       if (this._comment) {
         Log(
-          `Duplicate comments provided on property ${this.subject.id}. It will be overwritten.`
+          `Duplicate comments provided on property ${this.subject.id}. It will be overwritten.`,
         );
       }
       this._comment = c.comment;
@@ -77,16 +77,16 @@ export class PropertyType {
           `Type expected to be a UrlNode always. When adding ${JSON.stringify(
             value.toJSON(),
             undefined,
-            2
-          )}.`
+            2,
+          )}.`,
         );
       }
       const cls = classes.get(value.object.id);
       if (!cls) {
         throw new Error(
           `Could not find class for ${value.object.id} [only foud: ${Array.from(
-            classes.keys()
-          ).join(', ')}]`
+            classes.keys(),
+          ).join(', ')}]`,
         );
       }
       this.types.push(cls);
@@ -99,7 +99,7 @@ export class PropertyType {
         throw new Error(
           `Could not find class for ${
             value.object.id
-          }. [only foud: ${Array.from(classes.keys()).join(', ')}]`
+          }. [only foud: ${Array.from(classes.keys()).join(', ')}]`,
         );
       }
       cls.addProp(new Property(this.subject, this));
@@ -122,7 +122,7 @@ export class PropertyType {
     }
 
     const typeNodes = typeNames.map(type =>
-      factory.createTypeReferenceNode(type, /*typeArguments=*/ [])
+      factory.createTypeReferenceNode(type, /*typeArguments=*/ []),
     );
 
     return typeUnion(...typeNodes);
@@ -133,7 +133,10 @@ export class PropertyType {
  * A Property on a particular object.
  */
 export class Property {
-  constructor(readonly key: NamedNode, private readonly type: PropertyType) {}
+  constructor(
+    readonly key: NamedNode,
+    private readonly type: PropertyType,
+  ) {}
 
   get deprecated() {
     return this.type.deprecated;
@@ -143,7 +146,7 @@ export class Property {
     return SchemaValueReference(
       properties,
       () => this.type.scalarTypeNode(),
-      context.getScopedName(this.key)
+      context.getScopedName(this.key),
     );
   }
 
@@ -154,8 +157,8 @@ export class Property {
         /* modifiers= */ [],
         factory.createStringLiteral(context.getScopedName(this.key)),
         factory.createToken(SyntaxKind.QuestionToken),
-        /*typeNode=*/ this.typeNode(context, properties)
-      )
+        /*typeNode=*/ this.typeNode(context, properties),
+      ),
     );
   }
 }
@@ -171,8 +174,8 @@ export class TypeProperty {
       /* typeNode= */
       factory.createTypeReferenceNode(
         `"${context.getScopedName(this.className)}"`,
-        /*typeArguments=*/ undefined
-      )
+        /*typeArguments=*/ undefined,
+      ),
     );
   }
 

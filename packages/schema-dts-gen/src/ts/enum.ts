@@ -36,7 +36,7 @@ export class EnumValue {
   constructor(
     readonly value: NamedNode,
     types: readonly NamedNode[],
-    map: ClassMap
+    map: ClassMap,
   ) {
     for (const type of types) {
       // If a Subject has a "Type", then it either means:
@@ -78,7 +78,7 @@ export class EnumValue {
     if (comment) {
       if (this.comment) {
         Log(
-          `Duplicate comments provided on ${this.value.id} enum but one already exists. It will be overwritten.`
+          `Duplicate comments provided on ${this.value.id} enum but one already exists. It will be overwritten.`,
         );
       }
       this.comment = comment.comment;
@@ -101,7 +101,7 @@ export class EnumValue {
     }
 
     return types.map(t =>
-      factory.createLiteralTypeNode(factory.createStringLiteral(t))
+      factory.createLiteralTypeNode(factory.createStringLiteral(t)),
     );
   }
 }

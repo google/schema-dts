@@ -61,7 +61,7 @@ test(`baseline_${basename(import.meta.url)}`, async () => {
       '--ontology',
       `https://fake.com/${basename(import.meta.url)}.nt`,
       '--nodeprecated',
-    ]
+    ],
   );
 
   expect(actual).toMatchInlineSnapshot(`

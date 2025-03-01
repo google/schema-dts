@@ -42,7 +42,7 @@ test(`baseline_${basename(import.meta.url)}`, async () => {
 <https://schema.org/DateTime> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
 <https://schema.org/DateTime> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
       `,
-    ['--ontology', `https://fake.com/${basename(import.meta.url)}.nt`]
+    ['--ontology', `https://fake.com/${basename(import.meta.url)}.nt`],
   );
 
   expect(actual).toMatchInlineSnapshot(`
