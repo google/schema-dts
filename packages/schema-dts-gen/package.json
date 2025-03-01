@@ -22,25 +22,25 @@
   "type": "module",
   "devDependencies": {
     "@jest/globals": "^29.4.3",
-    "@types/argparse": "^2.0.10",
-    "@types/array.prototype.flatmap": "^1.2.2",
-    "@types/diff": "^5.0.2",
-    "@types/jest": "^29.4.0",
-    "@types/n3": "^1.10.4",
-    "@types/node": "^18.14.1",
-    "@types/unist": "^2.0.6",
+    "@types/argparse": "^2.0.17",
+    "@types/array.prototype.flatmap": "^1.2.6",
+    "@types/diff": "^7.0.1",
+    "@types/jest": "^29.5.14",
+    "@types/n3": "^1.21.1",
+    "@types/node": "^22.13.8",
+    "@types/unist": "^3.0.3",
     "cross-env": "^7.0.3"
   },
   "dependencies": {
     "argparse": "^2.0.1",
-    "n3": "^1.16.3",
-    "rehype-minify-whitespace": "^5.0.1",
-    "rehype-parse": "^8.0.4",
-    "rehype-raw": "^6.1.1",
-    "remark-parse": "^10.0.1",
-    "remark-rehype": "^10.1.0",
-    "remark-wiki-link": "^1.0.4",
-    "unified": "^10.1.2"
+    "n3": "^1.23.1",
+    "rehype-minify-whitespace": "^6.0.2",
+    "rehype-parse": "^9.0.1",
+    "rehype-raw": "^7.0.0",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.1",
+    "remark-wiki-link": "^2.0.1",
+    "unified": "^11.0.5"
   },
   "engines": {
     "node": ">=14.0.0"

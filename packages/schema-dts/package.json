@@ -19,7 +19,7 @@
   "types": "./dist/schema.d.ts",
   "main": "./dist/schema.js",
   "devDependencies": {
-    "mkdirp": "^1.0.4",
+    "mkdirp": "^3.0.1",
     "schema-dts-gen": "*"
   },
   "keywords": [
