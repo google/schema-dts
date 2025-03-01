@@ -21,6 +21,7 @@ import type {
   InterfaceDeclaration,
   TypeParameterDeclaration,
 } from 'typescript';
+
 const {factory, ModifierFlags, SyntaxKind} = ts;
 
 import {Log} from '../logging/index.js';
@@ -100,31 +101,29 @@ export class Class {
   }
 
   protected get typedefs(): TypeNode[] {
-    const f: TypeNode = undefined!;
-
     const parents = this.allParents().flatMap(p => p.typedefs);
     return Array.from(
-      new Map([...this._typedefs, ...parents].map(t => [JSON.stringify(t), t]))
+      new Map([...this._typedefs, ...parents].map(t => [JSON.stringify(t), t])),
     )
-      .sort(([key1, value1], [key2, value2]) => key1.localeCompare(key2))
+      .sort(([key1], [key2]) => key1.localeCompare(key2))
       .map(([_, value]) => value);
   }
 
   private properties() {
     return Array.from(this._props.values()).sort((a, b) =>
-      CompareKeys(a.key, b.key)
+      CompareKeys(a.key, b.key),
     );
   }
 
   private supersededBy() {
     return Array.from(this._supersededBy).sort((a, b) =>
-      CompareKeys(a.subject, b.subject)
+      CompareKeys(a.subject, b.subject),
     );
   }
 
   private enums() {
     return Array.from(this._enums).sort((a, b) =>
-      CompareKeys(a.value, b.value)
+      CompareKeys(a.value, b.value),
     );
   }
 
@@ -159,7 +158,7 @@ export class Class {
     if (c) {
       if (this._comment) {
         Log(
-          `Duplicate comments provided on class ${this.subject.id}. It will be overwritten.`
+          `Duplicate comments provided on class ${this.subject.id}. It will be overwritten.`,
         );
       }
       this._comment = c.comment;
@@ -179,7 +178,7 @@ export class Class {
         throw new Error(
           `Couldn't find parent of ${this.subject.value}, ${
             s.subClassOf.value
-          } (available: ${Array.from(classMap.keys()).join(', ')})`
+          } (available: ${Array.from(classMap.keys()).join(', ')})`,
         );
       }
       return true;
@@ -189,7 +188,7 @@ export class Class {
       const supersededBy = classMap.get(value.object.value);
       if (!supersededBy) {
         throw new Error(
-          `Couldn't find class ${value.object.value}, which supersedes class ${this.subject.value}`
+          `Couldn't find class ${value.object.value}, which supersedes class ${this.subject.value}`,
         );
       }
       this._supersededBy.add(supersededBy);
@@ -217,7 +216,7 @@ export class Class {
   validateClass(): void {
     if (!this.isMarkedAsClass(new WeakSet())) {
       throw new Error(
-        `Class ${this.className()} is not marked as an rdfs:Class, and neither are any of its parents.`
+        `Class ${this.className()} is not marked as an rdfs:Class, and neither are any of its parents.`,
       );
     }
   }
@@ -236,7 +235,7 @@ export class Class {
 
   private baseDecl(
     context: Context,
-    properties: {skipDeprecatedProperties: boolean; hasRole: boolean}
+    properties: {skipDeprecatedProperties: boolean; hasRole: boolean},
   ): InterfaceDeclaration | undefined {
     if (this.skipBase()) {
       return undefined;
@@ -246,7 +245,10 @@ export class Class {
     assert(baseName, 'If a baseNode is defined, baseName must be defined.');
 
     const parentTypes = this.namedParents().map(p =>
-      factory.createExpressionWithTypeArguments(factory.createIdentifier(p), [])
+      factory.createExpressionWithTypeArguments(
+        factory.createIdentifier(p),
+        [],
+      ),
     );
 
     const heritage = factory.createHeritageClause(
@@ -258,17 +260,18 @@ export class Class {
               /*typeArguments=*/ [
                 factory.createTypeReferenceNode(
                   IdReferenceName,
-                  /*typeArguments=*/ []
+                  /*typeArguments=*/ [],
                 ),
-              ]
+              ],
             ),
           ]
-        : parentTypes
+        : parentTypes,
     );
 
     const members = this.properties()
       .filter(
-        property => !property.deprecated || !properties.skipDeprecatedProperties
+        property =>
+          !property.deprecated || !properties.skipDeprecatedProperties,
       )
       .map(prop => prop.toNode(context, properties));
 
@@ -277,7 +280,7 @@ export class Class {
       baseName,
       /*typeParameters=*/ [],
       /*heritageClause=*/ [heritage],
-      /*members=*/ members
+      /*members=*/ members,
     );
   }
 
@@ -300,11 +303,11 @@ export class Class {
         factory.createHeritageClause(SyntaxKind.ExtendsKeyword, [
           factory.createExpressionWithTypeArguments(
             factory.createIdentifier(baseName),
-            /*typeArguments=*/ []
+            /*typeArguments=*/ [],
           ),
         ]),
       ],
-      /*members=*/ [new TypeProperty(this.subject).toNode(context)]
+      /*members=*/ [new TypeProperty(this.subject).toNode(context)],
     );
   }
 
@@ -315,8 +318,8 @@ export class Class {
       .map(child =>
         factory.createTypeReferenceNode(
           child.className(),
-          /*typeArguments=*/ child.typeArguments(this.typeParameters())
-        )
+          /*typeArguments=*/ child.typeArguments(this.typeParameters()),
+        ),
       );
 
     // A type can have a valid typedef, add that if so.
@@ -333,7 +336,7 @@ export class Class {
   private totalType(context: Context, skipDeprecated: boolean): TypeNode {
     return typeUnion(
       ...this.enums().flatMap(e => e.toTypeLiteral(context)),
-      ...this.nonEnumType(skipDeprecated)
+      ...this.nonEnumType(skipDeprecated),
     );
   }
 
@@ -344,7 +347,7 @@ export class Class {
 
   /** Generic Types to pass to this total type when referencing it. */
   protected typeArguments(
-    available: readonly TypeParameterDeclaration[]
+    _: readonly TypeParameterDeclaration[],
   ): readonly TypeNode[] {
     return [];
   }
@@ -355,11 +358,11 @@ export class Class {
 
   toNode(
     context: Context,
-    properties: {skipDeprecatedProperties: boolean; hasRole: boolean}
+    properties: {skipDeprecatedProperties: boolean; hasRole: boolean},
   ): readonly Statement[] {
     const typeValue: TypeNode = this.totalType(
       context,
-      properties.skipDeprecatedProperties
+      properties.skipDeprecatedProperties,
     );
     const declaration = withComments(
       this.comment,
@@ -367,8 +370,8 @@ export class Class {
         factory.createModifiersFromModifierFlags(ModifierFlags.Export),
         this.className(),
         this.typeParameters(),
-        typeValue
-      )
+        typeValue,
+      ),
     );
 
     // Guide to Code Generated:
@@ -388,7 +391,7 @@ export class Class {
     return arrayOf<Statement>(
       this.baseDecl(context, properties),
       this.leafDecl(context),
-      declaration
+      declaration,
     );
   }
 }
@@ -423,9 +426,9 @@ export class AliasBuiltin extends Builtin {
       [
         factory.createTemplateLiteralTypeSpan(
           factory.createTypeReferenceNode('number'),
-          factory.createTemplateTail(/* text= */ '')
+          factory.createTemplateTail(/* text= */ ''),
         ),
-      ]
+      ],
     );
   }
 }
@@ -440,13 +443,13 @@ export class RoleBuiltin extends Builtin {
         /*modifiers=*/ [],
         /*name=*/ RoleBuiltin.kContentTypename,
         /*constraint=*/ undefined,
-        /*default=*/ factory.createTypeReferenceNode('never')
+        /*default=*/ factory.createTypeReferenceNode('never'),
       ),
       factory.createTypeParameterDeclaration(
         /*modifiers=*/ [],
         /*name=*/ RoleBuiltin.kPropertyTypename,
         /*constraint=*/ factory.createTypeReferenceNode('string'),
-        /*default=*/ factory.createTypeReferenceNode('never')
+        /*default=*/ factory.createTypeReferenceNode('never'),
       ),
     ];
   }
@@ -459,18 +462,18 @@ export class RoleBuiltin extends Builtin {
   }
 
   protected typeArguments(
-    availableParams: readonly TypeParameterDeclaration[]
+    availableParams: readonly TypeParameterDeclaration[],
   ): TypeNode[] {
     const hasTContent = !!availableParams.find(
-      param => param.name.escapedText === RoleBuiltin.kContentTypename
+      param => param.name.text === RoleBuiltin.kContentTypename,
     );
     const hasTProperty = !!availableParams.find(
-      param => param.name.escapedText === RoleBuiltin.kPropertyTypename
+      param => param.name.text === RoleBuiltin.kPropertyTypename,
     );
 
     assert(
       (hasTProperty && hasTContent) || (!hasTProperty && !hasTContent),
-      `hasTcontent and hasTProperty should be both true or both false, but saw (${hasTContent}, ${hasTProperty})`
+      `hasTcontent and hasTProperty should be both true or both false, but saw (${hasTContent}, ${hasTProperty})`,
     );
 
     return hasTContent && hasTProperty
@@ -494,12 +497,12 @@ export class RoleBuiltin extends Builtin {
         factory.createTypeParameterDeclaration(
           /*modifiers=*/ [],
           /*name=*/ RoleBuiltin.kContentTypename,
-          /*constraint=*/ undefined
+          /*constraint=*/ undefined,
         ),
         factory.createTypeParameterDeclaration(
           /*modifiers=*/ [],
           /*name=*/ RoleBuiltin.kPropertyTypename,
-          /*constraint=*/ factory.createTypeReferenceNode('string')
+          /*constraint=*/ factory.createTypeReferenceNode('string'),
         ),
       ],
       /*type=*/
@@ -514,23 +517,26 @@ export class RoleBuiltin extends Builtin {
             /*modifiers=*/ [],
             'key',
             /*constraint=*/ factory.createTypeReferenceNode(
-              RoleBuiltin.kPropertyTypename
-            )
+              RoleBuiltin.kPropertyTypename,
+            ),
           ),
           /*nameType=*/ undefined,
           /*questionToken=*/ undefined,
           /*type=*/ factory.createTypeReferenceNode(
-            RoleBuiltin.kContentTypename
+            RoleBuiltin.kContentTypename,
           ),
-          /*members=*/ undefined
+          /*members=*/ undefined,
         ),
-      ])
+      ]),
     );
   }
 }
 
 export class DataTypeUnion extends Builtin {
-  constructor(subject: NamedNode, readonly wk: Builtin[]) {
+  constructor(
+    subject: NamedNode,
+    readonly wk: Builtin[],
+  ) {
     super(subject);
   }
 
@@ -548,11 +554,11 @@ export class DataTypeUnion extends Builtin {
             this.wk.map(wk =>
               factory.createTypeReferenceNode(
                 namedPortion(wk.subject),
-                /*typeArguments=*/ []
-              )
-            )
-          )
-        )
+                /*typeArguments=*/ [],
+              ),
+            ),
+          ),
+        ),
       ),
     ];
   }
@@ -586,7 +592,7 @@ export function Sort(a: Class, b: Class): number {
 
 function CompareKeys(a: NamedNode, b: NamedNode): number {
   const byName = (namedPortionOrEmpty(a) || '').localeCompare(
-    namedPortionOrEmpty(b) || ''
+    namedPortionOrEmpty(b) || '',
   );
   if (byName !== 0) return byName;
 

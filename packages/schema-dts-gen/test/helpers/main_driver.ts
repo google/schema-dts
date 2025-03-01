@@ -28,7 +28,7 @@ import {flush} from './async.js';
 
 export async function inlineCli(
   content: string,
-  args: string[]
+  args: string[],
 ): Promise<{actual: string; actualLogs: string}> {
   // Restorables
   const realGet = https.get;
@@ -48,7 +48,7 @@ export async function inlineCli(
     // would go away, making a lot of this much simpler.
     https.get = ((
       _: string,
-      callback: (inc: IncomingMessage) => void
+      callback: (inc: IncomingMessage) => void,
     ): ClientRequest => {
       callback({
         statusCode: 200,

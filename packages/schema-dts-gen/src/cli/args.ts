@@ -97,9 +97,9 @@ export function ParseFlags(args?: string[]): Options {
     action: 'store_false',
     dest: 'deprecated',
   });
-  return parser.parse_args(args);
+  return parser.parse_args(args) as Options;
 }
 
-function DeprecatedValue(item: unknown) {
+function DeprecatedValue(_: unknown) {
   throw new Error('This command line argument is deprecated.');
 }

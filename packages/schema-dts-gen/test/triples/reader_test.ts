@@ -33,8 +33,7 @@ describe('load', () => {
   beforeEach(() => {
     get = jest.fn();
     ogGet = https.get;
-    // @ts-ignore
-    https.get = get;
+    https.get = get as (typeof https)['get'];
   });
   afterEach(() => {
     https.get = ogGet;
@@ -100,7 +99,7 @@ describe('load', () => {
     it('Oneshot', async () => {
       const control = fakeResponse(200, 'Ok');
       control.data(
-        `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`
+        `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`,
       );
       control.end();
 
@@ -109,7 +108,7 @@ describe('load', () => {
         new Quad(
           new NamedNode('https://schema.org/Person'),
           new NamedNode('https://schema.org/knowsAbout'),
-          new Literal('"math"')
+          new Literal('"math"'),
         ),
       ]);
     });
@@ -117,10 +116,10 @@ describe('load', () => {
     it('Multiple (clean broken)', async () => {
       const control = fakeResponse(200, 'Ok');
       control.data(
-        `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`
+        `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`,
       );
       control.data(
-        `<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`
+        `<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`,
       );
       control.end();
 
@@ -130,10 +129,10 @@ describe('load', () => {
     it('Multiple (works with unnamed URL: subject)', async () => {
       const control = fakeResponse(200, 'Ok');
       control.data(
-        `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`
+        `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`,
       );
       control.data(
-        `<http://schema.org/> <http://www.w3.org/2000/01/rdf-schema#comment> "A test comment." .\n`
+        `<http://schema.org/> <http://www.w3.org/2000/01/rdf-schema#comment> "A test comment." .\n`,
       );
       control.end();
 
@@ -142,12 +141,12 @@ describe('load', () => {
         new Quad(
           new NamedNode('https://schema.org/Person'),
           new NamedNode('https://schema.org/knowsAbout'),
-          new Literal('"math"')
+          new Literal('"math"'),
         ),
         new Quad(
           new NamedNode('http://schema.org/'),
           new NamedNode('http://www.w3.org/2000/01/rdf-schema#comment'),
-          new Literal('"A test comment."')
+          new Literal('"A test comment."'),
         ),
       ]);
     });
@@ -155,10 +154,10 @@ describe('load', () => {
     it('Multiple (works with search URL)', async () => {
       const control = fakeResponse(200, 'Ok');
       control.data(
-        `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`
+        `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`,
       );
       control.data(
-        `<https://schema.org/X?A=B> <http://www.w3.org/2000/01/rdf-schema#comment> "A test comment." .\n`
+        `<https://schema.org/X?A=B> <http://www.w3.org/2000/01/rdf-schema#comment> "A test comment." .\n`,
       );
       control.end();
 
@@ -166,12 +165,12 @@ describe('load', () => {
         new Quad(
           new NamedNode('https://schema.org/Person'),
           new NamedNode('https://schema.org/knowsAbout'),
-          new Literal('"math"')
+          new Literal('"math"'),
         ),
         new Quad(
           new NamedNode('https://schema.org/X?A=B'),
           new NamedNode('http://www.w3.org/2000/01/rdf-schema#comment'),
-          new Literal('"A test comment."')
+          new Literal('"A test comment."'),
         ),
       ]);
     });
@@ -179,10 +178,10 @@ describe('load', () => {
     it('Multiple (works with unnamed URL: predicate)', async () => {
       const control = fakeResponse(200, 'Ok');
       control.data(
-        `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`
+        `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`,
       );
       control.data(
-        `<http://schema.org/A> <https://schema.org> "A test comment." .\n`
+        `<http://schema.org/A> <https://schema.org> "A test comment." .\n`,
       );
       control.end();
 
@@ -193,7 +192,7 @@ describe('load', () => {
       const control = fakeResponse(200, 'Ok');
       control.data(`<https://schema.org/Person> <https://sc`);
       control.data(
-        `hema.org/knowsAbout> "math" .\n<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`
+        `hema.org/knowsAbout> "math" .\n<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`,
       );
       control.end();
 
@@ -201,12 +200,12 @@ describe('load', () => {
         new Quad(
           new NamedNode('https://schema.org/Person'),
           new NamedNode('https://schema.org/knowsAbout'),
-          new Literal('"math"')
+          new Literal('"math"'),
         ),
         new Quad(
           new NamedNode('https://schema.org/Person'),
           new NamedNode('https://schema.org/knowsAbout'),
-          new Literal('"science"')
+          new Literal('"science"'),
         ),
       ]);
     });
@@ -215,7 +214,7 @@ describe('load', () => {
       const control = fakeResponse(200, 'Ok');
       control.data(`<https://schema.org/Person> <https://sc`);
       control.data(
-        `hema.org/knowsAbout> "math" .\n<file:///usr/Person> <https://schema.org/knowsAbout> "science" .\n`
+        `hema.org/knowsAbout> "math" .\n<file:///usr/Person> <https://schema.org/knowsAbout> "science" .\n`,
       );
       control.end();
 
@@ -240,7 +239,7 @@ describe('load', () => {
       it('missing dot', async () => {
         const control = fakeResponse(200, 'Ok');
         control.data(
-          `<https://schema.org/knowsAbout> <https://scema.org/domainIncludes> "a"`
+          `<https://schema.org/knowsAbout> <https://scema.org/domainIncludes> "a"`,
         );
         control.end();
         await expect(store).rejects.toThrow();
@@ -321,7 +320,7 @@ describe('load', () => {
       it('Post Redirect Oneshot', async () => {
         const control = fakeResponse2(200, 'Ok');
         control.data(
-          `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`
+          `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`,
         );
         control.end();
 
@@ -331,10 +330,10 @@ describe('load', () => {
       it('Post Redirect Multiple (clean broken)', async () => {
         const control = fakeResponse2(200, 'Ok');
         control.data(
-          `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`
+          `<https://schema.org/Person> <https://schema.org/knowsAbout> "math" .\n`,
         );
         control.data(
-          `<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`
+          `<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`,
         );
         control.end();
 
@@ -345,7 +344,7 @@ describe('load', () => {
         const control = fakeResponse2(200, 'Ok');
         control.data(`<https://schema.org/Person> <https://sc`);
         control.data(
-          `hema.org/knowsAbout> "math" .\n<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`
+          `hema.org/knowsAbout> "math" .\n<https://schema.org/Person> <https://schema.org/knowsAbout> "science" .\n`,
         );
         control.end();
 
@@ -358,12 +357,12 @@ describe('load', () => {
         const mockFileLine = `<https://schema.org/Person> <https://schema.org/knowsAbout> <https://schema.org/Event> .\n`;
         readFileFn = jest
           .spyOn(fs, 'readFile')
-          .mockImplementation(path => Promise.resolve(mockFileLine));
+          .mockImplementation(_ => Promise.resolve(mockFileLine));
       });
       it('fails loading a file (containing .nt syntax errors)', async () => {
         const failingMockPath = './bad-ontology.nt';
         const failingMockLine = `<https://schema.org/knowsAbout> <https://sc`;
-        readFileFn.mockImplementation(path => Promise.resolve(failingMockLine));
+        readFileFn.mockImplementation(_ => Promise.resolve(failingMockLine));
 
         const fileTriples = loadFile(failingMockPath);
         await expect(fileTriples).rejects.toThrow('Unexpected');
@@ -377,7 +376,7 @@ describe('load', () => {
           new Quad(
             new NamedNode('https://schema.org/Person'),
             new NamedNode('https://schema.org/knowsAbout'),
-            new NamedNode('https://schema.org/Event')!
+            new NamedNode('https://schema.org/Event'),
           ),
         ]);
       });
@@ -404,11 +403,11 @@ type Headers =
 type FakeResponseFunc = (
   statusCode: number,
   statusMessage: string,
-  headers?: Headers
+  headers?: Headers,
 ) => Control;
 
 function makeFakeResponse(
-  callback: (inc: IncomingMessage) => void
+  callback: (inc: IncomingMessage) => void,
 ): FakeResponseFunc {
   return (statusCode: number, statusMessage: string, headers?: Headers) => {
     interface CBs {
@@ -433,14 +432,14 @@ function makeFakeResponse(
     const control = {
       data(s: string) {
         const buffer = Buffer.from(s, 'utf-8');
-        flush().then(() => cbs['data'](buffer));
+        void flush().then(() => cbs['data'](buffer));
       },
       end() {
-        flush().then(() => cbs['end']());
+        void flush().then(() => cbs['end']());
       },
       error(e: string) {
         const error = new Error(e);
-        flush().then(() => cbs['error'](error));
+        void flush().then(() => cbs['error'](error));
       },
     };
     return control;

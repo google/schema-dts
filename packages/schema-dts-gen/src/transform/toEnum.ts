@@ -47,7 +47,7 @@ export function ProcessEnums(topics: readonly TypedTopic[], classes: ClassMap) {
       Log(
         `For Enum Item ${shortStr(topic.subject)}, did not process:\n\t${skipped
           .map(q => `(${shortStr(q.predicate)}, ${shortStr(q.object)})`)
-          .join('\n\t')}`
+          .join('\n\t')}`,
       );
     }
   }

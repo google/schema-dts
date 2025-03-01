@@ -28,7 +28,7 @@ function decodeOr(component: string) {
 export function toClassName(subject: NamedNode): string {
   let sanitizedName = decodeOr(namedPortion(subject)).replace(
     /[^A-Za-z0-9_]/g,
-    '_'
+    '_',
   );
 
   // No leading numbers.

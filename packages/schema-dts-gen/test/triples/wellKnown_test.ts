@@ -31,9 +31,9 @@ describe('wellKnown', () => {
           new Quad(
             new NamedNode('https://schema.org/Foo'),
             new NamedNode('http://www.w3.org/2000/01/rdf-schema#comment'),
-            new Literal('"foo"')
-          )
-        )
+            new Literal('"foo"'),
+          ),
+        ),
       ).toEqual({comment: 'foo'});
     });
 
@@ -43,9 +43,9 @@ describe('wellKnown', () => {
           new Quad(
             new NamedNode('https://schema.org/Foo'),
             new NamedNode('http://www.w3.org/2000/01/rdf-schema#type'),
-            new Literal('"foo"')
-          )
-        )
+            new Literal('"foo"'),
+          ),
+        ),
       ).toBeNull();
 
       expect(
@@ -53,9 +53,9 @@ describe('wellKnown', () => {
           new Quad(
             new NamedNode('https://schema.org/Foo'),
             new NamedNode('http://schema.org/comment'),
-            new Literal('"foo"')
-          )
-        )
+            new Literal('"foo"'),
+          ),
+        ),
       ).toBeNull();
     });
 
@@ -65,9 +65,9 @@ describe('wellKnown', () => {
           new Quad(
             new NamedNode('https://schema.org/Foo'),
             new NamedNode('http://www.w3.org/2000/01/rdf-schema#comment'),
-            new NamedNode('http://schema.org/Amazing')
-          )
-        )
+            new NamedNode('http://schema.org/Amazing'),
+          ),
+        ),
       ).toThrowError('non-string object');
     });
   });
@@ -79,9 +79,9 @@ describe('wellKnown', () => {
           new Quad(
             new NamedNode('https://schema.org/Foo'),
             new NamedNode('http://www.w3.org/2000/01/rdf-schema#subClassOf'),
-            new NamedNode('http://schema.org/Foo')
-          )
-        )
+            new NamedNode('http://schema.org/Foo'),
+          ),
+        ),
       ).toEqual({subClassOf: new NamedNode('http://schema.org/Foo')});
     });
 
@@ -91,9 +91,9 @@ describe('wellKnown', () => {
           new Quad(
             new NamedNode('https://schema.org/Foo'),
             new NamedNode('https://schema.org/knowsAbout'),
-            new Literal('"foo"')
-          )
-        )
+            new Literal('"foo"'),
+          ),
+        ),
       ).toBeNull();
 
       expect(
@@ -101,9 +101,9 @@ describe('wellKnown', () => {
           new Quad(
             new NamedNode('https://schema.org/Foo'),
             new NamedNode('http://www.w3.org/2000/01/rdf-schema#comment'),
-            new NamedNode('http://schema.org/Foo')
-          )
-        )
+            new NamedNode('http://schema.org/Foo'),
+          ),
+        ),
       ).toBeNull();
     });
 
@@ -113,9 +113,9 @@ describe('wellKnown', () => {
           new Quad(
             new NamedNode('https://schema.org/Foo'),
             new NamedNode('http://www.w3.org/2000/01/rdf-schema#subClassOf'),
-            new Literal('"foo"')
-          )
-        )
+            new Literal('"foo"'),
+          ),
+        ),
       ).toThrowError('Unexpected object for predicate');
     });
   });
@@ -127,9 +127,9 @@ describe('wellKnown', () => {
           new Quad(
             new NamedNode('https://schema.org/Foo'),
             new NamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-            new NamedNode('https://schema.org/Foo')
-          )
-        )
+            new NamedNode('https://schema.org/Foo'),
+          ),
+        ),
       ).toEqual(new NamedNode('https://schema.org/Foo'));
     });
 
@@ -139,9 +139,9 @@ describe('wellKnown', () => {
           new Quad(
             new NamedNode('https://schema.org/Foo'),
             new NamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-            new NamedNode('http://www.w3.org/2000/01/rdf-schema#Class')
-          )
-        )
+            new NamedNode('http://www.w3.org/2000/01/rdf-schema#Class'),
+          ),
+        ),
       ).toEqual(new NamedNode('http://www.w3.org/2000/01/rdf-schema#Class'));
     });
 
@@ -151,9 +151,9 @@ describe('wellKnown', () => {
           new Quad(
             new NamedNode('https://schema.org/Foo'),
             new NamedNode('http://www.w3.org/2000/01/rdf-schema#type'),
-            new NamedNode('http://www.w3.org/2000/01/rdf-schema#Class')
-          )
-        )
+            new NamedNode('http://www.w3.org/2000/01/rdf-schema#Class'),
+          ),
+        ),
       ).toBeNull();
 
       expect(
@@ -161,11 +161,11 @@ describe('wellKnown', () => {
           new Quad(
             new NamedNode('https://schema.org/Foo'),
             new NamedNode(
-              'http://www.w3.org/1999/02/22-rdf-syntax-ns#property'
+              'http://www.w3.org/1999/02/22-rdf-syntax-ns#property',
             ),
-            new NamedNode('http://www.w3.org/2000/01/rdf-schema#Class')
-          )
-        )
+            new NamedNode('http://www.w3.org/2000/01/rdf-schema#Class'),
+          ),
+        ),
       ).toBeNull();
     });
 
@@ -175,9 +175,9 @@ describe('wellKnown', () => {
           new Quad(
             new NamedNode('https://schema.org/Foo'),
             new NamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-            new Literal('"foo"')
-          )
-        )
+            new Literal('"foo"'),
+          ),
+        ),
       ).toThrowError('Unexpected type');
     });
   });
@@ -189,14 +189,14 @@ describe('wellKnown', () => {
           new Quad(
             new NamedNode('https://schema.org/Foo'),
             new NamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-            new NamedNode('http://www.w3.org/2000/01/rdf-schema#Class')
+            new NamedNode('http://www.w3.org/2000/01/rdf-schema#Class'),
           ),
           new Quad(
             new NamedNode('https://schema.org/Foo'),
             new NamedNode('http://www.w3.org/2000/01/rdf-schema#label'),
-            new Literal('"Thing"')
+            new Literal('"Thing"'),
           ),
-        ])
+        ]),
       ).toEqual([new NamedNode('http://www.w3.org/2000/01/rdf-schema#Class')]);
     });
 
@@ -206,19 +206,19 @@ describe('wellKnown', () => {
           new Quad(
             new NamedNode('https://schema.org/Foo'),
             new NamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-            new NamedNode('http://www.w3.org/2000/01/rdf-schema#Class')
+            new NamedNode('http://www.w3.org/2000/01/rdf-schema#Class'),
           ),
           new Quad(
             new NamedNode('https://schema.org/Foo'),
             new NamedNode('http://www.w3.org/2000/01/rdf-schema#label'),
-            new Literal('"Thing"')
+            new Literal('"Thing"'),
           ),
           new Quad(
             new NamedNode('https://schema.org/Foo'),
             new NamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-            new NamedNode('http://schema.org/Thing')
+            new NamedNode('http://schema.org/Thing'),
           ),
-        ])
+        ]),
       ).toEqual([
         new NamedNode('http://www.w3.org/2000/01/rdf-schema#Class'),
         new NamedNode('http://schema.org/Thing'),
@@ -237,7 +237,7 @@ describe('wellKnown', () => {
           subject: new NamedNode('https://schema.org/Text'),
           types: [cls, dataType],
           quads: [],
-        })
+        }),
       ).toBe(true);
 
       expect(
@@ -245,7 +245,7 @@ describe('wellKnown', () => {
           subject: new NamedNode('https://schema.org/Text'),
           types: [dataType, cls],
           quads: [],
-        })
+        }),
       ).toBe(true);
     });
 
@@ -255,7 +255,7 @@ describe('wellKnown', () => {
           subject: new NamedNode('https://schema.org/True'),
           types: [bool],
           quads: [],
-        })
+        }),
       ).toBe(false);
     });
 
@@ -265,7 +265,7 @@ describe('wellKnown', () => {
           subject: new NamedNode('https://schema.org/ItsComplicated'),
           types: [bool, cls],
           quads: [],
-        })
+        }),
       ).toBe(true);
     });
 
@@ -278,10 +278,10 @@ describe('wellKnown', () => {
             new Quad(
               new NamedNode('https://schema.org/Foo'),
               new NamedNode('http://www.w3.org/2000/01/rdf-schema#subClassOf'),
-              new NamedNode('http://www.w3.org/2000/01/rdf-schema#Class')
+              new NamedNode('http://www.w3.org/2000/01/rdf-schema#Class'),
             ),
           ],
-        })
+        }),
       ).toBe(true);
     });
   });

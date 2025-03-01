@@ -27,10 +27,12 @@ import wikiLinkPlugin from 'remark-wiki-link';
 import mdastToHast from 'remark-rehype';
 import stripWhitespace from 'rehype-minify-whitespace';
 import raw from 'rehype-raw';
+import type {Root as HtmlRoot} from 'hast';
+import type {Root as MarkdownRoot} from 'mdast';
 
 export function withComments<T extends Node>(
   comment: string | undefined,
-  node: T
+  node: T,
 ): T {
   if (!comment) return node;
 
@@ -51,7 +53,7 @@ export function withComments<T extends Node>(
 
 export function appendParagraph(
   first: string | undefined,
-  next: string
+  next: string,
 ): string {
   if (!first) return next;
   if (shouldParseAsHtml(first)) return `${first}<br/><br/>${next}`;
@@ -95,10 +97,10 @@ function parseComment(comment: string): string {
     : '*\n * ' + lines.join('\n * ') + '\n ';
 }
 
-function parseCommentInternal<P extends Processor>(
-  processor: P,
-  comment: string
-) {
+type Root = HtmlRoot | MarkdownRoot;
+function parseCommentInternal<
+  P extends Processor<Root, Root | undefined, Root | undefined>,
+>(processor: P, comment: string) {
   return processor.runSync(processor.parse(comment));
 }
 
@@ -238,20 +240,20 @@ function one(
     isFirstChild: boolean;
     isLastChild: boolean;
     parent: FriendlyNode | undefined;
-  }
+  },
 ): void {
   const handler = context.onTag.get(getNodeType(node));
   if (!handler) {
     throw new Error(
       `While parsing comment: unknown node type (${getNodeType(
-        node
-      )}) for: ${JSON.stringify(node, undefined, 2)}.`
+        node,
+      )}) for: ${JSON.stringify(node, undefined, 2)}.`,
     );
   }
 
   if (handler.open) {
     context.result.push(
-      handler.open({...nodeContext, node: node as FriendlyNode})
+      handler.open({...nodeContext, node: node as FriendlyNode}),
     );
   }
 
@@ -273,7 +275,7 @@ function one(
 
   if (handler.close) {
     context.result.push(
-      handler.close({...nodeContext, node: node as FriendlyNode})
+      handler.close({...nodeContext, node: node as FriendlyNode}),
     );
   }
 }

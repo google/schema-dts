@@ -28,7 +28,7 @@ export class Context {
     if (this.context.length > 0) {
       throw new Error(
         'Attempting to set a default URL context, ' +
-          'but other named contexts exist already.'
+          'but other named contexts exist already.',
       );
     }
     this.context.push(['', ctx]);
@@ -48,7 +48,7 @@ export class Context {
       }
       if (name === '') {
         throw new Error(
-          'Context with multiple named contexts includes unnamed URL.'
+          'Context with multiple named contexts includes unnamed URL.',
         );
       }
       seen.add(name);
@@ -76,7 +76,7 @@ export class Context {
     // "@context": "https://schema.org" or similar:
     if (this.context.length === 1 && this.context[0][0] === '') {
       return factory.createLiteralTypeNode(
-        factory.createStringLiteral(this.context[0][1])
+        factory.createStringLiteral(this.context[0][1]),
       );
     }
 
@@ -87,9 +87,9 @@ export class Context {
           /*modifiers=*/ [],
           factory.createStringLiteral(name),
           /*questionToken=*/ undefined,
-          factory.createLiteralTypeNode(factory.createStringLiteral(url))
-        )
-      )
+          factory.createLiteralTypeNode(factory.createStringLiteral(url)),
+        ),
+      ),
     );
   }
 
@@ -99,7 +99,7 @@ export class Context {
       /*modifiers=*/ [],
       factory.createStringLiteral('@context'),
       /*questionToken=*/ undefined,
-      this.typeNode()
+      this.typeNode(),
     );
   }
 

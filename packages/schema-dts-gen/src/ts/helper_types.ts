@@ -16,8 +16,8 @@ function IdPropertyNode() {
       factory.createStringLiteral('@id'),
       /* questionToken= */ undefined,
       /* typeNode= */
-      factory.createTypeReferenceNode('string', /*typeArguments=*/ [])
-    )
+      factory.createTypeReferenceNode('string', /*typeArguments=*/ []),
+    ),
   );
 }
 
@@ -34,14 +34,17 @@ function WithContextType(context: Context) {
         factory.createTypeParameterDeclaration(
           /*modifiers=*/ [],
           'T' /*constraint=*/,
-          factory.createTypeReferenceNode('Thing', /*typeArguments=*/ undefined)
+          factory.createTypeReferenceNode(
+            'Thing',
+            /*typeArguments=*/ undefined,
+          ),
         ),
       ],
       factory.createIntersectionTypeNode([
         factory.createTypeReferenceNode('T', /*typeArguments=*/ undefined),
         factory.createTypeLiteralNode([context.contextProperty()]),
-      ])
-    )
+      ]),
+    ),
   );
 }
 
@@ -64,13 +67,13 @@ function GraphType(context: Context) {
             factory.createArrayTypeNode(
               factory.createTypeReferenceNode(
                 'Thing',
-                /*typeArguments=*/ undefined
-              )
-            )
-          )
+                /*typeArguments=*/ undefined,
+              ),
+            ),
+          ),
         ),
-      ]
-    )
+      ],
+    ),
   );
 }
 
@@ -81,15 +84,17 @@ export const GraphTypeName = 'Graph';
 export function SchemaValueReference(
   {hasRole}: {hasRole: boolean},
   makeScalarType: () => TypeNode,
-  propertyName: string
+  propertyName: string,
 ) {
   return factory.createTypeReferenceNode(
     SchemaValueName,
     /* typeArguments = */ arrayOf(
       makeScalarType(),
       hasRole &&
-        factory.createLiteralTypeNode(factory.createStringLiteral(propertyName))
-    )
+        factory.createLiteralTypeNode(
+          factory.createStringLiteral(propertyName),
+        ),
+    ),
   );
 }
 
@@ -106,8 +111,8 @@ export function HelperTypes(context: Context, {hasRole}: {hasRole: boolean}) {
           factory.createTypeParameterDeclaration(
             /*modifiers=*/ [],
             'TProperty',
-            /*constraint=*/ factory.createTypeReferenceNode('string')
-          )
+            /*constraint=*/ factory.createTypeReferenceNode('string'),
+          ),
       ),
       factory.createUnionTypeNode(
         arrayOf<TypeNode>(
@@ -126,18 +131,18 @@ export function HelperTypes(context: Context, {hasRole}: {hasRole: boolean}) {
                   factory.createTypeReferenceNode('Role', [
                     /*TContent=*/ factory.createTypeReferenceNode('T'),
                     /*TProperty=*/ factory.createTypeReferenceNode('TProperty'),
-                  ])
-              )
-            )
-          )
-        )
-      )
+                  ]),
+              ),
+            ),
+          ),
+        ),
+      ),
     ),
     factory.createTypeAliasDeclaration(
       /*modifiers=*/ [],
       IdReferenceName,
       /*typeParameters=*/ [],
-      factory.createTypeLiteralNode([IdPropertyNode()])
+      factory.createTypeLiteralNode([IdPropertyNode()]),
     ),
   ];
 }

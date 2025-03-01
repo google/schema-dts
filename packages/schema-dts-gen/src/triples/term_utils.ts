@@ -18,7 +18,7 @@ import type {NamedNode, Term} from 'n3';
 
 export function nameFromContext(
   term: NamedNode,
-  context: string
+  context: string,
 ): string | null {
   if (term.id.startsWith(context)) {
     return cleanName(term.id.replace(new RegExp(`^${context}`), ''));
@@ -47,7 +47,7 @@ export function namedPortion(term: NamedNode): string {
 
   if (!name) {
     throw new Error(
-      `Expected ${term.id} to have a short name (final path or hash), but found none.`
+      `Expected ${term.id} to have a short name (final path or hash), but found none.`,
     );
   }
   return name;

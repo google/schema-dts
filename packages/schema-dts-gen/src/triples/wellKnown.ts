@@ -33,12 +33,12 @@ const owlPrefix = 'http://www.w3.org/2002/07/owl#';
 
 function possibleTerms(
   prefix: string | readonly string[],
-  names: string | readonly string[]
+  names: string | readonly string[],
 ): NamedNode[] {
-  if (Array.isArray(prefix)) {
+  if (prefix instanceof Array) {
     return prefix.map(p => possibleTerms(p, names)).flat();
   }
-  if (Array.isArray(names)) {
+  if (names instanceof Array) {
     return names.map(n => possibleTerms(prefix, n)).flat();
   }
 
@@ -92,7 +92,7 @@ export function GetComment(q: Quad): {comment: string} | null {
   if (Comment.some(c => c.equals(q.predicate))) {
     if (q.object.termType === 'Literal') return {comment: q.object.value};
     throw new Error(
-      `Unexpected Comment predicate with non-string object: ${debugStr(q)}.`
+      `Unexpected Comment predicate with non-string object: ${debugStr(q)}.`,
     );
   }
   return null;
@@ -106,7 +106,7 @@ export function GetSubClassOf(q: Quad): {subClassOf: NamedNode} | null {
   if (SubClassOf.some(s => s.equals(q.predicate))) {
     if (q.object.termType !== 'NamedNode') {
       throw new Error(
-        `Unexpected object for predicate 'subClassOf': ${debugStr(q)}`
+        `Unexpected object for predicate 'subClassOf': ${debugStr(q)}`,
       );
     }
 

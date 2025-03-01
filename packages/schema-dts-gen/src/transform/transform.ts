@@ -51,7 +51,7 @@ export async function WriteDeclarations(
   graph: Store,
   includeDeprecated: boolean,
   context: Context,
-  write: (content: string) => Promise<void> | void
+  write: (content: string) => Promise<void> | void,
 ) {
   const topics = asTopicArray(graph);
 
@@ -73,15 +73,15 @@ export async function WriteDeclarations(
     '',
     ScriptTarget.ES2015,
     /*setParentNodes=*/ false,
-    ScriptKind.TS
+    ScriptKind.TS,
   );
   const printer = createPrinter({newLine: NewLineKind.LineFeed});
 
   for (const helperType of HelperTypes(context, properties)) {
-    write(printer.printNode(EmitHint.Unspecified, helperType, source));
-    write('\n');
+    await write(printer.printNode(EmitHint.Unspecified, helperType, source));
+    await write('\n');
   }
-  write('\n');
+  await write('\n');
 
   for (const cls of sorted) {
     if (cls.deprecated && !includeDeprecated) continue;

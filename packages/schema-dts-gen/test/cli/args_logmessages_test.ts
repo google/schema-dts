@@ -40,7 +40,7 @@ describe('main Args logs', () => {
   it(`the path it is loading from`, async () => {
     await main(noop, ['--file', `ontology-file.nt`, `--verbose`]);
     expect(logs.join('')).toMatchInlineSnapshot(
-      `"Loading Ontology from path: ontology-file.nt"`
+      `"Loading Ontology from path: ontology-file.nt"`,
     );
   });
 });

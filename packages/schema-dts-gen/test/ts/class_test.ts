@@ -44,10 +44,10 @@ describe('Class', () => {
           new Quad(
             null!,
             subClassOf(),
-            new NamedNode('https://schema.org/Thing')
+            new NamedNode('https://schema.org/Thing'),
           ),
-          makeClassMap(cls)
-        )
+          makeClassMap(cls),
+        ),
       ).toThrowError("Couldn't find parent");
     });
 
@@ -57,10 +57,10 @@ describe('Class', () => {
           new Quad(
             null!,
             supersededBy(),
-            new NamedNode('https://schema.org/CoolPerson')
+            new NamedNode('https://schema.org/CoolPerson'),
           ),
-          makeClassMap(cls)
-        )
+          makeClassMap(cls),
+        ),
       ).toThrowError("Couldn't find class https://schema.org/CoolPerson");
     });
   });
@@ -119,10 +119,10 @@ describe('Class', () => {
           new Quad(
             null!,
             supersededBy(),
-            new NamedNode('https://schema.org/CoolPerson')
+            new NamedNode('https://schema.org/CoolPerson'),
           ),
-          makeClassMap(cls, makeClass('https://schema.org/CoolPerson'))
-        )
+          makeClassMap(cls, makeClass('https://schema.org/CoolPerson')),
+        ),
       ).toBe(true);
 
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
@@ -142,7 +142,7 @@ describe('Class', () => {
       const map = makeClassMap(
         cls,
         makeClass('https://schema.org/CoolPerson'),
-        makeClass('https://schema.org/APerson')
+        makeClass('https://schema.org/APerson'),
       );
 
       expect(
@@ -150,10 +150,10 @@ describe('Class', () => {
           new Quad(
             null!,
             supersededBy(),
-            new NamedNode('https://schema.org/CoolPerson')
+            new NamedNode('https://schema.org/CoolPerson'),
           ),
-          map
-        )
+          map,
+        ),
       ).toBe(true);
 
       expect(
@@ -161,10 +161,10 @@ describe('Class', () => {
           new Quad(
             null!,
             supersededBy(),
-            new NamedNode('https://schema.org/APerson')
+            new NamedNode('https://schema.org/APerson'),
           ),
-          map
-        )
+          map,
+        ),
       ).toBe(true);
 
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
@@ -186,16 +186,16 @@ describe('Class', () => {
           new Quad(
             null!,
             supersededBy(),
-            new NamedNode('https://schema.org/CoolPerson')
+            new NamedNode('https://schema.org/CoolPerson'),
           ),
-          makeClassMap(cls, makeClass('https://schema.org/CoolPerson'))
-        )
+          makeClassMap(cls, makeClass('https://schema.org/CoolPerson')),
+        ),
       ).toBe(true);
       expect(
         cls.add(
           new Quad(null!, comment(), new Literal('"Fantastic"')),
-          new Map()
-        )
+          new Map(),
+        ),
       ).toBe(true);
 
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
@@ -226,15 +226,15 @@ describe('Class', () => {
                 '<table>' +
                 '<tr><td>XYZ</td><td>ABC</td></tr>' +
                 '<tr><td>123</td><td>234</td></tr>' +
-                '</table>"'
-            )
+                '</table>"',
+            ),
           ),
-          new Map()
-        )
+          new Map(),
+        ),
       ).toBe(true);
 
       expect(() =>
-        cls.toNode(ctx, {skipDeprecatedProperties: true, hasRole: false})
+        cls.toNode(ctx, {skipDeprecatedProperties: true, hasRole: false}),
       ).toThrowError('unknown node type');
     });
   });
@@ -276,52 +276,52 @@ describe('Sort(Class, Class)', () => {
       expect(
         Sort(
           makeClass('https://schema.org/A'),
-          makeClass('https://schema.org/B')
-        )
+          makeClass('https://schema.org/B'),
+        ),
       ).toBe(-1);
       expect(
         Sort(
           makeClass('https://schema.org/B'),
-          makeClass('https://schema.org/A')
-        )
+          makeClass('https://schema.org/A'),
+        ),
       ).toBe(+1);
       expect(
         Sort(
           makeClass('https://schema.org/A'),
-          makeClass('https://schema.org/A')
-        )
+          makeClass('https://schema.org/A'),
+        ),
       ).toBe(0);
 
       expect(
-        Sort(makeClass('https://schema.org/A'), makeClass('https://foo.bar/B'))
+        Sort(makeClass('https://schema.org/A'), makeClass('https://foo.bar/B')),
       ).toBe(-1);
       expect(
-        Sort(makeClass('https://schema.org/B'), makeClass('https://foo.bar/A'))
+        Sort(makeClass('https://schema.org/B'), makeClass('https://foo.bar/A')),
       ).toBe(+1);
 
       expect(
         Sort(
           makeClass('https://schema.org/Z'),
-          makeClass('https://schema.org/Z#A')
-        )
+          makeClass('https://schema.org/Z#A'),
+        ),
       ).toBe(+1);
     });
 
     it('Same name different URL', () => {
       expect(
-        Sort(makeClass('https://schema.org/A'), makeClass('https://foo.bar/A'))
+        Sort(makeClass('https://schema.org/A'), makeClass('https://foo.bar/A')),
       ).toBe(+1);
       expect(
         Sort(
           makeClass('https://schema.org/A'),
-          makeClass('https://z.org/2010#A')
-        )
+          makeClass('https://z.org/2010#A'),
+        ),
       ).toBe(-1);
       expect(
         Sort(
           makeClass('https://schema.org/A'),
-          makeClass('https://schema.org/Z#A')
-        )
+          makeClass('https://schema.org/Z#A'),
+        ),
       ).toBe(-1);
     });
 
@@ -331,19 +331,19 @@ describe('Sort(Class, Class)', () => {
         Sort(
           new AliasBuiltin(
             new NamedNode('https://schema.org/Text'),
-            AliasBuiltin.Alias('string')
+            AliasBuiltin.Alias('string'),
           ),
-          makeClass('https://schema.org/A')
-        )
+          makeClass('https://schema.org/A'),
+        ),
       ).toBe(-1);
       expect(
         Sort(
           makeClass('https://schema.org/A'),
           new AliasBuiltin(
             new NamedNode('https://schema.org/Text'),
-            AliasBuiltin.Alias('string')
-          )
-        )
+            AliasBuiltin.Alias('string'),
+          ),
+        ),
       ).toBe(+1);
 
       // Before regular classes with different domains.
@@ -351,19 +351,19 @@ describe('Sort(Class, Class)', () => {
         Sort(
           new AliasBuiltin(
             new NamedNode('https://schema.org/Text'),
-            AliasBuiltin.Alias('string')
+            AliasBuiltin.Alias('string'),
           ),
-          makeClass('https://a.org/DataType')
-        )
+          makeClass('https://a.org/DataType'),
+        ),
       ).toBe(-1);
       expect(
         Sort(
           makeClass('https://a.org/DataType'),
           new AliasBuiltin(
             new NamedNode('https://schema.org/Text'),
-            AliasBuiltin.Alias('string')
-          )
-        )
+            AliasBuiltin.Alias('string'),
+          ),
+        ),
       ).toBe(+1);
 
       // Before builtins.
@@ -372,27 +372,27 @@ describe('Sort(Class, Class)', () => {
           new DataTypeUnion(new NamedNode('https://schema.org/DataType'), []),
           new AliasBuiltin(
             new NamedNode('https://schema.org/A'),
-            AliasBuiltin.Alias('string')
-          )
-        )
+            AliasBuiltin.Alias('string'),
+          ),
+        ),
       ).toBe(+1);
       expect(
         Sort(
           new AliasBuiltin(
             new NamedNode('https://schema.org/A'),
-            AliasBuiltin.Alias('string')
+            AliasBuiltin.Alias('string'),
           ),
-          new DataTypeUnion(new NamedNode('https://schema.org/DataType'), [])
-        )
+          new DataTypeUnion(new NamedNode('https://schema.org/DataType'), []),
+        ),
       ).toBe(-1);
       expect(
         Sort(
           new AliasBuiltin(
             new NamedNode('https://schema.org/Z'),
-            AliasBuiltin.Alias('string')
+            AliasBuiltin.Alias('string'),
           ),
-          new DataTypeUnion(new NamedNode('https://schema.org/DataType'), [])
-        )
+          new DataTypeUnion(new NamedNode('https://schema.org/DataType'), []),
+        ),
       ).toBe(-1);
 
       // Can be same as less specific builtins.
@@ -401,9 +401,9 @@ describe('Sort(Class, Class)', () => {
           new Builtin(new NamedNode('https://schema.org/Boo')),
           new AliasBuiltin(
             new NamedNode('https://schema.org/Boo'),
-            AliasBuiltin.Alias('Text')
-          )
-        )
+            AliasBuiltin.Alias('Text'),
+          ),
+        ),
       ).toBe(0);
 
       // Sorts within Builtins
@@ -411,76 +411,76 @@ describe('Sort(Class, Class)', () => {
         Sort(
           new AliasBuiltin(
             new NamedNode('https://schema.org/A'),
-            AliasBuiltin.Alias('string')
+            AliasBuiltin.Alias('string'),
           ),
           new AliasBuiltin(
             new NamedNode('https://schema.org/B'),
-            AliasBuiltin.Alias('string')
-          )
-        )
+            AliasBuiltin.Alias('string'),
+          ),
+        ),
       ).toBe(-1);
 
       expect(
         Sort(
           new AliasBuiltin(
             new NamedNode('https://schema.org/B'),
-            AliasBuiltin.Alias('string')
+            AliasBuiltin.Alias('string'),
           ),
           new AliasBuiltin(
             new NamedNode('https://schema.org/A'),
-            AliasBuiltin.Alias('string')
-          )
-        )
+            AliasBuiltin.Alias('string'),
+          ),
+        ),
       ).toBe(+1);
 
       expect(
         Sort(
           new AliasBuiltin(
             new NamedNode('https://schema.org/C'),
-            AliasBuiltin.Alias('string')
+            AliasBuiltin.Alias('string'),
           ),
           new AliasBuiltin(
             new NamedNode('https://schema.org/C'),
-            AliasBuiltin.Alias('string')
-          )
-        )
+            AliasBuiltin.Alias('string'),
+          ),
+        ),
       ).toBe(0);
 
       expect(
         Sort(
           new AliasBuiltin(
             new NamedNode('https://schema.org/A#Z'),
-            AliasBuiltin.Alias('string')
+            AliasBuiltin.Alias('string'),
           ),
           new AliasBuiltin(
             new NamedNode('https://schema.org/C'),
-            AliasBuiltin.Alias('string')
-          )
-        )
+            AliasBuiltin.Alias('string'),
+          ),
+        ),
       ).toBe(+1);
       expect(
         Sort(
           new AliasBuiltin(
             new NamedNode('https://z.org/C'),
-            AliasBuiltin.Alias('string')
+            AliasBuiltin.Alias('string'),
           ),
           new AliasBuiltin(
             new NamedNode('https://schema.org/C'),
-            AliasBuiltin.Alias('string')
-          )
-        )
+            AliasBuiltin.Alias('string'),
+          ),
+        ),
       ).toBe(+1);
       expect(
         Sort(
           new AliasBuiltin(
             new NamedNode('https://z.org/Z#A'),
-            AliasBuiltin.Alias('string')
+            AliasBuiltin.Alias('string'),
           ),
           new AliasBuiltin(
             new NamedNode('https://schema.org/C'),
-            AliasBuiltin.Alias('string')
-          )
-        )
+            AliasBuiltin.Alias('string'),
+          ),
+        ),
       ).toBe(-1);
     });
 
@@ -489,28 +489,28 @@ describe('Sort(Class, Class)', () => {
       expect(
         Sort(
           new DataTypeUnion(new NamedNode('https://schema.org/DataType'), []),
-          makeClass('https://schema.org/A')
-        )
+          makeClass('https://schema.org/A'),
+        ),
       ).toBe(-1);
       expect(
         Sort(
           makeClass('https://schema.org/A'),
-          new DataTypeUnion(new NamedNode('https://schema.org/DataType'), [])
-        )
+          new DataTypeUnion(new NamedNode('https://schema.org/DataType'), []),
+        ),
       ).toBe(+1);
 
       // Before regular classes with different domains.
       expect(
         Sort(
           new DataTypeUnion(new NamedNode('https://schema.org/DataType'), []),
-          makeClass('https://a.org/DataType')
-        )
+          makeClass('https://a.org/DataType'),
+        ),
       ).toBe(-1);
       expect(
         Sort(
           makeClass('https://a.org/DataType'),
-          new DataTypeUnion(new NamedNode('https://schema.org/DataType'), [])
-        )
+          new DataTypeUnion(new NamedNode('https://schema.org/DataType'), []),
+        ),
       ).toBe(+1);
     });
 
@@ -518,22 +518,22 @@ describe('Sort(Class, Class)', () => {
       expect(
         Sort(
           new DataTypeUnion(new NamedNode('https://schema.org/DataType'), []),
-          new DataTypeUnion(new NamedNode('https://schema.org/DataType'), [])
-        )
+          new DataTypeUnion(new NamedNode('https://schema.org/DataType'), []),
+        ),
       ).toBe(0);
 
       expect(
         Sort(
           new DataTypeUnion(new NamedNode('https://schema.org/A'), []),
-          new DataTypeUnion(new NamedNode('https://schema.org/Z'), [])
-        )
+          new DataTypeUnion(new NamedNode('https://schema.org/Z'), []),
+        ),
       ).toBe(0);
 
       expect(
         Sort(
           new DataTypeUnion(new NamedNode('https://schema.org/Z'), []),
-          new DataTypeUnion(new NamedNode('https://schema.org/A'), [])
-        )
+          new DataTypeUnion(new NamedNode('https://schema.org/A'), []),
+        ),
       ).toBe(0);
     });
   });
@@ -542,14 +542,14 @@ describe('Sort(Class, Class)', () => {
 function asString(
   cls: Class,
   context: Context,
-  {skipDeprecated}: {skipDeprecated?: boolean} = {}
+  {skipDeprecated}: {skipDeprecated?: boolean} = {},
 ): string {
   const source = ts.createSourceFile(
     'result.ts',
     '',
     ts.ScriptTarget.ES2015,
     /*setParentNodes=*/ false,
-    ts.ScriptKind.TS
+    ts.ScriptKind.TS,
   );
   const printer = ts.createPrinter({newLine: ts.NewLineKind.LineFeed});
 
@@ -578,7 +578,7 @@ function addParent(cls: Class, parentUrl: string): void {
   expect(
     cls.add(
       new Quad(null!, subClassOf(), new NamedNode(parentUrl)),
-      makeClassMap(cls, makeClass(parentUrl))
-    )
+      makeClassMap(cls, makeClass(parentUrl)),
+    ),
   ).toBe(true);
 }

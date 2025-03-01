@@ -70,7 +70,7 @@ test(`baseline_${basename(import.meta.url)}`, async () => {
 <http://schema.org/MedicalEntity> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://schema.org/Thing> .
 <http://schema.org/procedureType> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
       `,
-    ['--ontology', `https://fake.com/${basename(import.meta.url)}.nt`]
+    ['--ontology', `https://fake.com/${basename(import.meta.url)}.nt`],
   );
 
   expect(actual).toMatchInlineSnapshot(`

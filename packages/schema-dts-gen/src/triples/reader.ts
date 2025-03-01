@@ -64,8 +64,8 @@ function handleUrl(url: string): Promise<Quad[]> {
 
           reject(
             new Error(
-              `Got Errored Response ${response.statusCode}: ${response.statusMessage}.`
-            )
+              `Got Errored Response ${response.statusCode}: ${response.statusMessage}.`,
+            ),
           );
           return;
         }
@@ -81,8 +81,8 @@ function handleUrl(url: string): Promise<Quad[]> {
           try {
             resolve(asQuads(data.join('')));
           } catch (error) {
-            Log(`Caught Error on end: ${error}`);
-            reject(error);
+            Log(`Caught Error on end: ${error as Error}`);
+            reject(error as Error);
           }
         });
 
