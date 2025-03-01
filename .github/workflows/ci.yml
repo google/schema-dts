@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x, 16.x]
+        node-version: [22.x, 23.x]
 
     steps:
       - uses: actions/checkout@v2
@@ -21,15 +21,12 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Update NPM  # Needed while 14.x, is supported.
-        if: ${{ matrix.node-version == '14.x' }}
-        run: npm install -g npm@latest
       - run: npm ci
       - run: npm run build
       - run: npm test
       - name: Coveralls - schema-dts-gen
         uses: coverallsapp/github-action@master
-        if: ${{ matrix.node-version == '16.x' }}
+        if: ${{ matrix.node-version == '22.x' }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ./packages/schema-dts-gen/coverage/lcov.info
