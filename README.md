@@ -117,6 +117,35 @@ const graph: Graph = {
 };
 ```
 
+### Input and Output constraints
+
+Actions support additional information to describe inputs and outputs, so each
+property can be annotated using `-input` and `-output` suffixes and you can do
+that in `schema-dts` by using the `WithActionConstraints` type for each action
+type you want to annotate. See the following examples:
+
+```ts
+import type {SearchAction, WithActionConstraints} from 'schema-dts';
+
+const potentialAction: WithActionConstraints<SearchAction> = {
+  '@type': 'SearchAction',
+  'query-input': 'required name=search_term_string',
+  // ...
+};
+```
+
+```ts
+import type {SearchAction, WebSite, WithActionConstraints} from 'schema-dts';
+
+const website: WebSite = {
+  '@type': 'WebSite',
+  potentialAction: {
+    '@type': 'SearchAction',
+    'query-input': 'required name=search_term_string',
+  } as WithActionConstraints<SearchAction>,
+};
+```
+
 # Schema Typings Generator
 
 The Schema Typings Generator is available in the

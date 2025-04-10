@@ -2,9 +2,14 @@ import ts from 'typescript';
 import type {TypeNode} from 'typescript';
 const {factory, SyntaxKind, ModifierFlags} = ts;
 
+import {
+  WithActionConstraintsType,
+  InputActionConstraintsType,
+  OutputActionConstraintsType,
+} from './action_constraints.js';
 import {Context} from './context.js';
-import {arrayOf} from './util/arrayof.js';
 
+import {arrayOf} from './util/arrayof.js';
 import {withComments} from './util/comments.js';
 import {typeUnion} from './util/union.js';
 
@@ -144,5 +149,8 @@ export function HelperTypes(context: Context, {hasRole}: {hasRole: boolean}) {
       /*typeParameters=*/ [],
       factory.createTypeLiteralNode([IdPropertyNode()]),
     ),
+    InputActionConstraintsType,
+    OutputActionConstraintsType,
+    WithActionConstraintsType,
   ];
 }
