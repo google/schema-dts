@@ -35,25 +35,33 @@ test(`baseline_${basename(import.meta.url)}`, async () => {
   );
 
   expect(actual).toMatchInlineSnapshot(`
-    "/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
-    export type WithContext<T extends Thing> = T & {
-        "@context": "https://schema.org";
-    };
-    export interface Graph {
-        "@context": "https://schema.org";
-        "@graph": readonly Thing[];
-    }
-    type SchemaValue<T> = T | readonly T[];
-    type IdReference = {
-        /** IRI identifying the canonical address of this object. */
-        "@id": string;
-    };
+"/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
+export type WithContext<T extends Thing> = T & {
+    "@context": "https://schema.org";
+};
+export interface Graph {
+    "@context": "https://schema.org";
+    "@graph": readonly Thing[];
+}
+type SchemaValue<T> = T | readonly T[];
+type IdReference = {
+    /** IRI identifying the canonical address of this object. */
+    "@id": string;
+};
+type InputActionConstraints<T extends ActionBase> = Partial<{
+    [K in Exclude<keyof T, \`@\${string}\`> as \`\${string & K}-input\`]: PropertyValueSpecification | string;
+}>;
+type OutputActionConstraints<T extends ActionBase> = Partial<{
+    [K in Exclude<keyof T, \`@\${string}\`> as \`\${string & K}-output\`]: PropertyValueSpecification | string;
+}>;
+/** Provides input and output action constraints for an action. */
+export type WithActionConstraints<T extends ActionBase> = T & InputActionConstraints<T> & OutputActionConstraints<T>;
 
-    export type Text = URL | string;
+export type Text = URL | string;
 
-    /** Data type: URL. */
-    export type URL = string;
+/** Data type: URL. */
+export type URL = string;
 
-    "
-  `);
+"
+`);
 });
