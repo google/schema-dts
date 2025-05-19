@@ -3,6 +3,7 @@ export default {
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
+  prettierPath: null,
   testEnvironment: 'node',
   testMatch: ['**/*_test.[jt]s?(x)'],
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
