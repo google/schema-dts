@@ -47,7 +47,9 @@ export function withComments<T extends Node>(
       },
     ]);
   } catch (error) {
-    throw new Error(`${error}\n... while processing comment:\n${comment}`);
+    throw new Error(
+      `${error as Error}\n... while processing comment:\n${comment}`,
+    );
   }
 }
 
