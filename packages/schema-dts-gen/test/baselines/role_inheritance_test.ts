@@ -49,64 +49,72 @@ test(`baseline_${basename(import.meta.url)}`, async () => {
   );
 
   expect(actual).toMatchInlineSnapshot(`
-    "/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
-    export type WithContext<T extends Thing> = T & {
-        "@context": "https://schema.org";
-    };
-    export interface Graph {
-        "@context": "https://schema.org";
-        "@graph": readonly Thing[];
-    }
-    type SchemaValue<T, TProperty extends string> = T | Role<T, TProperty> | readonly (T | Role<T, TProperty>)[];
-    type IdReference = {
-        /** IRI identifying the canonical address of this object. */
-        "@id": string;
-    };
+"/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
+export type WithContext<T extends Thing> = T & {
+    "@context": "https://schema.org";
+};
+export interface Graph {
+    "@context": "https://schema.org";
+    "@graph": readonly Thing[];
+}
+type SchemaValue<T, TProperty extends string> = T | Role<T, TProperty> | readonly (T | Role<T, TProperty>)[];
+type IdReference = {
+    /** IRI identifying the canonical address of this object. */
+    "@id": string;
+};
+type InputActionConstraints<T extends ActionBase> = Partial<{
+    [K in Exclude<keyof T, \`@\${string}\`> as \`\${string & K}-input\`]: PropertyValueSpecification | string;
+}>;
+type OutputActionConstraints<T extends ActionBase> = Partial<{
+    [K in Exclude<keyof T, \`@\${string}\`> as \`\${string & K}-output\`]: PropertyValueSpecification | string;
+}>;
+/** Provides input and output action constraints for an action. */
+export type WithActionConstraints<T extends ActionBase> = T & InputActionConstraints<T> & OutputActionConstraints<T>;
 
-    interface DateTimeBase extends Partial<IdReference> {
-    }
-    interface DateTimeLeaf extends DateTimeBase {
-        "@type": "DateTime";
-    }
-    export type DateTime = DateTimeLeaf | string;
+interface DateTimeBase extends Partial<IdReference> {
+}
+interface DateTimeLeaf extends DateTimeBase {
+    "@type": "DateTime";
+}
+export type DateTime = DateTimeLeaf | string;
 
-    type OrganizationRoleLeaf<TContent, TProperty extends string> = RoleBase & {
-        "@type": "OrganizationRole";
-    } & {
-        [key in TProperty]: TContent;
-    };
-    export type OrganizationRole<TContent = never, TProperty extends string = never> = OrganizationRoleLeaf<TContent, TProperty>;
+type OrganizationRoleLeaf<TContent, TProperty extends string> = RoleBase & {
+    "@type": "OrganizationRole";
+} & {
+    [key in TProperty]: TContent;
+};
+export type OrganizationRole<TContent = never, TProperty extends string = never> = OrganizationRoleLeaf<TContent, TProperty>;
 
-    interface RoleBase extends ThingBase {
-        "startDate"?: SchemaValue<DateTime | IdReference, "startDate">;
-    }
-    type RoleLeaf<TContent, TProperty extends string> = RoleBase & {
-        "@type": "Role";
-    } & {
-        [key in TProperty]: TContent;
-    };
-    /**
-     * Represents additional information about a relationship or property. For example a Role can be used to say that a 'member' role linking some SportsTeam to a player occurred during a particular time period. Or that a Person's 'actor' role in a Movie was for some particular characterName. Such properties can be attached to a Role entity, which is then associated with the main entities using ordinary properties like 'member' or 'actor'.
-     *
-     * See also {@link http://blog.schema.org/2014/06/introducing-role.html blog post}.
-     */
-    export type Role<TContent = never, TProperty extends string = never> = RoleLeaf<TContent, TProperty> | OrganizationRole<TContent, TProperty>;
+interface RoleBase extends ThingBase {
+    "startDate"?: SchemaValue<DateTime | IdReference, "startDate">;
+}
+type RoleLeaf<TContent, TProperty extends string> = RoleBase & {
+    "@type": "Role";
+} & {
+    [key in TProperty]: TContent;
+};
+/**
+ * Represents additional information about a relationship or property. For example a Role can be used to say that a 'member' role linking some SportsTeam to a player occurred during a particular time period. Or that a Person's 'actor' role in a Movie was for some particular characterName. Such properties can be attached to a Role entity, which is then associated with the main entities using ordinary properties like 'member' or 'actor'.
+ *
+ * See also {@link http://blog.schema.org/2014/06/introducing-role.html blog post}.
+ */
+export type Role<TContent = never, TProperty extends string = never> = RoleLeaf<TContent, TProperty> | OrganizationRole<TContent, TProperty>;
 
-    export type Text = string;
+export type Text = string;
 
-    interface IntangibleLeaf extends ThingBase {
-        "@type": "Intangible";
-    }
-    export type Intangible = IntangibleLeaf | Role;
+interface IntangibleLeaf extends ThingBase {
+    "@type": "Intangible";
+}
+export type Intangible = IntangibleLeaf | Role;
 
-    interface ThingBase extends Partial<IdReference> {
-        "name"?: SchemaValue<Text, "name">;
-    }
-    interface ThingLeaf extends ThingBase {
-        "@type": "Thing";
-    }
-    export type Thing = ThingLeaf | Intangible;
+interface ThingBase extends Partial<IdReference> {
+    "name"?: SchemaValue<Text, "name">;
+}
+interface ThingLeaf extends ThingBase {
+    "@type": "Thing";
+}
+export type Thing = ThingLeaf | Intangible;
 
-    "
-  `);
+"
+`);
 });
