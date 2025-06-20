@@ -1,7 +1,7 @@
 import {Thing, WithContext} from '../dist/schema';
 
 // "@context" and "@type" are both required
-// @ts-expect-error Missing '@type' and '@contet.'
+// @ts-expect-error Missing '@type' and '@context.'
 const _1: WithContext<Thing> = {};
 
 // @ts-expect-error Missing '@context'
