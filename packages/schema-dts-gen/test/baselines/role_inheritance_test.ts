@@ -78,7 +78,7 @@ interface DateTimeLeaf extends DateTimeBase {
 }
 export type DateTime = DateTimeLeaf | string;
 
-type OrganizationRoleLeaf<TContent, TProperty extends string> = RoleBase & {
+type OrganizationRoleLeaf<TContent, TProperty extends string> = Omit<RoleBase, TProperty> & {
     "@type": "OrganizationRole";
 } & {
     [key in TProperty]: TContent;
@@ -88,7 +88,7 @@ export type OrganizationRole<TContent = never, TProperty extends string = never>
 interface RoleBase extends ThingBase {
     "startDate"?: SchemaValue<DateTime | IdReference, "startDate">;
 }
-type RoleLeaf<TContent, TProperty extends string> = RoleBase & {
+type RoleLeaf<TContent, TProperty extends string> = Omit<RoleBase, TProperty> & {
     "@type": "Role";
 } & {
     [key in TProperty]: TContent;

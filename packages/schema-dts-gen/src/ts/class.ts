@@ -507,7 +507,13 @@ export class RoleBuiltin extends Builtin {
       ],
       /*type=*/
       factory.createIntersectionTypeNode([
-        factory.createTypeReferenceNode(baseName),
+        factory.createTypeReferenceNode(
+          /*typeName=*/ 'Omit',
+          /*typeArguments=*/ [
+            factory.createTypeReferenceNode(baseName),
+            factory.createTypeReferenceNode(RoleBuiltin.kPropertyTypename),
+          ],
+        ),
         factory.createTypeLiteralNode([
           new TypeProperty(this.subject).toNode(context),
         ]),
