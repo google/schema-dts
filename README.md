@@ -31,8 +31,8 @@ To use the typings for your project, simply add the
 [`schema-dts`](https://www.npmjs.com/package/schema-dts) NPM package to your
 project:
 
-```command
-npm install schema-dts
+```sh
+npm install --save-dev schema-dts
 ```
 
 Then you can use it by importing `"schema-dts"`.
@@ -151,8 +151,10 @@ const website: WebSite = {
 The Schema Typings Generator is available in the
 [**`schema-dts-gen`**](https://www.npmjs.com/package/schema-dts-gen) package.
 
-    npm install schema-dts-gen
-    npx schema-dts-gen --ontology=https://schema.org/version/latest/schemaorg-all-https.nt
+```sh
+npm install --save-dev schema-dts-gen
+npx schema-dts-gen --ontology=https://schema.org/version/latest/schemaorg-all-https.nt
+```
 
 Command line usage:
 
@@ -183,7 +185,7 @@ Command line usage:
 
 Use NPM to install dependencies:
 
-```command
+```sh
 npm install
 ```
 
@@ -192,13 +194,13 @@ We have wrappers around `tsc` and `tsc --build` to build our generator other
 
 To generate TypeScript from the latest Schema.org Schema:
 
-```command
+```sh
 npm run build-gen && npm run build-schema
 ```
 
 or simply build the schema-dts generator:
 
-```command
+```sh
 npm run build-gen
 ```
 
