@@ -73,6 +73,7 @@ function GraphType(context: Context) {
 }
 
 const SchemaValueName = 'SchemaValue';
+const MergeLeafTypesName = 'MergeLeafTypes';
 export const IdReferenceName = 'IdReference';
 export const GraphTypeName = 'Graph';
 
@@ -111,6 +112,11 @@ export function HelperTypes(context: Context, {hasRole}: {hasRole: boolean}) {
             /*propertyName=*/ undefined,
             /*name=*/ factory.createIdentifier('IdReference'),
           ),
+          factory.createImportSpecifier(
+            /*isTypeOnly=*/ false,
+            /*propertyName=*/ undefined,
+            /*name=*/ factory.createIdentifier(MergeLeafTypesName),
+          ),
         ]),
       ),
       factory.createStringLiteral('schema-dts-lib'),
@@ -128,6 +134,11 @@ export function HelperTypes(context: Context, {hasRole}: {hasRole: boolean}) {
           /*isTypeOnly=*/ false,
           /*propertyName=*/ undefined,
           /*name=*/ factory.createIdentifier('IdReference'),
+        ),
+        factory.createExportSpecifier(
+          /*isTypeOnly=*/ false,
+          /*propertyName=*/ undefined,
+          /*name=*/ factory.createIdentifier(MergeLeafTypesName),
         ),
       ]),
     ),
