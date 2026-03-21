@@ -15,42 +15,71 @@
  */
 import {NamedNode} from 'n3';
 import {toClassName} from '../../src/ts/util/names.js';
+import {Context} from '../../src/ts/context.js';
 
 function parseNamed(url: string) {
   return new NamedNode(url);
 }
 
+function regularContext() {
+  const c = new Context();
+  c.setUrlContext('https://schema.org/');
+  return c;
+}
+
 describe('toClassName', () => {
   it('operates normally, with typical inputs', () => {
-    expect(toClassName(parseNamed('https://schema.org/Person'))).toBe('Person');
-    expect(toClassName(parseNamed('https://schema.org/Person3'))).toBe(
-      'Person3',
-    );
-    expect(toClassName(parseNamed('http://schema.org/Person'))).toBe('Person');
     expect(
-      toClassName(parseNamed('http://schema.org/Organization4Organization')),
+      toClassName(parseNamed('https://schema.org/Person'), regularContext()),
+    ).toBe('Person');
+    expect(
+      toClassName(parseNamed('https://schema.org/Person3'), regularContext()),
+    ).toBe('Person3');
+    expect(
+      toClassName(parseNamed('http://schema.org/Person'), regularContext()),
+    ).toBe('Person');
+    expect(
+      toClassName(
+        parseNamed('http://schema.org/Organization4Organization'),
+        regularContext(),
+      ),
     ).toBe('Organization4Organization');
   });
 
   it('handles illegal TypeScript identifier characters', () => {
-    expect(toClassName(parseNamed('https://schema.org/Person-4'))).toBe(
-      'Person_4',
-    );
-    expect(toClassName(parseNamed('https://schema.org/Person%4'))).toBe(
-      'Person_4',
-    );
-    expect(toClassName(parseNamed('https://schema.org/Person%204'))).toBe(
-      'Person_4',
-    );
-    expect(toClassName(parseNamed('https://schema.org/Person, 4'))).toBe(
-      'Person__4',
-    );
+    expect(
+      toClassName(parseNamed('https://schema.org/Person-4'), regularContext()),
+    ).toBe('Person_4');
+    expect(
+      toClassName(parseNamed('https://schema.org/Person%4'), regularContext()),
+    ).toBe('Person_4');
+    expect(
+      toClassName(
+        parseNamed('https://schema.org/Person%204'),
+        regularContext(),
+      ),
+    ).toBe('Person_4');
+    expect(
+      toClassName(parseNamed('https://schema.org/Person, 4'), regularContext()),
+    ).toBe('Person__4');
 
-    expect(toClassName(parseNamed('https://schema.org/3DModel'))).toBe(
-      '_3DModel',
-    );
-    expect(toClassName(parseNamed('https://schema.org/3DModel-5'))).toBe(
-      '_3DModel_5',
-    );
+    expect(
+      toClassName(parseNamed('https://schema.org/3DModel'), regularContext()),
+    ).toBe('_3DModel');
+    expect(
+      toClassName(parseNamed('https://schema.org/3DModel-5'), regularContext()),
+    ).toBe('_3DModel_5');
+  });
+
+  it('handles out-of-context class names', () => {
+    expect(
+      toClassName(parseNamed('https://example.com/Person'), regularContext()),
+    ).toBe('example_com_Person');
+    expect(
+      toClassName(
+        parseNamed('https://example.com/schemas#Person'),
+        regularContext(),
+      ),
+    ).toBe('example_com_schemas_Person');
   });
 });

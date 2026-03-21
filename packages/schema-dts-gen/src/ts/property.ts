@@ -115,8 +115,8 @@ export class PropertyType {
     return false;
   }
 
-  scalarTypeNode() {
-    const typeNames = this.types.map(cls => cls.className()).sort();
+  scalarTypeNode(context: Context) {
+    const typeNames = this.types.map(cls => cls.className(context)).sort();
     if (this.types.some(cls => cls.isNodeType())) {
       typeNames.push(IdReferenceName);
     }
@@ -145,7 +145,7 @@ export class Property {
   private typeNode(context: Context, properties: {hasRole: boolean}) {
     return SchemaValueReference(
       properties,
-      () => this.type.scalarTypeNode(),
+      () => this.type.scalarTypeNode(context),
       context.getScopedName(this.key),
     );
   }

@@ -15,9 +15,9 @@
  */
 
 import type {NamedNode} from 'n3';
-import {namedPortion} from '../../triples/term_utils.js';
+import {Context} from '../context.js';
 
-function decodeOr(component: string) {
+function decodeIfPossible(component: string) {
   try {
     return decodeURIComponent(component);
   } catch {
@@ -25,8 +25,27 @@ function decodeOr(component: string) {
   }
 }
 
-export function toClassName(subject: NamedNode): string {
-  let sanitizedName = decodeOr(namedPortion(subject)).replace(
+function unURLify(url: URL): string {
+  if (url.hash) {
+    return url.host + url.pathname + url.hash;
+  }
+  return url.host + url.pathname;
+}
+
+function unURLifyIfNecessary(name: string): string {
+  try {
+    return unURLify(new URL(name));
+  } catch {
+    return name;
+  }
+}
+
+export function toClassName(subject: NamedNode, context: Context): string {
+  let scopedName = context.getScopedName(subject);
+  if (scopedName === subject.id) {
+    scopedName = unURLifyIfNecessary(scopedName);
+  }
+  let sanitizedName = decodeIfPossible(scopedName).replace(
     /[^A-Za-z0-9_]/g,
     '_',
   );

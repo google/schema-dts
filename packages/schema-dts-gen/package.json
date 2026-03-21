@@ -90,6 +90,7 @@
   "scripts": {
     "lint:eslint": "eslint src/**/*.ts test/**/*.ts",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --coverage",
+    "test:update": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --coverage -u",
     "build": "tsc -b"
   }
 }
