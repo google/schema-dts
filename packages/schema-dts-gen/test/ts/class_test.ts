@@ -48,7 +48,7 @@ describe('Class', () => {
           ),
           makeClassMap(cls),
         ),
-      ).toThrowError("Couldn't find parent");
+      ).toThrow("Couldn't find parent");
     });
 
     it('add parent with missing class', () => {
@@ -61,7 +61,7 @@ describe('Class', () => {
           ),
           makeClassMap(cls),
         ),
-      ).toThrowError("Couldn't find class https://schema.org/CoolPerson");
+      ).toThrow("Couldn't find class https://schema.org/CoolPerson");
     });
   });
 
@@ -235,7 +235,7 @@ describe('Class', () => {
 
       expect(() =>
         cls.toNode(ctx, {skipDeprecatedProperties: true, hasRole: false}),
-      ).toThrowError('unknown node type');
+      ).toThrow('unknown node type');
     });
   });
 

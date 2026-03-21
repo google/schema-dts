@@ -29,7 +29,7 @@ test(`invalidSyntax_${basename(import.meta.url)}`, async () => {
     ['--ontology', `https://fake.com/${basename(import.meta.url)}.nt`],
   );
 
-  await expect(run).rejects.toThrowError('Unexpected');
+  await expect(run).rejects.toThrow('Unexpected');
 });
 
 test(`unnamedURLClass_${basename(import.meta.url)}`, async () => {
@@ -40,7 +40,7 @@ test(`unnamedURLClass_${basename(import.meta.url)}`, async () => {
     ['--ontology', `https://fake.com/${basename(import.meta.url)}.nt`],
   );
 
-  await expect(run).rejects.toThrowError('to have a short name');
+  await expect(run).rejects.toThrow('to have a short name');
 });
 
 test(`notMarkedAsClass_cycle_${basename(import.meta.url)}`, async () => {
@@ -60,7 +60,5 @@ test(`notMarkedAsClass_cycle_${basename(import.meta.url)}`, async () => {
     ['--ontology', `https://fake.com/${basename(import.meta.url)}.nt`],
   );
 
-  await expect(run).rejects.toThrowError(
-    'Thing is not marked as an rdfs:Class',
-  );
+  await expect(run).rejects.toThrow('Thing is not marked as an rdfs:Class');
 });

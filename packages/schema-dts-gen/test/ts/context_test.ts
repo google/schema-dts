@@ -60,7 +60,7 @@ describe('Context.validate', () => {
     expect(() => {
       const ctx = new Context();
       ctx.validate();
-    }).toThrowError('Invalid empty context.');
+    }).toThrow('Invalid empty context.');
   });
 
   it('duplicate throws', () => {
@@ -69,7 +69,7 @@ describe('Context.validate', () => {
       ctx.addNamedContext('a', 'foo.com');
       ctx.addNamedContext('a', 'bar.com');
       ctx.validate();
-    }).toThrowError('Named context a found twice in context.');
+    }).toThrow('Named context a found twice in context.');
   });
 
   it('empty name throws', () => {
@@ -78,9 +78,7 @@ describe('Context.validate', () => {
       ctx.addNamedContext('a', 'foo.com');
       ctx.addNamedContext('', 'bar.com');
       ctx.validate();
-    }).toThrowError(
-      'Context with multiple named contexts includes unnamed URL.',
-    );
+    }).toThrow('Context with multiple named contexts includes unnamed URL.');
   });
 
   it('named + default throws', () => {
@@ -89,15 +87,13 @@ describe('Context.validate', () => {
       ctx.setUrlContext('https://schema.org');
       ctx.addNamedContext('eys', 'https://eyas.sh/foo');
       ctx.validate();
-    }).toThrowError(
-      'Context with multiple named contexts includes unnamed URL.',
-    );
+    }).toThrow('Context with multiple named contexts includes unnamed URL.');
   });
 
   it('default + name throws', () => {
     const ctx = new Context();
     ctx.addNamedContext('eys', 'https://eyas.sh/foo');
-    expect(() => ctx.setUrlContext('https://schema.org')).toThrowError(
+    expect(() => ctx.setUrlContext('https://schema.org')).toThrow(
       'Attempting to set a default URL context',
     );
   });
@@ -107,13 +103,13 @@ describe('Context.validate', () => {
       const ctx = new Context();
       ctx.setUrlContext('https://schema.org');
       ctx.validate();
-    }).not.toThrowError();
+    }).not.toThrow();
 
     expect(() => {
       const ctx = new Context();
       ctx.addNamedContext('sdo', 'https://schema.org');
       ctx.validate();
-    }).not.toThrowError();
+    }).not.toThrow();
   });
 
   it('multiple can work', () => {
@@ -122,7 +118,7 @@ describe('Context.validate', () => {
       ctx.addNamedContext('sdo', 'https://schema.org');
       ctx.addNamedContext('eys', 'https://eyas.sh/foo');
       ctx.validate();
-    }).not.toThrowError();
+    }).not.toThrow();
   });
 });
 
@@ -286,13 +282,13 @@ describe('Context.Parse', () => {
       Context.Parse(
         'a:https://schema.org/A,http://www.com,b:https://schema.org/B',
       ),
-    ).toThrowError();
+    ).toThrow();
   });
 
   it('unexpected totally off', () => {
     expect(() =>
       Context.Parse('a:https://schema.org/A,a=b,b:https://schema.org/B'),
-    ).toThrowError();
+    ).toThrow();
   });
 });
 

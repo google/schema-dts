@@ -45,7 +45,7 @@ describe('PropertyType', () => {
             ),
             new Map(),
           ),
-        ).toThrowError('Type expected to be a UrlNode');
+        ).toThrow('Type expected to be a UrlNode');
       });
 
       it("type rangeIncludes object fails when class doesn't exist", () => {
@@ -58,7 +58,7 @@ describe('PropertyType', () => {
             ),
             new Map(),
           ),
-        ).toThrowError('Could not find class for https://schema.org/Thing');
+        ).toThrow('Could not find class for https://schema.org/Thing');
       });
 
       it('type rangeIncludes object succeeds', () => {
@@ -90,7 +90,7 @@ describe('PropertyType', () => {
           ),
           classes,
         ),
-      ).toThrowError('Could not find class');
+      ).toThrow('Could not find class');
     });
 
     it('real lookup works', () => {
@@ -155,7 +155,7 @@ describe('PropertyType', () => {
           ),
           new Map(),
         ),
-      ).toThrowError('non-string object');
+      ).toThrow('non-string object');
     });
   });
 });

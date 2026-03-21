@@ -33,19 +33,19 @@ describe('Log', () => {
 
   it("doesn't log by default", () => {
     Log('Foo');
-    expect(logErr).not.toBeCalled();
+    expect(logErr).not.toHaveBeenCalled();
   });
 
   it("doesn't log when verbose=false", () => {
     SetOptions({verbose: false});
     Log('Foo');
-    expect(logErr).not.toBeCalled();
+    expect(logErr).not.toHaveBeenCalled();
   });
 
   it('logs when verbose=true', () => {
     SetOptions({verbose: true});
     Log('Foo');
-    expect(logErr).toBeCalledWith('Foo');
+    expect(logErr).toHaveBeenCalledWith('Foo');
   });
 
   it('stops logging after turned off', () => {
@@ -54,7 +54,7 @@ describe('Log', () => {
     SetOptions({verbose: false});
     Log('Bar');
 
-    expect(logErr).toBeCalledWith('Foo');
-    expect(logErr).not.toBeCalledWith('Bar');
+    expect(logErr).toHaveBeenCalledWith('Foo');
+    expect(logErr).not.toHaveBeenCalledWith('Bar');
   });
 });
