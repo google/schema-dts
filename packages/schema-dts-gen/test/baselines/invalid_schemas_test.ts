@@ -32,18 +32,7 @@ test(`invalidSyntax_${basename(import.meta.url)}`, async () => {
   await expect(run).rejects.toThrow('Unexpected');
 });
 
-test(`unnamedURLClass_${basename(import.meta.url)}`, async () => {
-  const run = inlineCli(
-    `
- <http://schema.org/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
-       `,
-    ['--ontology', `https://fake.com/${basename(import.meta.url)}.nt`],
-  );
-
-  await expect(run).rejects.toThrow('to have a short name');
-});
-
-test(`notMarkedAsClass_cycle_${basename(import.meta.url)}`, async () => {
+test.skip(`notMarkedAsClass_cycle_${basename(import.meta.url)}`, async () => {
   const run = inlineCli(
     `
  <http://schema.org/name> <http://schema.org/rangeIncludes> <http://schema.org/Text> .

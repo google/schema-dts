@@ -74,9 +74,9 @@ export class Class {
   private allParents(): readonly Class[] {
     return this._parents;
   }
-  private namedParents(): readonly string[] {
+  private namedParents(context: Context): readonly string[] {
     return this._parents
-      .map(p => p.baseName())
+      .map(p => p.baseName(context))
       .filter((name): name is string => !!name);
   }
 
@@ -91,10 +91,10 @@ export class Class {
     return this._supersededBy.size > 0;
   }
 
-  protected get comment() {
+  protected comment(context: Context) {
     if (!this.deprecated) return this._comment;
     const deprecated = `@deprecated Use ${this.supersededBy()
-      .map(c => c.className())
+      .map(c => c.className(context))
       .join(' or ')} instead.`;
 
     return appendParagraph(this._comment, deprecated);
@@ -127,29 +127,29 @@ export class Class {
     );
   }
 
-  protected baseName(): string | undefined {
+  protected baseName(context: Context): string | undefined {
     // If Skip Base, we use the parent type instead.
     if (this.skipBase()) {
-      if (this.namedParents().length === 0) return undefined;
-      assert(this.namedParents().length === 1);
-      return this.namedParents()[0];
+      if (this.namedParents(context).length === 0) return undefined;
+      assert(this.namedParents(context).length === 1);
+      return this.namedParents(context)[0];
     }
 
-    return toClassName(this.subject) + 'Base';
+    return toClassName(this.subject, context) + 'Base';
   }
 
-  protected leafName(): string | undefined {
+  protected leafName(context: Context): string | undefined {
     // If the leaf has no node type and doesn't refer to any parent,
     // skip defining it.
-    if (!this.isNodeType() && this.namedParents().length === 0) {
+    if (!this.isNodeType() && this.namedParents(context).length === 0) {
       return undefined;
     }
 
-    return toClassName(this.subject) + 'Leaf';
+    return toClassName(this.subject, context) + 'Leaf';
   }
 
-  className() {
-    return toClassName(this.subject);
+  className(context: Context) {
+    return toClassName(this.subject, context);
   }
 
   constructor(readonly subject: NamedNode) {}
@@ -216,7 +216,7 @@ export class Class {
   validateClass(): void {
     if (!this.isMarkedAsClass(new WeakSet())) {
       throw new Error(
-        `Class ${this.className()} is not marked as an rdfs:Class, and neither are any of its parents.`,
+        `Class ${this.className(new Context())} is not marked as an rdfs:Class, and neither are any of its parents.`,
       );
     }
   }
@@ -230,7 +230,9 @@ export class Class {
 
   private skipBase(): boolean {
     if (!this.isNodeType()) return true;
-    return this.namedParents().length === 1 && this._props.size === 0;
+    return (
+      this.namedParents(new Context()).length === 1 && this._props.size === 0
+    );
   }
 
   private baseDecl(
@@ -241,10 +243,10 @@ export class Class {
       return undefined;
     }
 
-    const baseName = this.baseName();
+    const baseName = this.baseName(context);
     assert(baseName, 'If a baseNode is defined, baseName must be defined.');
 
-    const parentTypes = this.namedParents().map(p =>
+    const parentTypes = this.namedParents(context).map(p =>
       factory.createExpressionWithTypeArguments(
         factory.createIdentifier(p),
         [],
@@ -285,12 +287,12 @@ export class Class {
   }
 
   protected leafDecl(context: Context): DeclarationStatement | undefined {
-    const leafName = this.leafName();
+    const leafName = this.leafName(context);
     if (!leafName) return undefined;
 
-    const baseName = this.baseName();
-    // Leaf is missing if !isNodeType || namedParents.length == 0
-    // Base is missing if !isNodeType && namedParents.length == 0 && numProps == 0
+    const baseName = this.baseName(context);
+    // Leaf is missing if !isNodeType && namedParents.length == 0
+    // Base is missing if !isNodeType || (namedParents.length == 1 && numProps == 0)
     //
     // so when "Leaf" is present, Base will always be present.
     assert(baseName, 'Expect baseName to exist when leafName exists.');
@@ -311,13 +313,13 @@ export class Class {
     );
   }
 
-  protected nonEnumType(skipDeprecated: boolean): TypeNode[] {
+  protected nonEnumType(context: Context, skipDeprecated: boolean): TypeNode[] {
     this.children.sort((a, b) => CompareKeys(a.subject, b.subject));
     const children: TypeNode[] = this.children
       .filter(child => !(child.deprecated && skipDeprecated))
       .map(child =>
         factory.createTypeReferenceNode(
-          child.className(),
+          child.className(context),
           /*typeArguments=*/ child.typeArguments(this.typeParameters()),
         ),
       );
@@ -325,8 +327,8 @@ export class Class {
     // A type can have a valid typedef, add that if so.
     children.push(...this.typedefs);
 
-    const upRef = this.leafName() || this.baseName();
-    const typeArgs = this.leafName() ? this.leafTypeArguments() : [];
+    const upRef = this.leafName(context) || this.baseName(context);
+    const typeArgs = this.leafName(context) ? this.leafTypeArguments() : [];
 
     return upRef
       ? [factory.createTypeReferenceNode(upRef, typeArgs), ...children]
@@ -336,7 +338,7 @@ export class Class {
   private totalType(context: Context, skipDeprecated: boolean): TypeNode {
     return typeUnion(
       ...this.enums().flatMap(e => e.toTypeLiteral(context)),
-      ...this.nonEnumType(skipDeprecated),
+      ...this.nonEnumType(context, skipDeprecated),
     );
   }
 
@@ -364,11 +366,14 @@ export class Class {
       context,
       properties.skipDeprecatedProperties,
     );
+    if (typeValue.kind === SyntaxKind.NeverKeyword) {
+      return [];
+    }
     const declaration = withComments(
-      this.comment,
+      this.comment(context),
       factory.createTypeAliasDeclaration(
         factory.createModifiersFromModifierFlags(ModifierFlags.Export),
-        this.className(),
+        this.className(context),
         this.typeParameters(),
         typeValue,
       ),
@@ -485,8 +490,8 @@ export class RoleBuiltin extends Builtin {
   }
 
   protected leafDecl(context: Context): DeclarationStatement {
-    const leafName = this.leafName();
-    const baseName = this.baseName();
+    const leafName = this.leafName(context);
+    const baseName = this.baseName(context);
     assert(leafName, 'Role must have Leaf Name');
     assert(baseName, 'Role must have Base Name.');
 
@@ -546,12 +551,12 @@ export class DataTypeUnion extends Builtin {
     super(subject);
   }
 
-  toNode(): DeclarationStatement[] {
+  toNode(context: Context): DeclarationStatement[] {
     this.wk.sort(Sort);
 
     return [
       withComments(
-        this.comment,
+        this.comment(context),
         factory.createTypeAliasDeclaration(
           factory.createModifiersFromModifierFlags(ModifierFlags.Export),
           namedPortion(this.subject),

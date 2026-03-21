@@ -201,12 +201,12 @@ export type WithActionConstraints<T extends ActionBase> = T & InputActionConstra
 /** Data type: Text. */
 export type Text = string;
 
-interface MyEnumBase extends Partial<IdReference> {
+interface www_w3_org_2002_07_owl_MyEnumBase extends Partial<IdReference> {
 }
-interface MyEnumLeaf extends MyEnumBase {
+interface www_w3_org_2002_07_owl_MyEnumLeaf extends www_w3_org_2002_07_owl_MyEnumBase {
     "@type": "http://www.w3.org/2002/07/owl#MyEnum";
 }
-export type MyEnum = "http://www.w3.org/2002/07/owl#EnumValueA" | "https://www.w3.org/2002/07/owl#EnumValueA" | "http://www.w3.org/2002/07/owl#EnumValueB" | "https://www.w3.org/2002/07/owl#EnumValueB" | MyEnumLeaf;
+export type www_w3_org_2002_07_owl_MyEnum = "http://www.w3.org/2002/07/owl#EnumValueA" | "https://www.w3.org/2002/07/owl#EnumValueA" | "http://www.w3.org/2002/07/owl#EnumValueB" | "https://www.w3.org/2002/07/owl#EnumValueB" | www_w3_org_2002_07_owl_MyEnumLeaf;
 
 interface PersonLeaf extends ThingBase {
     "@type": "Person";
