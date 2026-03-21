@@ -146,6 +146,133 @@ const website: WebSite = {
 };
 ```
 
+### Real-world examples
+
+Below are common patterns for using `schema-dts` types when building JSON-LD
+for real websites.
+
+#### Organization and WebSite (every site should have these)
+
+```ts
+import type {Organization, WebSite, WithContext} from 'schema-dts';
+
+const org: WithContext<Organization> = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Acme Corp',
+  url: 'https://acme.com',
+  logo: 'https://acme.com/logo.png',
+  sameAs: [
+    'https://twitter.com/acme',
+    'https://www.linkedin.com/company/acme',
+  ],
+};
+
+const site: WithContext<WebSite> = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Acme Corp',
+  url: 'https://acme.com',
+};
+```
+
+#### Product with Offer (e-commerce)
+
+```ts
+import type {Product, WithContext} from 'schema-dts';
+
+const product: WithContext<Product> = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: 'Classic Leather Wallet',
+  description: 'Full-grain leather bifold wallet with RFID blocking.',
+  image: 'https://shop.example/images/wallet.jpg',
+  sku: 'WALLET-001',
+  brand: {
+    '@type': 'Brand',
+    name: 'Example Shop',
+  },
+  offers: {
+    '@type': 'Offer',
+    price: 89,
+    priceCurrency: 'USD',
+    availability: 'https://schema.org/InStock',
+    url: 'https://shop.example/products/classic-wallet',
+  },
+};
+```
+
+#### FAQPage (content sites)
+
+```ts
+import type {FAQPage, WithContext} from 'schema-dts';
+
+const faq: WithContext<FAQPage> = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'Do you ship internationally?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes, we ship to over 50 countries.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is your return policy?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'We offer a 30-day return policy on all items.',
+      },
+    },
+  ],
+};
+```
+
+#### Article (blog posts)
+
+```ts
+import type {Article, WithContext} from 'schema-dts';
+
+const article: WithContext<Article> = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'How to choose a leather wallet',
+  datePublished: '2026-03-01',
+  dateModified: '2026-03-15',
+  author: {
+    '@type': 'Person',
+    name: 'Jane Smith',
+    url: 'https://blog.example/authors/jane',
+  },
+  image: 'https://blog.example/images/wallet-guide.jpg',
+  description: 'A practical guide to choosing a leather wallet that lasts.',
+};
+```
+
+#### Injecting JSON-LD into HTML
+
+When serializing JSON-LD for injection into a `<script>` tag, escape
+characters that could break out of the tag or enable XSS:
+
+```ts
+function safeJsonLd(data: WithContext<Thing>): string {
+  return JSON.stringify(data)
+    .replace(/</g, '\\u003C')
+    .replace(/>/g, '\\u003E')
+    .replace(/&/g, '\\u0026')
+    .replace(/'/g, '\\u0027');
+}
+
+// Use in HTML:
+// <script type="application/ld+json">${safeJsonLd(product)}</script>
+```
+
+> **Tip:** See [`examples.md`](./examples.md) for more integration patterns,
+> including React, Next.js, Astro, and other frameworks.
+
 # Schema Typings Generator
 
 The Schema Typings Generator is available in the
