@@ -32,7 +32,7 @@ test(`invalidSyntax_${basename(import.meta.url)}`, async () => {
   await expect(run).rejects.toThrow('Unexpected');
 });
 
-test.skip(`notMarkedAsClass_cycle_${basename(import.meta.url)}`, async () => {
+test(`notMarkedAsClass_cycle_${basename(import.meta.url)}`, async () => {
   const run = inlineCli(
     `
  <http://schema.org/name> <http://schema.org/rangeIncludes> <http://schema.org/Text> .
