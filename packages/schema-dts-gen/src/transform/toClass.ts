@@ -84,6 +84,7 @@ const wellKnownTypes = [
   ...buildAlias('Date', 'string'),
   ...buildAlias('DateTime', 'string'),
   ...buildAlias('Boolean', 'boolean'),
+  ...buildAlias('Quantity', 'string'),
   new RoleBuiltin(new NamedNode('http://schema.org/Role')),
   new RoleBuiltin(new NamedNode('http://schema.org/OrganizationRole')),
   new RoleBuiltin(new NamedNode('http://schema.org/EmployeeRole')),
