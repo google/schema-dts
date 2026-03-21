@@ -46,7 +46,7 @@ describe('load', () => {
 
     await expect(load('https://schema.org/')).rejects.toThrow('Bad!!!');
 
-    expect(get).toBeCalledTimes(1);
+    expect(get).toHaveBeenCalledTimes(1);
   });
 
   describe('with one or more message', () => {
@@ -71,7 +71,7 @@ describe('load', () => {
     it('METATEST', () => {
       // Make sure our test machinery works. If the METATEST fails, then
       // the test code itself broke.
-      expect(get).toBeCalled();
+      expect(get).toHaveBeenCalled();
       expect(store).not.toBeUndefined();
       expect(fakeResponse).toBeInstanceOf(Function);
     });
