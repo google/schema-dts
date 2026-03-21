@@ -82,6 +82,11 @@ type OutputActionConstraints<T extends ActionBase> = Partial<{
 /** Provides input and output action constraints for an action. */
 export type WithActionConstraints<T extends ActionBase> = T & InputActionConstraints<T> & OutputActionConstraints<T>;
 
+interface QuantityLeaf extends ThingBase {
+    "@type": "Quantity";
+}
+export type Quantity = QuantityLeaf | string;
+
 export type Text = URL | string;
 
 interface EntryPointLeaf extends ThingBase {
@@ -112,11 +117,6 @@ interface PlaceLeaf extends ThingBase {
     "@type": "Place";
 }
 export type Place = PlaceLeaf | string;
-
-interface QuantityLeaf extends ThingBase {
-    "@type": "Quantity";
-}
-export type Quantity = QuantityLeaf | string;
 
 interface ThingBase extends Partial<IdReference> {
     "name"?: SchemaValue<Text>;
