@@ -128,7 +128,6 @@ The Schema Typings Generator is available in the
 Command line usage:
 
 - **Specify your ontology**
-
   - Specify **`--ontology`**: An HTTPs URL to an .nt NTriple file declaring your
     ontology.
 
