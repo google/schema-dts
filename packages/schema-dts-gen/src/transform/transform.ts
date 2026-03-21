@@ -42,6 +42,7 @@ import {Store} from 'n3';
  * @param includeDeprecated True if classes and properties marked with
  *     'supersededBy' should still be included (as 'deprecated') in the final
  *     TypeScript output.
+ * @param context Context for the transformation.
  * @param write Callback function to write a portion of the file. Will be called
  *     sequentially on separate chunks within a file.
  *
