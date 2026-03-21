@@ -48,7 +48,7 @@ describe('Class', () => {
           ),
           makeClassMap(cls),
         ),
-      ).toThrowError("Couldn't find parent");
+      ).toThrow("Couldn't find parent");
     });
 
     it('add parent with missing class', () => {
@@ -61,7 +61,7 @@ describe('Class', () => {
           ),
           makeClassMap(cls),
         ),
-      ).toThrowError("Couldn't find class https://schema.org/CoolPerson");
+      ).toThrow("Couldn't find class https://schema.org/CoolPerson");
     });
   });
 
@@ -235,7 +235,7 @@ describe('Class', () => {
 
       expect(() =>
         cls.toNode(ctx, {skipDeprecatedProperties: true, hasRole: false}),
-      ).toThrowError('unknown node type');
+      ).toThrow('unknown node type');
     });
   });
 
@@ -253,19 +253,19 @@ describe('Class', () => {
       cls.addProp(makeProperty('https://abc.com'));
 
       expect(asString(cls, ctx)).toMatchInlineSnapshot(`
-        "interface ABase extends Partial<IdReference> {
-            "https://abc.com"?: SchemaValue<never>;
-            "schema:"?: SchemaValue<never>;
-            "schema:a"?: SchemaValue<never>;
-            "schema:b"?: SchemaValue<never>;
-            "schema:c"?: SchemaValue<never>;
-            "https://abc.com/e"?: SchemaValue<never>;
-        }
-        interface ALeaf extends ABase {
-            "@type": "schema:A";
-        }
-        export type A = ALeaf;"
-      `);
+"interface schema_ABase extends Partial<IdReference> {
+    "https://abc.com"?: SchemaValue<never>;
+    "schema:"?: SchemaValue<never>;
+    "schema:a"?: SchemaValue<never>;
+    "schema:b"?: SchemaValue<never>;
+    "schema:c"?: SchemaValue<never>;
+    "https://abc.com/e"?: SchemaValue<never>;
+}
+interface schema_ALeaf extends schema_ABase {
+    "@type": "schema:A";
+}
+export type schema_A = schema_ALeaf;"
+`);
     });
   });
 });

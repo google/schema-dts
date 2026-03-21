@@ -34,7 +34,7 @@ describe('EnumValue', () => {
             [new NamedNode('https://schema.org/DayOfWeek')],
             map,
           ),
-      ).toThrowError("Couldn't find");
+      ).toThrow("Couldn't find");
     });
 
     it('Works fine when called for plain enum', () => {
@@ -54,7 +54,7 @@ describe('EnumValue', () => {
         map,
       );
 
-      expect(addEnum).toBeCalledWith(myEnum);
+      expect(addEnum).toHaveBeenCalledWith(myEnum);
     });
 
     it('Works fine when called for an enum/class', () => {
@@ -79,7 +79,7 @@ describe('EnumValue', () => {
         map,
       );
 
-      expect(addEnum).toBeCalledWith(myEnum);
+      expect(addEnum).toHaveBeenCalledWith(myEnum);
     });
   });
 });

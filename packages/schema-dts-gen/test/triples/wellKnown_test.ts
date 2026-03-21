@@ -68,7 +68,7 @@ describe('wellKnown', () => {
             new NamedNode('http://schema.org/Amazing'),
           ),
         ),
-      ).toThrowError('non-string object');
+      ).toThrow('non-string object');
     });
   });
 
@@ -116,7 +116,7 @@ describe('wellKnown', () => {
             new Literal('"foo"'),
           ),
         ),
-      ).toThrowError('Unexpected object for predicate');
+      ).toThrow('Unexpected object for predicate');
     });
   });
 
@@ -178,7 +178,7 @@ describe('wellKnown', () => {
             new Literal('"foo"'),
           ),
         ),
-      ).toThrowError('Unexpected type');
+      ).toThrow('Unexpected type');
     });
   });
 
