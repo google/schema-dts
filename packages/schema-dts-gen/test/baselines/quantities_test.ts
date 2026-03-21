@@ -62,6 +62,14 @@ type IdReference = {
     /** IRI identifying the canonical address of this object. */
     "@id": string;
 };
+type InputActionConstraints<T extends ActionBase> = Partial<{
+    [K in Exclude<keyof T, \`@\${string}\`> as \`\${string & K}-input\`]: PropertyValueSpecification | string;
+}>;
+type OutputActionConstraints<T extends ActionBase> = Partial<{
+    [K in Exclude<keyof T, \`@\${string}\`> as \`\${string & K}-output\`]: PropertyValueSpecification | string;
+}>;
+/** Provides input and output action constraints for an action. */
+export type WithActionConstraints<T extends ActionBase> = T & InputActionConstraints<T> & OutputActionConstraints<T>;
 
 interface QuantityLeaf extends ThingBase {
     "@type": "Quantity";

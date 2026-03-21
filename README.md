@@ -31,8 +31,8 @@ To use the typings for your project, simply add the
 [`schema-dts`](https://www.npmjs.com/package/schema-dts) NPM package to your
 project:
 
-```command
-npm install schema-dts
+```sh
+npm install --save-dev schema-dts
 ```
 
 Then you can use it by importing `"schema-dts"`.
@@ -117,13 +117,44 @@ const graph: Graph = {
 };
 ```
 
+### Input and Output constraints
+
+Actions support additional information to describe inputs and outputs, so each
+property can be annotated using `-input` and `-output` suffixes and you can do
+that in `schema-dts` by using the `WithActionConstraints` type for each action
+type you want to annotate. See the following examples:
+
+```ts
+import type {SearchAction, WithActionConstraints} from 'schema-dts';
+
+const potentialAction: WithActionConstraints<SearchAction> = {
+  '@type': 'SearchAction',
+  'query-input': 'required name=search_term_string',
+  // ...
+};
+```
+
+```ts
+import type {SearchAction, WebSite, WithActionConstraints} from 'schema-dts';
+
+const website: WebSite = {
+  '@type': 'WebSite',
+  potentialAction: {
+    '@type': 'SearchAction',
+    'query-input': 'required name=search_term_string',
+  } as WithActionConstraints<SearchAction>,
+};
+```
+
 # Schema Typings Generator
 
 The Schema Typings Generator is available in the
 [**`schema-dts-gen`**](https://www.npmjs.com/package/schema-dts-gen) package.
 
-    npm install schema-dts-gen
-    npx schema-dts-gen --ontology=https://schema.org/version/latest/schemaorg-all-https.nt
+```sh
+npm install --save-dev schema-dts-gen
+npx schema-dts-gen --ontology=https://schema.org/version/latest/schemaorg-all-https.nt
+```
 
 Command line usage:
 
@@ -153,7 +184,7 @@ Command line usage:
 
 Use NPM to install dependencies:
 
-```command
+```sh
 npm install
 ```
 
@@ -162,13 +193,13 @@ We have wrappers around `tsc` and `tsc --build` to build our generator other
 
 To generate TypeScript from the latest Schema.org Schema:
 
-```command
+```sh
 npm run build-gen && npm run build-schema
 ```
 
 or simply build the schema-dts generator:
 
-```command
+```sh
 npm run build-gen
 ```
 
