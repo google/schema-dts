@@ -270,10 +270,8 @@ function safeJsonLd(data: WithContext<Thing>): string {
 // <script type="application/ld+json">${safeJsonLd(product)}</script>
 ```
 
-> **Note:** Build-time tools like
-> [agentmarkup](https://github.com/agentmarkup/agentmarkup) can handle
-> JSON-LD injection, XSS-safe serialization, and validation automatically
-> for Vite and Astro projects.
+> **Tip:** See [`examples.md`](./examples.md) for more integration patterns,
+> including React, Next.js, Astro, and other frameworks.
 
 # Schema Typings Generator
 
