@@ -148,8 +148,8 @@ const website: WebSite = {
 
 ### Real-world examples
 
-Below are common patterns for using `schema-dts` types when building JSON-LD
-for real websites.
+Below are common patterns for using `schema-dts` types when building JSON-LD for
+real websites.
 
 #### Organization and WebSite (every site should have these)
 
@@ -162,10 +162,7 @@ const org: WithContext<Organization> = {
   name: 'Acme Corp',
   url: 'https://acme.com',
   logo: 'https://acme.com/logo.png',
-  sameAs: [
-    'https://twitter.com/acme',
-    'https://www.linkedin.com/company/acme',
-  ],
+  sameAs: ['https://twitter.com/acme', 'https://www.linkedin.com/company/acme'],
 };
 
 const site: WithContext<WebSite> = {
@@ -254,8 +251,8 @@ const article: WithContext<Article> = {
 
 #### Injecting JSON-LD into HTML
 
-When serializing JSON-LD for injection into a `<script>` tag, escape
-characters that could break out of the tag or enable XSS:
+When serializing JSON-LD for injection into a `<script>` tag, escape characters
+that could break out of the tag or enable XSS:
 
 ```ts
 function safeJsonLd(data: WithContext<Thing>): string {
