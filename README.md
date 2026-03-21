@@ -159,7 +159,6 @@ npx schema-dts-gen --ontology=https://schema.org/version/latest/schemaorg-all-ht
 Command line usage:
 
 - **Specify your ontology**
-
   - Specify **`--ontology`**: An HTTPs URL to an .nt NTriple file declaring your
     ontology.
 

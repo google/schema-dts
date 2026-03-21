@@ -1,23 +1,23 @@
 import jsdoc from 'eslint-plugin-jsdoc';
-import importPlugin from 'eslint-plugin-import';
 import prettierConfig from 'eslint-config-prettier';
 import stylistic from '@stylistic/eslint-plugin';
 import tseslint from 'typescript-eslint';
+import {defineConfig} from 'eslint/config';
 
-export default tseslint.config(
+export default defineConfig(
   tseslint.configs.recommendedTypeChecked,
   prettierConfig,
   {
     languageOptions: {
       parserOptions: {
         projectService: true,
-        tsconfigRootDir: [import.meta.dirname],
+        tsconfigRootDir: import.meta.dirname,
       },
     },
   },
   {
     files: ['**/*.ts'],
-    plugins: {jsdoc, import: importPlugin, '@stylistic': stylistic},
+    plugins: {jsdoc, '@stylistic': stylistic},
     rules: {
       '@typescript-eslint/array-type': [
         'error',
@@ -141,7 +141,6 @@ export default tseslint.config(
         'Undefined',
       ],
       'id-match': 'error',
-      'import/no-default-export': 'error',
       'jsdoc/check-alignment': 'error',
       'new-parens': 'error',
       'no-debugger': 'error',
