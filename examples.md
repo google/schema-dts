@@ -109,8 +109,8 @@ function safeJsonLd(data: object): string {
 
 ## Svelte — `<svelte:head>`
 
-Svelte lets you inject into `<head>` with `<svelte:head>`. Use the same
-escaping pattern.
+Svelte lets you inject into `<head>` with `<svelte:head>`. Use the same escaping
+pattern.
 
 ```svelte
 <script lang="ts">
@@ -161,10 +161,10 @@ document.head.appendChild(script);
 
 ## Other tooling
 
-Some projects also pair `schema-dts` with tooling that either injects JSON-LD
-at build time or generates custom Schema.org-compatible typings:
+Some projects also pair `schema-dts` with tooling that either injects JSON-LD at
+build time or generates custom Schema.org-compatible typings:
 
-- [**agentmarkup**](https://github.com/agentmarkup/agentmarkup) — Vite and
-  Astro plugins for automatic JSON-LD injection and validation.
+- [**agentmarkup**](https://github.com/agentmarkup/agentmarkup) — Vite and Astro
+  plugins for automatic JSON-LD injection and validation.
 - [**schema-dts-gen**](https://www.npmjs.com/package/schema-dts-gen) — Generate
   custom typings from any Schema.org–compatible ontology.
