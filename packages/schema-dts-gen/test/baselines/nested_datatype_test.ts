@@ -57,8 +57,8 @@ test(`baseline_${basename(import.meta.url)}`, async () => {
   );
 
   expect(actual).toMatchInlineSnapshot(`
-"import type { JsonLdObject, IdReference } from "schema-dts-lib";
-export type { JsonLdObject, IdReference };
+"import type { JsonLdObject, IdReference, MergeLeafTypes } from "schema-dts-lib";
+export type { JsonLdObject, IdReference, MergeLeafTypes };
 /** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
 export type WithContext<T extends JsonLdObject | string> = T & {
     "@context": "https://schema.org";
@@ -82,12 +82,12 @@ export type Text = PronounceableText | URL | string;
 interface ArabicTextBase extends PronounceableTextBase {
     "arabicPhoneticText"?: SchemaValue<Text>;
 }
-interface ArabicTextLeaf extends ArabicTextBase {
+export interface ArabicTextLeaf extends ArabicTextBase {
     "@type": "ArabicText";
 }
 export type ArabicText = ArabicTextLeaf | string;
 
-interface EnglishTextLeaf extends PronounceableTextBase {
+export interface EnglishTextLeaf extends PronounceableTextBase {
     "@type": "EnglishText";
 }
 export type EnglishText = EnglishTextLeaf | string;
@@ -97,7 +97,7 @@ export type FancyURL = string;
 interface PronounceableTextBase extends Partial<IdReference> {
     "phoneticText"?: SchemaValue<Text>;
 }
-interface PronounceableTextLeaf extends PronounceableTextBase {
+export interface PronounceableTextLeaf extends PronounceableTextBase {
     "@type": "PronounceableText";
 }
 export type PronounceableText = PronounceableTextLeaf | ArabicText | EnglishText | string;
@@ -107,7 +107,7 @@ interface ThingBase extends Partial<IdReference> {
     "pronunciation"?: SchemaValue<PronounceableText | IdReference>;
     "website"?: SchemaValue<URL>;
 }
-interface ThingLeaf extends ThingBase {
+export interface ThingLeaf extends ThingBase {
     "@type": "Thing";
 }
 export type Thing = ThingLeaf;

@@ -13,12 +13,14 @@ export interface IdReference {
   readonly '@id': string;
 }
 
-type LeafLike = {'@type': string};
+interface LeafLike {
+  '@type': string;
+}
 
 type LeafTypesError<T> = 'Error: Leaf types expected.' & {got: T};
 
 type UnionToIntersection<T> = (
-  T extends any ? (value: T) => void : never
+  T extends unknown ? (value: T) => void : never
 ) extends (value: infer I) => void
   ? I
   : never;
@@ -27,7 +29,9 @@ type CheckLeaf<T extends LeafLike> = UnionToIntersection<T['@type']> extends nev
   ? LeafTypesError<T>
   : T;
 
-type OmitTypeProperty<T extends LeafLike> = T extends any ? Omit<T, '@type'> : never;
+type OmitTypeProperty<T extends LeafLike> = T extends unknown
+  ? Omit<T, '@type'>
+  : never;
 
 type MergeLeafTypesChecked<
   T extends readonly [LeafLike, ...LeafLike[]],
