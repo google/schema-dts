@@ -22,6 +22,9 @@
     "mkdirp": "^3.0.1",
     "schema-dts-gen": "*"
   },
+  "dependencies": {
+    "schema-dts-lib": "^1.0.0"
+  },
   "keywords": [
     "typescript",
     "tsd",

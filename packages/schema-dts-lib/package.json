@@ -1,0 +1,69 @@
+{
+  "name": "schema-dts-lib",
+  "version": "1.0.0",
+  "displayName": "schema-dts Library",
+  "description": "Library for JSON-LD vocabularies",
+  "author": "Eyas Sharaiha <eyas@google.com> (https://eyas.sh/)",
+  "maintainers": [
+    "Eyas Sharaiha <npm@eyas.sh> (https://eyas.sh/)"
+  ],
+  "contributors": [
+    "Eyas Sharaiha <npm@eyas.sh> (https://eyas.sh/)"
+  ],
+  "files": [
+    "dist/**/*"
+  ],
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "sideEffects": false,
+  "type": "module",
+  "devDependencies": {},
+  "dependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "engineStrict": true,
+  "peerDependencies": {
+    "typescript": ">=4.9.5"
+  },
+  "nyc": {
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "exclude": [
+      "test/**/*"
+    ],
+    "reporter": [
+      "html"
+    ],
+    "all": true
+  },
+  "keywords": [
+    "typescript",
+    "tsd",
+    "dts",
+    "schema.org",
+    "Semantic Web",
+    "semantic-web",
+    "Linked Data",
+    "linked-data",
+    "jsonld",
+    "JSON-LD",
+    "structured data",
+    "structured-data"
+  ],
+  "homepage": "https://opensource.google/projects/schema-dts",
+  "bugs": "https://github.com/google/schema-dts/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/google/schema-dts.git",
+    "directory": "packages/schema-dts-gen"
+  },
+  "license": "Apache-2.0",
+  "scripts": {
+    "lint:eslint": "eslint *.ts",
+    "test": "echo 'No tests yet'",
+    "build": "tsc -b"
+  }
+}

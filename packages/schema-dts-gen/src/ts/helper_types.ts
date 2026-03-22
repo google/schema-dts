@@ -13,21 +13,8 @@ import {arrayOf} from './util/arrayof.js';
 import {withComments} from './util/comments.js';
 import {typeUnion} from './util/union.js';
 
-function IdPropertyNode() {
-  return withComments(
-    'IRI identifying the canonical address of this object.',
-    factory.createPropertySignature(
-      /* modifiers= */ [],
-      factory.createStringLiteral('@id'),
-      /* questionToken= */ undefined,
-      /* typeNode= */
-      factory.createTypeReferenceNode('string', /*typeArguments=*/ []),
-    ),
-  );
-}
-
 function WithContextType(context: Context) {
-  // export type WithContext<T extends Thing> = T & { "@context": TYPE_NODE }
+  // export interface WithContext<T extends JsonLdObject | string> extends Exclude<T, string> { "@context": TYPE_NODE }
   return withComments(
     'Used at the top-level node to indicate the context for the JSON-LD ' +
       'objects used. The context provided in this type is compatible ' +
@@ -39,10 +26,13 @@ function WithContextType(context: Context) {
         factory.createTypeParameterDeclaration(
           /*modifiers=*/ [],
           'T' /*constraint=*/,
-          factory.createTypeReferenceNode(
-            'Thing',
-            /*typeArguments=*/ undefined,
-          ),
+          factory.createUnionTypeNode([
+            factory.createTypeReferenceNode(
+              'JsonLdObject',
+              /*typeArguments=*/ undefined,
+            ),
+            factory.createKeywordTypeNode(SyntaxKind.StringKeyword),
+          ]),
         ),
       ],
       factory.createIntersectionTypeNode([
@@ -105,6 +95,42 @@ export function SchemaValueReference(
 
 export function HelperTypes(context: Context, {hasRole}: {hasRole: boolean}) {
   return [
+    factory.createImportDeclaration(
+      /*modifiers=*/ [],
+      factory.createImportClause(
+        SyntaxKind.TypeKeyword,
+        /*name=*/ undefined,
+        factory.createNamedImports([
+          factory.createImportSpecifier(
+            /*isTypeOnly=*/ false,
+            /*propertyName=*/ undefined,
+            /*name=*/ factory.createIdentifier('JsonLdObject'),
+          ),
+          factory.createImportSpecifier(
+            /*isTypeOnly=*/ false,
+            /*propertyName=*/ undefined,
+            /*name=*/ factory.createIdentifier('IdReference'),
+          ),
+        ]),
+      ),
+      factory.createStringLiteral('schema-dts-lib'),
+    ),
+    factory.createExportDeclaration(
+      /*modifiers=*/ [],
+      /*isTypeOnly=*/ true,
+      factory.createNamedExports([
+        factory.createExportSpecifier(
+          /*isTypeOnly=*/ false,
+          /*propertyName=*/ undefined,
+          /*name=*/ factory.createIdentifier('JsonLdObject'),
+        ),
+        factory.createExportSpecifier(
+          /*isTypeOnly=*/ false,
+          /*propertyName=*/ undefined,
+          /*name=*/ factory.createIdentifier('IdReference'),
+        ),
+      ]),
+    ),
     WithContextType(context),
     GraphType(context),
     factory.createTypeAliasDeclaration(
@@ -142,12 +168,6 @@ export function HelperTypes(context: Context, {hasRole}: {hasRole: boolean}) {
           ),
         ),
       ),
-    ),
-    factory.createTypeAliasDeclaration(
-      /*modifiers=*/ [],
-      IdReferenceName,
-      /*typeParameters=*/ [],
-      factory.createTypeLiteralNode([IdPropertyNode()]),
     ),
     InputActionConstraintsType,
     OutputActionConstraintsType,
