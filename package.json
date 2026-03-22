@@ -71,6 +71,7 @@
   "type": "module",
   "workspaces": [
     "packages/schema-dts-gen",
+    "packages/schema-dts-lib",
     "packages/schema-dts"
   ]
 }

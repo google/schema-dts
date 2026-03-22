@@ -44,8 +44,10 @@ test(`baseline_${basename(import.meta.url)}`, async () => {
   );
 
   expect(actual).toMatchInlineSnapshot(`
-"/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
-export type WithContext<T extends Thing> = T & {
+"import type { JsonLdObject, IdReference } from "schema-dts-lib";
+export type { JsonLdObject, IdReference };
+/** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
+export type WithContext<T extends JsonLdObject | string> = T & {
     "@context": "https://schema.org";
 };
 export interface Graph {
@@ -53,10 +55,6 @@ export interface Graph {
     "@graph": readonly Thing[];
 }
 type SchemaValue<T> = T | readonly T[];
-type IdReference = {
-    /** IRI identifying the canonical address of this object. */
-    "@id": string;
-};
 type InputActionConstraints<T extends ActionBase> = Partial<{
     [K in Exclude<keyof T, \`@\${string}\`> as \`\${string & K}-input\`]: PropertyValueSpecification | string;
 }>;
