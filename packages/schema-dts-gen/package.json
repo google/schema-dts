@@ -11,7 +11,9 @@
     "Eyas Sharaiha <npm@eyas.sh> (https://eyas.sh/)"
   ],
   "files": [
-    "dist/src/**/*"
+    "dist/src/**/*",
+    "!*.js.map",
+    "!*.d.ts.map"
   ],
   "types": "./dist/src/index.d.ts",
   "main": "./dist/src/index.js",
