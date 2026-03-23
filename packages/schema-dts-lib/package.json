@@ -11,6 +11,7 @@
     "Eyas Sharaiha <npm@eyas.sh> (https://eyas.sh/)"
   ],
   "files": [
+    "!dist/tsconfig.tsbuildinfo",
     "dist/**/*"
   ],
   "types": "./dist/index.d.ts",
