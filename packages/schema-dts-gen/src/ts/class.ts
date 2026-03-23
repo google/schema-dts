@@ -298,7 +298,7 @@ export class Class {
     assert(baseName, 'Expect baseName to exist when leafName exists.');
 
     return factory.createInterfaceDeclaration(
-      /*modifiers=*/ [],
+      factory.createModifiersFromModifierFlags(ModifierFlags.Export),
       leafName,
       /*typeParameters=*/ [],
       /*heritage=*/ [
@@ -385,7 +385,7 @@ export class Class {
     //   ... props;
     // };
     // // Leaf:
-    // export type XyzLeaf = XyzBase & {
+    // export interface XyzLeaf extends XyzBase {
     //   '@type': 'Xyz'
     // }
     // // Complete Type ----------------------------//
@@ -496,7 +496,7 @@ export class RoleBuiltin extends Builtin {
     assert(baseName, 'Role must have Base Name.');
 
     return factory.createTypeAliasDeclaration(
-      /*modifiers=*/ [],
+      factory.createModifiersFromModifierFlags(ModifierFlags.Export),
       leafName,
       /*typeParameters=*/ [
         factory.createTypeParameterDeclaration(

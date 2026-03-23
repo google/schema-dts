@@ -41,8 +41,8 @@ test(`baseline_mixedOWL1_${basename(import.meta.url)}`, async () => {
   );
 
   expect(actual).toMatchInlineSnapshot(`
-"import type { JsonLdObject, IdReference } from "schema-dts-lib";
-export type { JsonLdObject, IdReference };
+"import type { JsonLdObject, IdReference, MergeLeafTypes } from "schema-dts-lib";
+export type { JsonLdObject, IdReference, MergeLeafTypes };
 /** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
 export type WithContext<T extends JsonLdObject | string> = T & {
     "@context": "https://schema.org";
@@ -64,7 +64,7 @@ export type WithActionConstraints<T extends ActionBase> = T & InputActionConstra
 /** Data type: Text. */
 export type Text = string;
 
-interface PersonLeaf extends ThingBase {
+export interface PersonLeaf extends ThingBase {
     "@type": "Person";
 }
 /** ABC */
@@ -73,7 +73,7 @@ export type Person = PersonLeaf | string;
 interface ThingBase extends Partial<IdReference> {
     "name"?: SchemaValue<Text>;
 }
-interface ThingLeaf extends ThingBase {
+export interface ThingLeaf extends ThingBase {
     "@type": "Thing";
 }
 /** ABC */
@@ -104,8 +104,8 @@ test(`baseline_mixedOWL2_${basename(import.meta.url)}`, async () => {
   );
 
   expect(actual).toMatchInlineSnapshot(`
-"import type { JsonLdObject, IdReference } from "schema-dts-lib";
-export type { JsonLdObject, IdReference };
+"import type { JsonLdObject, IdReference, MergeLeafTypes } from "schema-dts-lib";
+export type { JsonLdObject, IdReference, MergeLeafTypes };
 /** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
 export type WithContext<T extends JsonLdObject | string> = T & {
     "@context": "https://schema.org";
@@ -127,7 +127,7 @@ export type WithActionConstraints<T extends ActionBase> = T & InputActionConstra
 /** Data type: Text. */
 export type Text = string;
 
-interface PersonLeaf extends ThingBase {
+export interface PersonLeaf extends ThingBase {
     "@type": "Person";
 }
 /** ABC */
@@ -136,7 +136,7 @@ export type Person = PersonLeaf | string;
 interface ThingBase extends Partial<IdReference> {
     "name"?: SchemaValue<Text>;
 }
-interface ThingLeaf extends ThingBase {
+export interface ThingLeaf extends ThingBase {
     "@type": "Thing";
 }
 /** ABC */
@@ -172,8 +172,8 @@ test(`baseline_OWLenum_${basename(import.meta.url)}`, async () => {
   );
 
   expect(actual).toMatchInlineSnapshot(`
-"import type { JsonLdObject, IdReference } from "schema-dts-lib";
-export type { JsonLdObject, IdReference };
+"import type { JsonLdObject, IdReference, MergeLeafTypes } from "schema-dts-lib";
+export type { JsonLdObject, IdReference, MergeLeafTypes };
 /** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
 export type WithContext<T extends JsonLdObject | string> = T & {
     "@context": "https://schema.org";
@@ -197,12 +197,12 @@ export type Text = string;
 
 interface www_w3_org_2002_07_owl_MyEnumBase extends Partial<IdReference> {
 }
-interface www_w3_org_2002_07_owl_MyEnumLeaf extends www_w3_org_2002_07_owl_MyEnumBase {
+export interface www_w3_org_2002_07_owl_MyEnumLeaf extends www_w3_org_2002_07_owl_MyEnumBase {
     "@type": "http://www.w3.org/2002/07/owl#MyEnum";
 }
 export type www_w3_org_2002_07_owl_MyEnum = "http://www.w3.org/2002/07/owl#EnumValueA" | "https://www.w3.org/2002/07/owl#EnumValueA" | "http://www.w3.org/2002/07/owl#EnumValueB" | "https://www.w3.org/2002/07/owl#EnumValueB" | www_w3_org_2002_07_owl_MyEnumLeaf;
 
-interface PersonLeaf extends ThingBase {
+export interface PersonLeaf extends ThingBase {
     "@type": "Person";
 }
 /** ABC */
@@ -211,7 +211,7 @@ export type Person = PersonLeaf | string;
 interface ThingBase extends Partial<IdReference> {
     "name"?: SchemaValue<Text>;
 }
-interface ThingLeaf extends ThingBase {
+export interface ThingLeaf extends ThingBase {
     "@type": "Thing";
 }
 /** ABC */

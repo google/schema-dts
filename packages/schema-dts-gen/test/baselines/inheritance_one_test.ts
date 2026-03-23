@@ -42,8 +42,8 @@ test(`baseline_${basename(import.meta.url)}`, async () => {
   );
 
   expect(actual).toMatchInlineSnapshot(`
-"import type { JsonLdObject, IdReference } from "schema-dts-lib";
-export type { JsonLdObject, IdReference };
+"import type { JsonLdObject, IdReference, MergeLeafTypes } from "schema-dts-lib";
+export type { JsonLdObject, IdReference, MergeLeafTypes };
 /** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
 export type WithContext<T extends JsonLdObject | string> = T & {
     "@context": "https://schema.org";
@@ -69,7 +69,7 @@ export type Text = string;
 interface PersonLikeBase extends ThingBase {
     "height"?: SchemaValue<Number>;
 }
-interface PersonLikeLeaf extends PersonLikeBase {
+export interface PersonLikeLeaf extends PersonLikeBase {
     "@type": "PersonLike";
 }
 export type PersonLike = PersonLikeLeaf;
@@ -77,7 +77,7 @@ export type PersonLike = PersonLikeLeaf;
 interface ThingBase extends Partial<IdReference> {
     "name"?: SchemaValue<Text>;
 }
-interface ThingLeaf extends ThingBase {
+export interface ThingLeaf extends ThingBase {
     "@type": "Thing";
 }
 export type Thing = ThingLeaf | PersonLike;

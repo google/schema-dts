@@ -60,8 +60,8 @@ test(`baseline_${basename(import.meta.url)}`, async () => {
   );
 
   expect(actual).toMatchInlineSnapshot(`
-"import type { JsonLdObject, IdReference } from "schema-dts-lib";
-export type { JsonLdObject, IdReference };
+"import type { JsonLdObject, IdReference, MergeLeafTypes } from "schema-dts-lib";
+export type { JsonLdObject, IdReference, MergeLeafTypes };
 /** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
 export type WithContext<T extends JsonLdObject | string> = T & {
     "@context": "https://schema.org";
@@ -80,14 +80,14 @@ type OutputActionConstraints<T extends ActionBase> = Partial<{
 /** Provides input and output action constraints for an action. */
 export type WithActionConstraints<T extends ActionBase> = T & InputActionConstraints<T> & OutputActionConstraints<T>;
 
-interface QuantityLeaf extends ThingBase {
+export interface QuantityLeaf extends ThingBase {
     "@type": "Quantity";
 }
 export type Quantity = QuantityLeaf | string;
 
 export type Text = URL | string;
 
-interface EntryPointLeaf extends ThingBase {
+export interface EntryPointLeaf extends ThingBase {
     "@type": "EntryPoint";
 }
 export type EntryPoint = EntryPointLeaf | string;
@@ -97,7 +97,7 @@ interface OrganizationBase extends ThingBase {
     "owner"?: SchemaValue<Person | IdReference>;
     "urlTemplate"?: SchemaValue<URL>;
 }
-interface OrganizationLeaf extends OrganizationBase {
+export interface OrganizationLeaf extends OrganizationBase {
     "@type": "Organization";
 }
 export type Organization = OrganizationLeaf | string;
@@ -106,12 +106,12 @@ interface PersonBase extends ThingBase {
     "height"?: SchemaValue<Quantity | IdReference>;
     "locatedIn"?: SchemaValue<Place | IdReference>;
 }
-interface PersonLeaf extends PersonBase {
+export interface PersonLeaf extends PersonBase {
     "@type": "Person";
 }
 export type Person = PersonLeaf | string;
 
-interface PlaceLeaf extends ThingBase {
+export interface PlaceLeaf extends ThingBase {
     "@type": "Place";
 }
 export type Place = PlaceLeaf | string;
@@ -119,7 +119,7 @@ export type Place = PlaceLeaf | string;
 interface ThingBase extends Partial<IdReference> {
     "name"?: SchemaValue<Text>;
 }
-interface ThingLeaf extends ThingBase {
+export interface ThingLeaf extends ThingBase {
     "@type": "Thing";
 }
 export type Thing = ThingLeaf | EntryPoint | Organization | Person | Place | Quantity;

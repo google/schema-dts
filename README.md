@@ -57,6 +57,38 @@ const p: WithContext<Person> = {
 };
 ```
 
+### Merging multiple concrete types
+
+Some Schema.org objects can legitimately carry multiple concrete `@type` values.
+For those advanced cases, `schema-dts` exports leaf types alongside the usual
+union aliases, plus a `MergeLeafTypes` helper for combining them:
+
+```ts
+import type {
+  MergeLeafTypes,
+  ProductLeaf,
+  SoftwareApplicationLeaf,
+  WithContext,
+} from 'schema-dts';
+
+const product: WithContext<
+  MergeLeafTypes<[ProductLeaf, SoftwareApplicationLeaf]>
+> = {
+  '@context': 'https://schema.org',
+  '@type': ['Product', 'SoftwareApplication'],
+  name: 'My App',
+  offers: {
+    '@type': 'Offer',
+    price: 89,
+    priceCurrency: 'USD',
+  },
+  operatingSystem: 'Any',
+};
+```
+
+`MergeLeafTypes` expects concrete leaf types such as `ProductLeaf`, not union
+aliases such as `Product`.
+
 ### Graphs and IDs
 
 JSON-LD supports `'@graph'` objects that have richer interconnected links

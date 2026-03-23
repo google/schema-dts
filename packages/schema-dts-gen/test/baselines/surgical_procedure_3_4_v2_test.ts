@@ -49,8 +49,8 @@ test(`baseline_${basename(import.meta.url)}`, async () => {
   );
 
   expect(actual).toMatchInlineSnapshot(`
-"import type { JsonLdObject, IdReference } from "schema-dts-lib";
-export type { JsonLdObject, IdReference };
+"import type { JsonLdObject, IdReference, MergeLeafTypes } from "schema-dts-lib";
+export type { JsonLdObject, IdReference, MergeLeafTypes };
 /** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
 export type WithContext<T extends JsonLdObject | string> = T & {
     "@context": "https://schema.org";
@@ -69,32 +69,32 @@ type OutputActionConstraints<T extends ActionBase> = Partial<{
 /** Provides input and output action constraints for an action. */
 export type WithActionConstraints<T extends ActionBase> = T & InputActionConstraints<T> & OutputActionConstraints<T>;
 
-interface EnumerationLeaf extends ThingBase {
+export interface EnumerationLeaf extends ThingBase {
     "@type": "Enumeration";
 }
 export type Enumeration = EnumerationLeaf | MedicalEnumeration;
 
-interface IntangibleLeaf extends ThingBase {
+export interface IntangibleLeaf extends ThingBase {
     "@type": "Intangible";
 }
 export type Intangible = IntangibleLeaf | Enumeration;
 
-interface MedicalEnumerationLeaf extends ThingBase {
+export interface MedicalEnumerationLeaf extends ThingBase {
     "@type": "MedicalEnumeration";
 }
 export type MedicalEnumeration = MedicalEnumerationLeaf | MedicalProcedureType;
 
-interface MedicalProcedureLeaf extends ThingBase {
+export interface MedicalProcedureLeaf extends ThingBase {
     "@type": "MedicalProcedure";
 }
 export type MedicalProcedure = MedicalProcedureLeaf | SurgicalProcedure;
 
-interface MedicalProcedureTypeLeaf extends ThingBase {
+export interface MedicalProcedureTypeLeaf extends ThingBase {
     "@type": "MedicalProcedureType";
 }
 export type MedicalProcedureType = "http://schema.org/SurgicalProcedure" | "https://schema.org/SurgicalProcedure" | "SurgicalProcedure" | MedicalProcedureTypeLeaf;
 
-interface SurgicalProcedureLeaf extends ThingBase {
+export interface SurgicalProcedureLeaf extends ThingBase {
     "@type": "SurgicalProcedure";
 }
 /** A type of medical procedure that involves invasive surgical techniques. */
@@ -102,7 +102,7 @@ export type SurgicalProcedure = SurgicalProcedureLeaf;
 
 interface ThingBase extends Partial<IdReference> {
 }
-interface ThingLeaf extends ThingBase {
+export interface ThingLeaf extends ThingBase {
     "@type": "Thing";
 }
 export type Thing = ThingLeaf | Intangible | MedicalProcedure;

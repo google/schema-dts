@@ -49,8 +49,8 @@ test(`baseline_${basename(import.meta.url)}`, async () => {
   );
 
   expect(actual).toMatchInlineSnapshot(`
-"import type { JsonLdObject, IdReference } from "schema-dts-lib";
-export type { JsonLdObject, IdReference };
+"import type { JsonLdObject, IdReference, MergeLeafTypes } from "schema-dts-lib";
+export type { JsonLdObject, IdReference, MergeLeafTypes };
 /** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
 export type WithContext<T extends JsonLdObject | string> = T & {
     "@context": "https://schema.org";
@@ -69,34 +69,34 @@ type OutputActionConstraints<T extends ActionBase> = Partial<{
 /** Provides input and output action constraints for an action. */
 export type WithActionConstraints<T extends ActionBase> = T & InputActionConstraints<T> & OutputActionConstraints<T>;
 
-interface QuantityLeaf extends ThingBase {
+export interface QuantityLeaf extends ThingBase {
     "@type": "Quantity";
 }
 export type Quantity = QuantityLeaf | Distance | Duration | Energy | Mass | string;
 
 export type Text = string;
 
-interface DistanceLeaf extends ThingBase {
+export interface DistanceLeaf extends ThingBase {
     "@type": "Distance";
 }
 export type Distance = DistanceLeaf | string;
 
-interface DurationLeaf extends ThingBase {
+export interface DurationLeaf extends ThingBase {
     "@type": "Duration";
 }
 export type Duration = DurationLeaf | string;
 
-interface EnergyLeaf extends ThingBase {
+export interface EnergyLeaf extends ThingBase {
     "@type": "Energy";
 }
 export type Energy = EnergyLeaf | string;
 
-interface IntangibleLeaf extends ThingBase {
+export interface IntangibleLeaf extends ThingBase {
     "@type": "Intangible";
 }
 export type Intangible = IntangibleLeaf | Quantity;
 
-interface MassLeaf extends ThingBase {
+export interface MassLeaf extends ThingBase {
     "@type": "Mass";
 }
 export type Mass = MassLeaf | string;
@@ -104,7 +104,7 @@ export type Mass = MassLeaf | string;
 interface ThingBase extends Partial<IdReference> {
     "name"?: SchemaValue<Text>;
 }
-interface ThingLeaf extends ThingBase {
+export interface ThingLeaf extends ThingBase {
     "@type": "Thing";
 }
 export type Thing = ThingLeaf | Intangible;
