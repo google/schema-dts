@@ -25,9 +25,8 @@ type UnionToIntersection<T> = (
   ? I
   : never;
 
-type CheckLeaf<T extends LeafLike> = UnionToIntersection<T['@type']> extends never
-  ? LeafTypesError<T>
-  : T;
+type CheckLeaf<T extends LeafLike> =
+  UnionToIntersection<T['@type']> extends never ? LeafTypesError<T> : T;
 
 type OmitTypeProperty<T extends LeafLike> = T extends unknown
   ? Omit<T, '@type'>

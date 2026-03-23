@@ -82,23 +82,22 @@ import type {
   WithContext,
 } from 'schema-dts';
 
-const app: WithContext<
-  MergeLeafTypes<[ProductLeaf, SoftwareApplicationLeaf]>
-> = {
-  '@context': 'https://schema.org',
-  '@type': ['Product', 'SoftwareApplication'],
-  name: 'My App',
-  offers: {
-    '@type': 'Offer',
-    price: 89,
-    priceCurrency: 'USD',
-  },
-  operatingSystem: 'Any',
-};
+const app: WithContext<MergeLeafTypes<[ProductLeaf, SoftwareApplicationLeaf]>> =
+  {
+    '@context': 'https://schema.org',
+    '@type': ['Product', 'SoftwareApplication'],
+    name: 'My App',
+    offers: {
+      '@type': 'Offer',
+      price: 89,
+      priceCurrency: 'USD',
+    },
+    operatingSystem: 'Any',
+  };
 ```
 
-`MergeLeafTypes` is intended for concrete leaf types like `ProductLeaf`, not
-for union aliases like `Product`.
+`MergeLeafTypes` is intended for concrete leaf types like `ProductLeaf`, not for
+union aliases like `Product`.
 
 ### Graphs and IDs
 

@@ -99,7 +99,7 @@ export function HelperTypes(context: Context, {hasRole}: {hasRole: boolean}) {
     factory.createImportDeclaration(
       /*modifiers=*/ [],
       factory.createImportClause(
-        /*isTypeOnly=*/ true,
+        SyntaxKind.TypeKeyword,
         /*name=*/ undefined,
         factory.createNamedImports([
           factory.createImportSpecifier(
