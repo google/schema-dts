@@ -66,6 +66,15 @@ export async function WriteDeclarations(
       classes.get('http://schema.org/Role') ||
       classes.get('https://schema.org/Role')
     ),
+    // The action-constraint helpers reference ActionBase and
+    // PropertyValueSpecification, so only emit them when the ontology
+    // actually defines those classes.
+    hasAction: !!(
+      (classes.get('http://schema.org/Action') ||
+        classes.get('https://schema.org/Action')) &&
+      (classes.get('http://schema.org/PropertyValueSpecification') ||
+        classes.get('https://schema.org/PropertyValueSpecification'))
+    ),
     skipDeprecatedProperties: !includeDeprecated,
   };
 
