@@ -89,6 +89,31 @@ const product: WithContext<
 `MergeLeafTypes` expects concrete leaf types such as `ProductLeaf`, not union
 aliases such as `Product`.
 
+### Implementing schema types in a class
+
+Every Schema.org type is exported twice: as a union alias (e.g. `Person`, which
+also spans its subtypes plus an id-reference `string`) and as a concrete "leaf"
+interface (e.g. `PersonLeaf`) describing exactly one `@type`. Because the leaf
+interface is a plain object type, you can `implements` it from a class, which
+the union alias does not allow:
+
+```ts
+import type {PersonLeaf} from 'schema-dts';
+
+class Employee implements PersonLeaf {
+  readonly '@type' = 'Person';
+  name: string;
+
+  constructor(name: string) {
+    this.name = name;
+  }
+}
+```
+
+Reach for the leaf interface (`PersonLeaf`) instead of the union alias
+(`Person`) whenever you need a single, concrete object shape to implement or
+extend.
+
 ### Graphs and IDs
 
 JSON-LD supports `'@graph'` objects that have richer interconnected links
