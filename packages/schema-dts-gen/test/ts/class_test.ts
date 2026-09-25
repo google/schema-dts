@@ -237,6 +237,31 @@ export type Person = PersonLeaf;"
         cls.toNode(ctx, {skipDeprecatedProperties: true, hasRole: false}),
       ).toThrow('unknown node type');
     });
+
+    it('escapes comment closing delimiters', () => {
+      const ctx = new Context();
+      ctx.setUrlContext('https://schema.org/');
+      addParent(cls, 'https://schema.org/Thing');
+
+      expect(
+        cls.add(
+          new Quad(
+            null!,
+            comment(),
+            new Literal('"Docs */ export const PWNED = 1; //"'),
+          ),
+          new Map(),
+        ),
+      ).toBe(true);
+
+      expect(asString(cls, ctx)).toMatchInlineSnapshot(`
+"export interface PersonLeaf extends ThingBase {
+    "@type": "Person";
+}
+/** Docs *\\/ export const PWNED = 1; // */
+export type Person = PersonLeaf;"
+`);
+    });
   });
 
   describe('property sorting', () => {

@@ -91,7 +91,11 @@ function parseComment(comment: string): string {
     parent: undefined,
   });
 
-  const lines = context.result.join('').trim().split('\n');
+  const lines = context.result
+    .join('')
+    .replace(/\*\//g, '*\\/')
+    .trim()
+    .split('\n');
 
   // Hack to get JSDOCs working. Microsoft does not expose JSDOC-creation API.
   return lines.length === 1
