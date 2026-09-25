@@ -36,11 +36,15 @@ test(`baseline_${basename(import.meta.url)}`, async () => {
 <http://schema.org/name4> <http://schema.org/rangeIncludes> <http://schema.org/Text> .
 <http://schema.org/name4> <http://schema.org/domainIncludes> <http://schema.org/Thing> .
 <http://schema.org/name4> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
+<http://schema.org/name5> <http://schema.org/rangeIncludes> <http://schema.org/Text> .
+<http://schema.org/name5> <http://schema.org/domainIncludes> <http://schema.org/Thing> .
+<http://schema.org/name5> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
 <http://schema.org/Thing> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
 <http://schema.org/name> <http://www.w3.org/2000/01/rdf-schema#comment> "Names are great!  <a href=\\"X\\">Y</a>" .
 <http://schema.org/name2> <http://www.w3.org/2000/01/rdf-schema#comment> "Names are great!\\n [Y](X)" .
 <http://schema.org/name3> <http://www.w3.org/2000/01/rdf-schema#comment> "[[Link]]s [[URL|Aliased]]" .
 <http://schema.org/name4> <http://www.w3.org/2000/01/rdf-schema#comment> "\\n    Some code block\\n\\nText." .
+<http://schema.org/name5> <http://www.w3.org/2000/01/rdf-schema#comment> "Closing comment */ in text and <a href=\\"https://example.com/*/path\\">link</a>." .
 <http://schema.org/Thing> <http://www.w3.org/2000/01/rdf-schema#comment> "Things are amazing!\\n\\n<br/><br /><ul><li>Foo</li><li>Bar</li><li><em>Baz</em>, and <strong>Bat</strong></li><ul>" .
 <http://schema.org/knows> <http://www.w3.org/2000/01/rdf-schema#comment> "Reminds me of this quote:\\n\\n<br /><code>Foo\\nBar</code>\\n\\n<br/><br/><pre>Hey!</pre> this." .
 <http://schema.org/knows> <http://schema.org/rangeIncludes> <http://schema.org/Text> .
@@ -131,6 +135,8 @@ interface ThingBase extends Partial<IdReference> {
      * Text.
      */
     "name4"?: SchemaValue<Text>;
+    /** Closing comment *\\/ in text and {@link https://example.com/*\\/path link}. */
+    "name5"?: SchemaValue<Text>;
     /**
      * The general opening hours for a business. Opening hours can be specified as a weekly time range, starting with days, then times per day. Multiple days can be listed with commas ',' separating each day. Day or time ranges are specified using a hyphen '-'.
      * - Days are specified using the following two-letter combinations: \`Mo\`, \`Tu\`, \`We\`, \`Th\`, \`Fr\`, \`Sa\`, \`Su\`.
