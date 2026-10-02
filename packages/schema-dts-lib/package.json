@@ -1,6 +1,6 @@
 {
   "name": "schema-dts-lib",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "displayName": "schema-dts Library",
   "description": "Library for JSON-LD vocabularies",
   "author": "Eyas Sharaiha <eyas@google.com> (https://eyas.sh/)",
@@ -24,9 +24,6 @@
     "node": ">=14.0.0"
   },
   "engineStrict": true,
-  "peerDependencies": {
-    "typescript": ">=4.9.5"
-  },
   "nyc": {
     "extension": [
       ".ts",
