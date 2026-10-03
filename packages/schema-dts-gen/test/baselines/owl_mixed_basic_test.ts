@@ -44,7 +44,7 @@ test(`baseline_mixedOWL1_${basename(import.meta.url)}`, async () => {
 "import type { JsonLdObject, IdReference, MergeLeafTypes } from "schema-dts-lib";
 export type { JsonLdObject, IdReference, MergeLeafTypes };
 /** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
-export type WithContext<T extends JsonLdObject | string> = T & {
+export type WithContext<T extends JsonLdObject | string> = Exclude<T, string> & {
     "@context": "https://schema.org";
 };
 export interface Graph {
@@ -107,7 +107,7 @@ test(`baseline_mixedOWL2_${basename(import.meta.url)}`, async () => {
 "import type { JsonLdObject, IdReference, MergeLeafTypes } from "schema-dts-lib";
 export type { JsonLdObject, IdReference, MergeLeafTypes };
 /** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
-export type WithContext<T extends JsonLdObject | string> = T & {
+export type WithContext<T extends JsonLdObject | string> = Exclude<T, string> & {
     "@context": "https://schema.org";
 };
 export interface Graph {
@@ -175,7 +175,7 @@ test(`baseline_OWLenum_${basename(import.meta.url)}`, async () => {
 "import type { JsonLdObject, IdReference, MergeLeafTypes } from "schema-dts-lib";
 export type { JsonLdObject, IdReference, MergeLeafTypes };
 /** Used at the top-level node to indicate the context for the JSON-LD objects used. The context provided in this type is compatible with the keys and URLs in the rest of this generated file. */
-export type WithContext<T extends JsonLdObject | string> = T & {
+export type WithContext<T extends JsonLdObject | string> = Exclude<T, string> & {
     "@context": "https://schema.org";
 };
 export interface Graph {

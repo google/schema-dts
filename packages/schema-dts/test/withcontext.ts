@@ -21,3 +21,9 @@ const _5: WithContext<Thing> = {
   '@context': 'https://google.com',
   '@type': 'Thing',
 };
+
+// #98: every schema type is a union with `string`, but WithContext is only ever
+// applied to a top-level object. WithContext must strip those `string` members,
+// otherwise the result carries a meaningless `string & {"@context"}` branch.
+type HasNoStringMember<T> = [Extract<T, string>] extends [never] ? true : false;
+const _noStringBranch: HasNoStringMember<WithContext<Thing>> = true;

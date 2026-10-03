@@ -14,7 +14,7 @@ import {withComments} from './util/comments.js';
 import {typeUnion} from './util/union.js';
 
 function WithContextType(context: Context) {
-  // export interface WithContext<T extends JsonLdObject | string> extends Exclude<T, string> { "@context": TYPE_NODE }
+  // export type WithContext<T extends JsonLdObject | string> = Exclude<T, string> & { "@context": TYPE_NODE }
   return withComments(
     'Used at the top-level node to indicate the context for the JSON-LD ' +
       'objects used. The context provided in this type is compatible ' +
@@ -36,7 +36,14 @@ function WithContextType(context: Context) {
         ),
       ],
       factory.createIntersectionTypeNode([
-        factory.createTypeReferenceNode('T', /*typeArguments=*/ undefined),
+        // Strip `string` (and any other non-object members) out of T. Every
+        // schema type is a union with `string`, but WithContext is only ever
+        // applied to a top-level object, so a `string & {"@context"}` branch
+        // would be meaningless (see #98).
+        factory.createTypeReferenceNode('Exclude', [
+          factory.createTypeReferenceNode('T', /*typeArguments=*/ undefined),
+          factory.createKeywordTypeNode(SyntaxKind.StringKeyword),
+        ]),
         factory.createTypeLiteralNode([context.contextProperty()]),
       ]),
     ),
