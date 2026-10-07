@@ -57,6 +57,22 @@ const p: WithContext<Person> = {
 };
 ```
 
+### Reusing a property's type
+
+Every Schema.org type is also exported as a concrete "leaf" interface (e.g.
+`OrganizationLeaf`) alongside its union alias (`Organization`). Indexing the
+union alias to grab a single property's type fails, because the alias also
+includes an id-reference `string` that has no properties. Index the leaf
+interface instead:
+
+```ts
+import type {OrganizationLeaf} from 'schema-dts';
+
+// Previously required Exclude<Organization, string>['image'].
+type OrgImage = OrganizationLeaf['image'];
+type OrgLogo = OrganizationLeaf['logo'];
+```
+
 ### Merging multiple concrete types
 
 Some Schema.org objects can legitimately carry multiple concrete `@type` values.
