@@ -66,7 +66,8 @@
     "fix": "npm run fix:eslint && npm run fix:prettier",
     "test": "npm run lint && npm run test --workspaces",
     "coverage_on_travis": "npm run coverage_on_travis -w schema-dts-gen",
-    "pkg": "npm run clean && npm run build"
+    "pkg": "npm run clean && npm run build",
+    "release:exit-gate": "./scripts/publish-exit-gate.sh"
   },
   "type": "module",
   "workspaces": [

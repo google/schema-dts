@@ -63,5 +63,9 @@
     "lint:eslint": "eslint *.ts",
     "test": "echo 'No tests yet'",
     "build": "tsc -b"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://us-npm.pkg.dev/oss-exit-gate-prod/schema-dts--npm/"
   }
 }
