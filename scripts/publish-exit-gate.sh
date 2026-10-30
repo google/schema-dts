@@ -4,7 +4,10 @@ set -euo pipefail
 AR_REGISTRY="https://us-npm.pkg.dev/oss-exit-gate-prod/schema-dts--npm/"
 GCS_MANIFEST_DIR="gs://oss-exit-gate-prod-projects-bucket/schema-dts/npm/manifests"
 
-npx --yes google-artifactregistry-auth --repo-config=.npmrc --credential-config="$HOME/.npmrc"
+TMP_NPMRC="$(mktemp)"
+printf 'registry=%s\n//us-npm.pkg.dev/oss-exit-gate-prod/schema-dts--npm/:always-auth=true\n' "${AR_REGISTRY}" > "${TMP_NPMRC}"
+npx --yes google-artifactregistry-auth --repo-config="${TMP_NPMRC}" --credential-config="$HOME/.npmrc"
+rm -f "${TMP_NPMRC}"
 
 npm run pkg
 npm test
