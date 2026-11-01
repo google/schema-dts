@@ -54,5 +54,9 @@
     "build": "npm run build:generate && npm run build:compile",
     "test": "npm run build && tsc -p test/"
   },
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://us-npm.pkg.dev/oss-exit-gate-prod/schema-dts--npm/"
+  }
 }
