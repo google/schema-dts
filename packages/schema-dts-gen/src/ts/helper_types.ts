@@ -94,7 +94,10 @@ export function SchemaValueReference(
   );
 }
 
-export function HelperTypes(context: Context, {hasRole}: {hasRole: boolean}) {
+export function HelperTypes(
+  context: Context,
+  {hasRole, hasAction}: {hasRole: boolean; hasAction: boolean},
+) {
   return [
     factory.createImportDeclaration(
       /*modifiers=*/ [],
@@ -180,8 +183,8 @@ export function HelperTypes(context: Context, {hasRole}: {hasRole: boolean}) {
         ),
       ),
     ),
-    InputActionConstraintsType,
-    OutputActionConstraintsType,
-    WithActionConstraintsType,
+    ...(hasAction
+      ? [InputActionConstraintsType, OutputActionConstraintsType, WithActionConstraintsType]
+      : []),
   ];
 }

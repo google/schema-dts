@@ -85,14 +85,6 @@ export interface Graph {
     "@graph": readonly Thing[];
 }
 type SchemaValue<T> = T | readonly T[];
-type InputActionConstraints<T extends ActionBase> = Partial<{
-    [K in Exclude<keyof T, \`@\${string}\`> as \`\${string & K}-input\`]: PropertyValueSpecification | string;
-}>;
-type OutputActionConstraints<T extends ActionBase> = Partial<{
-    [K in Exclude<keyof T, \`@\${string}\`> as \`\${string & K}-output\`]: PropertyValueSpecification | string;
-}>;
-/** Provides input and output action constraints for an action. */
-export type WithActionConstraints<T extends ActionBase> = T & InputActionConstraints<T> & OutputActionConstraints<T>;
 
 export interface DiagnosticProcedureLeaf extends ThingBase {
     "@type": "DiagnosticProcedure";
